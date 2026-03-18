@@ -549,7 +549,7 @@ const HomeScreen: React.FC = () => {
                 onChange={e => setAddFriendId(e.target.value)}
                 autoFocus
               />
-              <button className="pill-btn active !rounded-lg !px-2 !py-1 !text-[9px]">
+              <button className="pill-btn active !px-2 !py-1 !text-[9px]">
                 SEND
               </button>
             </div>

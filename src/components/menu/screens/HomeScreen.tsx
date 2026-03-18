@@ -339,7 +339,7 @@ const HomeScreen: React.FC = () => {
           </div>
         )}
         {room.isCreator && room.mode !== 'ffa' && (
-          <button className="pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5" onClick={room.randomizeTeams}>
+          <button className="pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5" onClick={room.randomizeTeams}>
             <Shuffle className="w-2.5 h-2.5" /> RANDOMIZE
           </button>
         )}

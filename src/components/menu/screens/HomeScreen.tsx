@@ -99,6 +99,9 @@ const HomeScreen: React.FC = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  /* Join confirmation for party members */
+  const [joinConfirm, setJoinConfirm] = useState<'friend' | 'room' | null>(null);
+
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
 

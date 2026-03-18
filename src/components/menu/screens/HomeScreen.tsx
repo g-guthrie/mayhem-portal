@@ -141,6 +141,7 @@ const HomeScreen: React.FC = () => {
   /* ─── Play Card ─── */
   const PlayCard = (
     <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2">
+      <span className="section-label !mb-0">GAME MODE</span>
       <div id="play-mode-toolbar" className="flex items-center gap-2">
         <button
           id="primary-launch-btn"

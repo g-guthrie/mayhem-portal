@@ -743,7 +743,12 @@ const HomeScreen: React.FC = () => {
           )}
 
           <div id="social-friends-list" className="flex flex-col gap-0.5 max-h-[200px] overflow-y-auto">
-            {friends.map(f => (
+          {friends.length === 0 && (
+            <div className="text-center py-4 text-muted-foreground font-orbitron text-[9px] tracking-wider">
+              NO FRIENDS YET — ADD SOMEONE!
+            </div>
+          )}
+          {friends.map(f => (
               <div
                 key={f.name}
                 className={`flex items-center px-2 py-1.5 rounded-lg transition-colors cursor-pointer group ${

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Settings, LogOut, X, AlertTriangle, Send } from 'lucide-react';
 import { useRoom } from '@/hooks/useRoom';
+import { useMenuNav } from '@/hooks/useMenuNav';
 
 const PauseMenu: React.FC = () => {
   const { togglePause, invitePlayer, leaveRoom, isPaused, matchStats } = useRoom();
+  const menuNav = useMenuNav();
   const [view, setView] = useState<'main' | 'settings' | 'confirm-leave'>('main');
   const [inviteInput, setInviteInput] = useState('');
 
@@ -83,7 +85,7 @@ const PauseMenu: React.FC = () => {
               </button>
               <button
                 className="pill-btn !rounded-xl flex-1 justify-center !py-2.5 !text-[9px] text-destructive border-destructive/30 hover:bg-destructive/10"
-                onClick={leaveRoom}
+                onClick={() => { leaveRoom(); menuNav.reset(); }}
               >
                 LEAVE
               </button>

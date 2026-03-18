@@ -2,8 +2,14 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import { toast } from '@/hooks/use-toast';
 
 /* ─── Constants ─── */
-export const MAX_PLAYERS = 8;
+export const MAX_PLAYERS = 16;
 const DISCONNECT_GRACE_MS = 60_000;
+
+export interface MatchStats {
+  kills: number;
+  deaths: number;
+  assists: number;
+}
 
 /* ─── Types ─── */
 export interface RoomPlayer {

@@ -554,7 +554,7 @@ const HomeScreen: React.FC = () => {
                 <span className="hidden sm:inline">ADD</span>
               </button>
               <button
-                className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 ${removeMode ? 'text-destructive border-destructive/50 bg-destructive/10' : 'text-destructive border-destructive/30 hover:bg-destructive/10'}`}
+                className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 ${removeMode ? 'active' : ''}`}
                 onClick={() => { setRemoveMode(!removeMode); setConfirmingFriend(null); }}
                 title="Remove Friend"
               >

@@ -72,9 +72,18 @@ const HomeScreen: React.FC = () => {
   const [friendId, setFriendId] = useState('');
   const [roomCodeInput, setRoomCodeInput] = useState('');
 
-  /* Add friend */
+  /* Add/remove friend */
   const [addFriendOpen, setAddFriendOpen] = useState(false);
   const [addFriendId, setAddFriendId] = useState('');
+  const [friends, setFriends] = useState<FakeFriend[]>(INITIAL_FRIENDS);
+  const [removeMode, setRemoveMode] = useState(false);
+  const [confirmingFriend, setConfirmingFriend] = useState<string | null>(null);
+
+  const removeFriend = (name: string) => {
+    setFriends(prev => prev.filter(f => f.name !== name));
+    setConfirmingFriend(null);
+    if (friends.length <= 1) setRemoveMode(false);
+  };
 
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');

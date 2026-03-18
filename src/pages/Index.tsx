@@ -57,8 +57,10 @@ const Index: React.FC = () => {
             </div>
           </main>
         </div>
+        <MatchOverlay />
       </div>
     </MenuNavProvider>
+    </RoomProvider>
     </AuthProvider>
   );
 };

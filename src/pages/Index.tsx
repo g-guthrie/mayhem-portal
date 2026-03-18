@@ -11,6 +11,8 @@ import MatchOverlay from '@/components/menu/MatchOverlay';
 const Index: React.FC = () => {
   return (
     <AuthProvider>
+    <RoomProvider>
+    <MenuNavProvider>
     <MenuNavProvider>
       <div
         id="overlay"

@@ -455,7 +455,7 @@ const HomeScreen: React.FC = () => {
           className="launch-btn flex-1 !py-2 !text-[9px] gap-1"
           onClick={room.startMatch}
         >
-          <Play className="w-3 h-3" /> {room.isCreator ? 'START MATCH' : 'READY UP'}
+          <Play className="w-3 h-3" /> {room.isCreator ? 'START PRIVATE MATCH' : 'READY UP'}
         </button>
       </div>
     </div>

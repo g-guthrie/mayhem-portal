@@ -266,6 +266,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsPaused(false);
     setMatchResult(null);
     if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
+    if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
   }, [isCreator, players]);
 
   /* ─── Kick player (also used for mock disconnect) ─── */

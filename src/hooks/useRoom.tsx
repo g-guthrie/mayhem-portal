@@ -114,6 +114,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isPaused, setIsPaused] = useState(false);
   const disconnectTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
   const matchTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   /* ─── Auto-end match after duration ─── */
   useEffect(() => {
@@ -220,27 +221,41 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   /* ─── Leave room with leadership transfer ─── */
   const leaveRoom = useCallback(() => {
-    setPlayers(prev => {
-      if (prev.length > 1 && isCreator) {
-        // Transfer leadership to next non-creator player
-        const remaining = prev.filter(p => !p.isCreator);
-        if (remaining.length > 0) {
-          remaining[0] = { ...remaining[0], isCreator: true };
-          // Update teams to reflect new creator
-          setTeams(t => {
-            const updated: Record<number, RoomPlayer[]> = {};
-            Object.keys(t).forEach(k => {
-              updated[Number(k)] = t[Number(k)]
-                .filter(pl => pl.id !== prev.find(p => p.isCreator)?.id)
-                .map(pl => pl.id === remaining[0].id ? { ...pl, isCreator: true } : pl);
-            });
-            return updated;
+    const currentPlayers = players;
+    const leavingCreator = isCreator;
+
+    if (currentPlayers.length > 1 && leavingCreator) {
+      // Transfer leadership: remove self, promote next player
+      const creatorId = currentPlayers.find(p => p.isCreator)?.id;
+      const remaining = currentPlayers.filter(p => !p.isCreator);
+      if (remaining.length > 0) {
+        remaining[0] = { ...remaining[0], isCreator: true };
+        const newCreatorId = remaining[0].id;
+        setPlayers(remaining);
+        setTeams(t => {
+          const updated: Record<number, RoomPlayer[]> = {};
+          Object.keys(t).forEach(k => {
+            updated[Number(k)] = t[Number(k)]
+              .filter(pl => pl.id !== creatorId)
+              .map(pl => pl.id === newCreatorId ? { ...pl, isCreator: true } : pl);
           });
-          return remaining;
-        }
+          return updated;
+        });
+        // Only reset local user state, room persists for others
+        setIsInRoom(false);
+        setIsCreator(false);
+        setSelectedPlayer(null);
+        setIsPaused(false);
+        setMatchResult(null);
+        setMatchState('idle');
+        if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
+        if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
+        return;
       }
-      return [];
-    });
+    }
+
+    // Last player or non-creator: dissolve room entirely
+    setPlayers([]);
     setIsInRoom(false);
     setRoomCode('');
     setTeams({});
@@ -251,7 +266,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsPaused(false);
     setMatchResult(null);
     if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
-  }, [isCreator]);
+    if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
+  }, [isCreator, players]);
 
   /* ─── Kick player (also used for mock disconnect) ─── */
   const kickPlayer = useCallback((playerId: string) => {
@@ -414,12 +430,15 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
     } else if (matchState === 'ready-check') {
+      // Guard: clear any existing countdown
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
       setMatchState('countdown');
       setCountdownValue(3);
-      const interval = setInterval(() => {
+      countdownIntervalRef.current = setInterval(() => {
         setCountdownValue(prev => {
           if (prev <= 1) {
-            clearInterval(interval);
+            if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
             setTimeout(() => setMatchState('in-match'), 500);
             return 0;
           }
@@ -452,6 +471,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setReadyPlayers(new Set());
     setIsPaused(false);
     if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
+    if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
   }, []);
 
   const returnToMenu = useCallback(() => {

@@ -2,6 +2,7 @@ import React from 'react';
 import { Settings, ChevronLeft, Copy, LogIn, User } from 'lucide-react';
 import { useMenuNav, type MenuScreen } from '@/hooks/useMenuNav';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from '@/hooks/use-toast';
 
 const SCREEN_TITLES: Record<MenuScreen, string> = {
   home: 'MAYHEM',

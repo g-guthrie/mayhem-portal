@@ -285,7 +285,7 @@ const HomeScreen: React.FC = () => {
               <button
                 key={mode.id}
                 id={`private-room-mode-${mode.id}-btn`}
-                className={`pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.mode === mode.id ? 'active' : ''}`}
+                className={`pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.mode === mode.id ? 'active' : ''}`}
                 onClick={() => room.setMode(mode.id)}
               >
                 {mode.icon} {mode.label}

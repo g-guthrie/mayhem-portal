@@ -2,6 +2,7 @@ import React from 'react';
 import { Settings, ChevronLeft, Copy, LogIn, User } from 'lucide-react';
 import { useMenuNav, type MenuScreen } from '@/hooks/useMenuNav';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from '@/hooks/use-toast';
 
 const SCREEN_TITLES: Record<MenuScreen, string> = {
   home: 'MAYHEM',
@@ -39,10 +40,32 @@ const MenuHeader: React.FC<MenuHeaderProps> = () => {
             {SCREEN_TITLES[current]}
           </span>
           {current === 'home' && (
-            <div id="menu-party-id-btn" className="pill-btn gap-1.5 cursor-pointer group ml-2">
-              <span id="menu-party-id-label" className="text-muted-foreground group-hover:text-foreground transition-colors text-[10px]">PLAYER ID</span>
+            <div
+              id="menu-party-id-btn"
+              className="pill-btn gap-1.5 cursor-pointer group ml-2"
+              onClick={() => {
+                if (isLoggedIn) {
+                  push('auth');
+                } else {
+                  navigator.clipboard.writeText(actorId);
+                  toast({ title: 'Copied to clipboard', description: actorId });
+                }
+              }}
+            >
+              <span id="menu-party-id-label" className="text-muted-foreground group-hover:text-foreground transition-colors text-[10px]">
+                {isLoggedIn ? displayName : 'PLAYER ID'}
+              </span>
               <span id="menu-party-id-value" className="text-primary font-bold text-[10px] font-mono">{actorId.slice(0, 12)}</span>
-              <Copy className="w-2.5 h-2.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+              <button
+                className="opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigator.clipboard.writeText(actorId);
+                  toast({ title: 'Copied to clipboard', description: actorId });
+                }}
+              >
+                <Copy className="w-2.5 h-2.5 text-muted-foreground hover:text-foreground" />
+              </button>
             </div>
           )}
         </div>

@@ -334,7 +334,7 @@ const HomeScreen: React.FC = () => {
           </button>
         )}
         {!room.isCreator && room.isLocked && (
-          <div className="pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 opacity-60 cursor-default">
+          <div className="pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 opacity-60 cursor-default">
             <Lock className="w-2.5 h-2.5" /> ROOM LOCKED
           </div>
         )}

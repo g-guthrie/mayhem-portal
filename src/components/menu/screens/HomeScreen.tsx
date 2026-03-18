@@ -721,7 +721,15 @@ const HomeScreen: React.FC = () => {
                 onChange={e => setAddFriendId(e.target.value)}
                 autoFocus
               />
-              <button className="pill-btn active !px-2 !py-1 !text-[9px]">
+              <button
+                className="pill-btn active !px-2 !py-1 !text-[9px]"
+                onClick={() => {
+                  if (!addFriendId.trim()) return;
+                  toast({ title: 'Friend request sent', description: `Sent to ${addFriendId}` });
+                  setAddFriendId('');
+                  setAddFriendOpen(false);
+                }}
+              >
                 SEND
               </button>
             </div>

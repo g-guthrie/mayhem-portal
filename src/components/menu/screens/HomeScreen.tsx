@@ -105,6 +105,7 @@ const HomeScreen: React.FC = () => {
   /* Party state */
   const [partyMembers, setPartyMembers] = useState<{ name: string; isLeader: boolean }[]>([
     { name: displayName, isLeader: true },
+    { name: 'xVortex', isLeader: false },
   ]);
 
   const transferLeader = (name: string) => {

@@ -428,12 +428,15 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
     } else if (matchState === 'ready-check') {
+      // Guard: clear any existing countdown
+      if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
       setMatchState('countdown');
       setCountdownValue(3);
-      const interval = setInterval(() => {
+      countdownIntervalRef.current = setInterval(() => {
         setCountdownValue(prev => {
           if (prev <= 1) {
-            clearInterval(interval);
+            if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
+            countdownIntervalRef.current = null;
             setTimeout(() => setMatchState('in-match'), 500);
             return 0;
           }

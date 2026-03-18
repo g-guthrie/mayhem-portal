@@ -2,8 +2,14 @@ import React, { createContext, useContext, useState, useCallback, useEffect, use
 import { toast } from '@/hooks/use-toast';
 
 /* ─── Constants ─── */
-export const MAX_PLAYERS = 8;
+export const MAX_PLAYERS = 16;
 const DISCONNECT_GRACE_MS = 60_000;
+
+export interface MatchStats {
+  kills: number;
+  deaths: number;
+  assists: number;
+}
 
 /* ─── Types ─── */
 export interface RoomPlayer {
@@ -37,6 +43,7 @@ interface RoomState {
   readyPlayers: Set<string>;
   disconnectedPlayers: Map<string, DisconnectedPlayer>;
   isPaused: boolean;
+  matchStats: MatchStats;
 
   // Actions
   createRoom: (creatorName: string, creatorId: string) => void;
@@ -90,6 +97,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [matchState, setMatchState] = useState<'idle' | 'ready-check' | 'countdown' | 'in-match'>('idle');
   const [countdownValue, setCountdownValue] = useState(3);
   const [readyPlayers, setReadyPlayers] = useState<Set<string>>(new Set());
+  const [matchStats] = useState<MatchStats>({ kills: 7, deaths: 3, assists: 4 });
   const [disconnectedPlayers, setDisconnectedPlayers] = useState<Map<string, DisconnectedPlayer>>(new Map());
   const [isPaused, setIsPaused] = useState(false);
   const disconnectTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
@@ -437,7 +445,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <RoomContext.Provider value={{
       isInRoom, roomCode, mode, teamCount, isLocked, isCreator, players, teams,
       selectedPlayer, pendingInvites, matchState, countdownValue, readyPlayers,
-      disconnectedPlayers, isPaused,
+      disconnectedPlayers, isPaused, matchStats,
       createRoom, joinRoom, leaveRoom, setMode, setTeamCount, toggleLock,
       inviteParty, invitePlayer, selectPlayer, assignToTeam, movePlayer,
       randomizeTeams, startMatch, toggleReady, acceptInvite, dismissInvite, addMockInvite,

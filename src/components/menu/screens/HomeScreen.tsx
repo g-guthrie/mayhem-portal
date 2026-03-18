@@ -255,7 +255,16 @@ const HomeScreen: React.FC = () => {
             value={friendId}
             onChange={e => setFriendId(e.target.value)}
           />
-          <button id="invite-friend-btn" className="pill-btn active !px-2 !py-1.5" title="Invite">
+          <button
+            id="invite-friend-btn"
+            className="pill-btn active !px-2 !py-1.5"
+            title="Invite"
+            onClick={() => {
+              if (!friendId.trim()) return;
+              toast({ title: 'Invite sent', description: `Invited ${friendId} to your party` });
+              setFriendId('');
+            }}
+          >
             <UserPlus className="w-3 h-3" />
           </button>
           <button
@@ -390,7 +399,19 @@ const HomeScreen: React.FC = () => {
         <div className="flex items-center gap-1.5">
           <div id="room-share-panel" className="flex items-center gap-1.5">
             <span id="room-share-code" className="font-orbitron text-xs font-bold text-primary tracking-wider">{room.roomCode}</span>
-            <button id="copy-room-code-btn" className="pill-btn !px-1.5 !py-1" title="Copy">
+            <button
+              id="copy-room-code-btn"
+              className="pill-btn !px-1.5 !py-1"
+              title="Copy"
+              onClick={() => {
+                try {
+                  navigator.clipboard.writeText(room.roomCode);
+                  toast({ title: 'Copied room code', description: room.roomCode });
+                } catch {
+                  toast({ title: 'Failed to copy', variant: 'destructive' });
+                }
+              }}
+            >
               <Copy className="w-2.5 h-2.5" />
             </button>
           </div>
@@ -615,6 +636,10 @@ const HomeScreen: React.FC = () => {
             <button
               id="party-hero-leave-btn"
               className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
+              onClick={() => {
+                setPartyMembers([{ name: displayName, isLeader: true }]);
+                toast({ title: 'Left party' });
+              }}
             >
               <LogOut className="w-2.5 h-2.5" />
               <span className="hidden sm:inline">LEAVE</span>
@@ -633,13 +658,23 @@ const HomeScreen: React.FC = () => {
                     <button
                       className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
                       title="Make Leader"
-                      onClick={() => transferLeader(m.name)}
+                      onClick={() => {
+                        transferLeader(m.name);
+                        toast({ title: `${m.name} is now party leader` });
+                      }}
                     >
                       <Crown className="w-2.5 h-2.5 text-primary" />
                     </button>
                   )}
                   {!m.isLeader && (
-                    <button className="pill-btn !px-1.5 !py-0.5 text-[8px]" title="Remove">
+                    <button
+                      className="pill-btn !px-1.5 !py-0.5 text-[8px]"
+                      title="Remove"
+                      onClick={() => {
+                        setPartyMembers(prev => prev.filter(p => p.name !== m.name));
+                        toast({ title: `Kicked ${m.name}`, description: 'Removed from party' });
+                      }}
+                    >
                       <UserMinus className="w-2.5 h-2.5" />
                     </button>
                   )}
@@ -686,7 +721,15 @@ const HomeScreen: React.FC = () => {
                 onChange={e => setAddFriendId(e.target.value)}
                 autoFocus
               />
-              <button className="pill-btn active !px-2 !py-1 !text-[9px]">
+              <button
+                className="pill-btn active !px-2 !py-1 !text-[9px]"
+                onClick={() => {
+                  if (!addFriendId.trim()) return;
+                  toast({ title: 'Friend request sent', description: `Sent to ${addFriendId}` });
+                  setAddFriendId('');
+                  setAddFriendOpen(false);
+                }}
+              >
                 SEND
               </button>
             </div>
@@ -731,7 +774,18 @@ const HomeScreen: React.FC = () => {
                     <>
                       {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider ml-1">IN GAME</span>}
                       {!removeMode && (
-                        <button className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity ml-1" title="Invite to party">
+                        <button
+                          className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity ml-1"
+                          title="Invite to party"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPartyMembers(prev => {
+                              if (prev.find(m => m.name === f.name)) return prev;
+                              return [...prev, { name: f.name, isLeader: false }];
+                            });
+                            toast({ title: `${f.name} joined your party` });
+                          }}
+                        >
                           <UserPlus className="w-2.5 h-2.5" />
                         </button>
                       )}

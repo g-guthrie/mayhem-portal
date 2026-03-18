@@ -25,7 +25,7 @@ const Index: React.FC = () => {
         <div id="menu-stage" className="w-full h-full flex items-center justify-center relative z-10">
           <main
             id="menu-shell"
-            className="menu-shell-v4 glass-surface w-full max-w-[960px] h-full max-h-[740px] flex flex-col overflow-hidden relative"
+            className="menu-shell-v4 glass-surface w-full max-w-[960px] max-h-full flex flex-col overflow-hidden relative"
             style={{ borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-lift)' }}
           >
             <div id="menu-surface" className="flex flex-col h-full overflow-hidden">

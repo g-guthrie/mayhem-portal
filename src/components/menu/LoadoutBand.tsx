@@ -122,14 +122,14 @@ const LoadoutBand: React.FC = () => {
                     className={`slot-btn flex-1 ${weaponSlot === 0 ? 'active' : ''}`}
                     onClick={() => setWeaponSlot(0)}
                   >
-                    P1
+                    SLOT 1
                   </button>
                   <button
                     id="weapon-slot-secondary"
                     className={`slot-btn flex-1 ${weaponSlot === 1 ? 'active' : ''}`}
                     onClick={() => setWeaponSlot(1)}
                   >
-                    S2
+                    SLOT 2
                   </button>
                 </div>
                 <div id="weapon-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5">

@@ -240,7 +240,7 @@ const HomeScreen: React.FC = () => {
               <Check className="w-2.5 h-2.5" /> JOIN
             </button>
             <button
-              className="pill-btn !rounded-md !px-1.5 !py-1"
+              className="pill-btn !px-1.5 !py-1"
               onClick={() => room.dismissInvite(inv.roomCode)}
             >
               <X className="w-2.5 h-2.5" />

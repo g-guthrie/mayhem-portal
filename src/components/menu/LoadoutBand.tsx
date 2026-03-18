@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Crosshair, Bomb, Sword, Zap, Shield, Wind, Flame, Sparkles, Target, Eye, Heart, Anchor, CircleDot } from 'lucide-react';
+import { Crosshair, Bomb, Sword, Zap, Shield, Wind, Flame, Sparkles, Target, Eye, Heart, Anchor } from 'lucide-react';
 
 type ThrowableCategory = 'grenade' | 'blade';
 

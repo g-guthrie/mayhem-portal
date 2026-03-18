@@ -159,15 +159,22 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Create room ─── */
   const handleCreateRoom = () => {
+    if (room.isInRoom) {
+      toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+      return;
+    }
     room.createRoom(displayName, actorId);
   };
 
   /* ─── Join room by code ─── */
   const handleJoinRoom = () => {
-    if (roomCodeInput.trim().length >= 4) {
-      room.joinRoom(roomCodeInput.trim(), displayName, actorId);
-      setRoomCodeInput('');
+    if (roomCodeInput.trim().length < 4) return;
+    if (room.isInRoom) {
+      toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+      return;
     }
+    room.joinRoom(roomCodeInput.trim(), displayName, actorId);
+    setRoomCodeInput('');
   };
 
   /* ─── Play Card ─── */
@@ -595,12 +602,19 @@ const HomeScreen: React.FC = () => {
             <Users className="w-3 h-3" /> INVITE PARTY
           </button>
         )}
-        <button
-          className="launch-btn flex-1 !py-2 !text-[9px] gap-1"
-          onClick={room.startMatch}
-        >
-          <Play className="w-3 h-3" /> {room.isCreator ? 'START PRIVATE MATCH' : 'READY UP'}
-        </button>
+          <button
+            className="launch-btn flex-1 !py-2 !text-[9px] gap-1"
+            onClick={() => {
+              if (room.isCreator) {
+                room.startMatch();
+              } else {
+                room.toggleReady(actorId);
+                toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
+              }
+            }}
+          >
+            <Play className="w-3 h-3" /> {room.isCreator ? 'START PRIVATE MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
+          </button>
       </div>
     </div>
   ) : (
@@ -736,7 +750,12 @@ const HomeScreen: React.FC = () => {
           )}
 
           <div id="social-friends-list" className="flex flex-col gap-0.5 max-h-[200px] overflow-y-auto">
-            {friends.map(f => (
+          {friends.length === 0 && (
+            <div className="text-center py-4 text-muted-foreground font-orbitron text-[9px] tracking-wider">
+              NO FRIENDS YET — ADD SOMEONE!
+            </div>
+          )}
+          {friends.map(f => (
               <div
                 key={f.name}
                 className={`flex items-center px-2 py-1.5 rounded-lg transition-colors cursor-pointer group ${
@@ -780,10 +799,17 @@ const HomeScreen: React.FC = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             setPartyMembers(prev => {
-                              if (prev.find(m => m.name === f.name)) return prev;
+                              if (prev.find(m => m.name === f.name)) {
+                                toast({ title: `${f.name} is already in your party` });
+                                return prev;
+                              }
+                              if (prev.length >= MAX_PLAYERS) {
+                                toast({ title: 'Party full', description: `Maximum ${MAX_PLAYERS} members.`, variant: 'destructive' });
+                                return prev;
+                              }
+                              toast({ title: `${f.name} joined your party` });
                               return [...prev, { name: f.name, isLeader: false }];
                             });
-                            toast({ title: `${f.name} joined your party` });
                           }}
                         >
                           <UserPlus className="w-2.5 h-2.5" />

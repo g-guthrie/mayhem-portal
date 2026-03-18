@@ -489,7 +489,7 @@ const HomeScreen: React.FC = () => {
           <span className="section-label flex items-center gap-1 !mb-1.5">
             <Users className="w-3 h-3 text-primary" /> YOUR PARTY
           </span>
-          <div id="party-hero-members" className="flex flex-col gap-1">
+          <div id="party-hero-members" className="flex flex-col gap-1 max-h-[120px] overflow-y-auto">
             {partyMembers.map(m => (
               <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
                 <div className="flex items-center gap-1.5">

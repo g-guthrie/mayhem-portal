@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Crosshair, Bomb, Sword, Zap, Shield, Wind, Flame, Sparkles, Target, Eye, Heart, Anchor, Aperture, Rows3 } from 'lucide-react';
+import { Crosshair, Bomb, Sword, Zap, Shield, Wind, Flame, Sparkles, Target, Eye, Heart, Anchor, Grip, Rows3 } from 'lucide-react';
 
 type ThrowableCategory = 'grenade' | 'blade';
 
@@ -11,7 +11,7 @@ interface LoadoutItem {
 
 const WEAPONS: LoadoutItem[] = [
   { id: 'machinegun', name: 'MACHINE GUN', icon: <Rows3 className="w-4 h-4" /> },
-  { id: 'shotgun', name: 'SHOTGUN', icon: <Aperture className="w-4 h-4" /> },
+  { id: 'shotgun', name: 'SHOTGUN', icon: <Grip className="w-4 h-4" /> },
   { id: 'rifle', name: 'RIFLE', icon: <Crosshair className="w-4 h-4" /> },
   { id: 'pistol', name: 'PISTOL', icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><circle cx="12" cy="12" r="8" /></svg> },
   { id: 'sniper', name: 'SNIPER', icon: <Target className="w-4 h-4" /> },

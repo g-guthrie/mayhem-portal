@@ -436,7 +436,7 @@ const HomeScreen: React.FC = () => {
             }}
           />
           <button
-            className="pill-btn !rounded-lg !px-2 !py-1.5 !text-[9px] gap-1"
+            className="pill-btn !px-2 !py-1.5 !text-[9px] gap-1"
             onClick={() => { if (inviteInput.trim()) { room.invitePlayer(inviteInput.trim()); setInviteInput(''); } }}
           >
             <UserPlus className="w-2.5 h-2.5" /> INVITE

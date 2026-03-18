@@ -8,11 +8,13 @@ const AuthScreen: React.FC = () => {
   const { pop } = useMenuNav();
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
+  const [justLoggedIn, setJustLoggedIn] = useState(false);
 
   const handleLogin = () => {
     if (username.trim()) {
-      pop();
+      setJustLoggedIn(true);
       login(username.trim());
+      pop();
     }
   };
 

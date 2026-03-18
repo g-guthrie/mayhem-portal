@@ -267,7 +267,7 @@ const HomeScreen: React.FC = () => {
         <div className="flex items-center gap-1.5">
           <div id="room-share-panel" className="flex items-center gap-1.5">
             <span id="room-share-code" className="font-orbitron text-xs font-bold text-primary tracking-wider">{room.roomCode}</span>
-            <button id="copy-room-code-btn" className="pill-btn !rounded-md !px-1.5 !py-1" title="Copy">
+            <button id="copy-room-code-btn" className="pill-btn !px-1.5 !py-1" title="Copy">
               <Copy className="w-2.5 h-2.5" />
             </button>
           </div>

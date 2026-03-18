@@ -55,7 +55,6 @@ const LoadoutBand: React.FC = () => {
       const next: [string, string] = [...prev] as [string, string];
       const otherSlot = weaponSlot === 0 ? 1 : 0;
       if (next[otherSlot] === id) {
-        // Swap
         next[otherSlot] = next[weaponSlot];
       }
       next[weaponSlot] = id;
@@ -79,7 +78,7 @@ const LoadoutBand: React.FC = () => {
   const getAbilityName = (id: string) => ABILITIES.find(a => a.id === id)?.name ?? id;
 
   return (
-    <footer id="menu-loadout-band" className="border-t border-border/50 bg-background/40 backdrop-blur-md">
+    <footer id="menu-loadout-band" className="border-t border-border/30">
       <div className="px-4 sm:px-6 py-3">
         {/* Collapse / Summary row */}
         <div className="flex items-center justify-between mb-2">
@@ -109,10 +108,10 @@ const LoadoutBand: React.FC = () => {
         {/* Expanded loadout */}
         {!collapsed && (
           <div id="loadout-expanded-shell">
-            <div id="loadout-row" className="loadout-grid grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+            <div id="loadout-row" className="loadout-grid grid grid-cols-1 sm:grid-cols-3 gap-3">
 
               {/* Weapons */}
-              <div id="weapon-slot-panel" className="flex flex-col gap-3">
+              <div id="weapon-slot-panel" className="glass-card p-3 flex flex-col gap-3">
                 <span className="section-label flex items-center gap-1.5">
                   <Crosshair className="w-3 h-3 text-primary" /> ARSENAL
                 </span>
@@ -132,7 +131,7 @@ const LoadoutBand: React.FC = () => {
                     SLOT 2
                   </button>
                 </div>
-                <div id="weapon-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5">
+                <div id="weapon-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5 overflow-y-auto max-h-[200px]">
                   {WEAPONS.map(w => (
                     <button
                       key={w.id}
@@ -148,7 +147,7 @@ const LoadoutBand: React.FC = () => {
               </div>
 
               {/* Throwables */}
-              <div id="throwable-slot-panel" className="flex flex-col gap-3">
+              <div id="throwable-slot-panel" className="glass-card p-3 flex flex-col gap-3">
                 <span className="section-label flex items-center gap-1.5">
                   <Bomb className="w-3 h-3 text-primary" /> TACTICAL
                 </span>
@@ -164,7 +163,7 @@ const LoadoutBand: React.FC = () => {
                     </button>
                   ))}
                 </div>
-                <div id="throwable-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5">
+                <div id="throwable-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5 overflow-y-auto max-h-[200px]">
                   {THROWABLES[throwableCategory].map(t => (
                     <button
                       key={t.id}
@@ -181,7 +180,7 @@ const LoadoutBand: React.FC = () => {
               </div>
 
               {/* Abilities */}
-              <div id="ability-slot-panel" className="flex flex-col gap-3">
+              <div id="ability-slot-panel" className="glass-card p-3 flex flex-col gap-3">
                 <span className="section-label flex items-center gap-1.5">
                   <Zap className="w-3 h-3 text-primary" /> ABILITIES
                 </span>
@@ -201,7 +200,7 @@ const LoadoutBand: React.FC = () => {
                     ABILITY 2
                   </button>
                 </div>
-                <div id="ability-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5">
+                <div id="ability-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5 overflow-y-auto max-h-[200px]">
                   {ABILITIES.map(a => (
                     <button
                       key={a.id}

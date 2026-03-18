@@ -27,12 +27,16 @@ const ROOM_MODES = [
 ];
 const TEAM_COUNTS = [2, 3, 4];
 
-/* ─── Fake friends data ─── */
-const FAKE_FRIENDS = [
-  { name: 'xVortex', status: 'online' as const, inGame: true },
-  { name: 'NightOwl', status: 'online' as const, inGame: false },
-  { name: 'BlazeFury', status: 'away' as const, inGame: false },
-  { name: 'ShadowKnight', status: 'offline' as const, inGame: false },
+interface FakeFriend {
+  name: string;
+  status: 'online' | 'away' | 'offline';
+  inGame: boolean;
+}
+const INITIAL_FRIENDS: FakeFriend[] = [
+  { name: 'xVortex', status: 'online', inGame: true },
+  { name: 'NightOwl', status: 'online', inGame: false },
+  { name: 'BlazeFury', status: 'away', inGame: false },
+  { name: 'ShadowKnight', status: 'offline', inGame: false },
 ];
 
 const TEAM_COLORS = [

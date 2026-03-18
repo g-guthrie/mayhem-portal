@@ -157,12 +157,12 @@ const HomeScreen: React.FC = () => {
         </button>
         <button
           id="game-modes-toggle-btn"
-          className={`pill-btn !rounded-xl !px-2 !py-2 gap-1.5 transition-transform ${modesOpen ? 'active' : ''}`}
+          className={`pill-btn !px-2 !py-2 gap-1.5 min-w-0 transition-transform ${modesOpen ? 'active' : ''}`}
           onClick={() => setModesOpen(!modesOpen)}
         >
           {currentMode.icon}
-          <span className="font-orbitron text-[9px] font-bold tracking-wider">{currentMode.label}</span>
-          <ChevronDown className={`w-3 h-3 transition-transform ${modesOpen ? 'rotate-180' : ''}`} />
+          <span className="font-orbitron text-[9px] font-bold tracking-wider truncate max-w-[100px]">{currentMode.label}</span>
+          <ChevronDown className={`w-3 h-3 shrink-0 transition-transform ${modesOpen ? 'rotate-180' : ''}`} />
         </button>
       </div>
       {modesOpen && (

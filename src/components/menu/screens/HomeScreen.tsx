@@ -580,17 +580,29 @@ const HomeScreen: React.FC = () => {
   );
 
   /* ═══════════════════════════════════════════
-     LAYOUT — always 3 columns, room inline in col 3
+     LAYOUT — conditional 2-col when room open
      ═══════════════════════════════════════════ */
 
   return (
     <div className="flex flex-col gap-3 h-full min-h-0">
       {InviteBanner}
-      {/* Top row: always 3 columns */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {PlayCard}
-        {QuickJoinCard}
-        {RoomCardContent}
+      {/* Top row: 3-col default, 2-col when room is open */}
+      <div className={`grid gap-3 ${room.isInRoom ? 'grid-cols-1 sm:grid-cols-[minmax(250px,1fr)_2fr]' : 'grid-cols-1 sm:grid-cols-3'}`}>
+        {room.isInRoom ? (
+          <>
+            <div className="flex flex-col gap-3">
+              {PlayCard}
+              {QuickJoinCard}
+            </div>
+            {RoomCardContent}
+          </>
+        ) : (
+          <>
+            {PlayCard}
+            {QuickJoinCard}
+            {RoomCardContent}
+          </>
+        )}
       </div>
 
       {/* Social panel below if applicable */}

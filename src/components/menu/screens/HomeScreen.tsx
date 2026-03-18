@@ -255,7 +255,16 @@ const HomeScreen: React.FC = () => {
             value={friendId}
             onChange={e => setFriendId(e.target.value)}
           />
-          <button id="invite-friend-btn" className="pill-btn active !px-2 !py-1.5" title="Invite">
+          <button
+            id="invite-friend-btn"
+            className="pill-btn active !px-2 !py-1.5"
+            title="Invite"
+            onClick={() => {
+              if (!friendId.trim()) return;
+              toast({ title: 'Invite sent', description: `Invited ${friendId} to your party` });
+              setFriendId('');
+            }}
+          >
             <UserPlus className="w-3 h-3" />
           </button>
           <button

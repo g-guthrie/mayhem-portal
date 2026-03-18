@@ -567,7 +567,7 @@ const HomeScreen: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider">IN GAME</span>}
-                  <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" title="Invite to party">
+                  <button className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" title="Invite to party">
                     <UserPlus className="w-2.5 h-2.5" />
                   </button>
                 </div>

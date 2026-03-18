@@ -140,7 +140,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Play Card ─── */
   const PlayCard = (
-    <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2">
+    <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2 h-full">
       <div id="play-mode-toolbar" className="flex items-center gap-2">
         <button
           id="primary-launch-btn"
@@ -590,9 +590,9 @@ const HomeScreen: React.FC = () => {
       <div className={`grid gap-3 ${room.isInRoom ? 'grid-cols-1 sm:grid-cols-[minmax(250px,1fr)_2fr]' : 'grid-cols-1 sm:grid-cols-3'}`}>
         {room.isInRoom ? (
           <>
-            <div className="flex flex-col gap-3">
-              {PlayCard}
-              {QuickJoinCard}
+            <div className="flex flex-col gap-3 h-full">
+              <div className="flex-1">{PlayCard}</div>
+              <div className="flex-none">{QuickJoinCard}</div>
             </div>
             {RoomCardContent}
           </>

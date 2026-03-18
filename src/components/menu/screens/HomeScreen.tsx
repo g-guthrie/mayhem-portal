@@ -3,7 +3,6 @@ import {
   Crosshair, ChevronDown, Swords, Target, Dumbbell,
   UserPlus, ArrowRight, Globe, Users, UserMinus,
   Copy, Lock, Unlock, Shuffle, Play, GripVertical,
-  LogIn, Share2,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMenuNav } from '@/hooks/useMenuNav';

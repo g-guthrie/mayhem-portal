@@ -544,14 +544,24 @@ const HomeScreen: React.FC = () => {
             <span className="section-label flex items-center gap-1 !mb-0">
               <Users className="w-3 h-3 text-primary" /> FRIENDS
             </span>
-            <button
-              className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
-              onClick={() => setAddFriendOpen(!addFriendOpen)}
-              title="Add Friend"
-            >
-              <UserPlus className="w-2.5 h-2.5" />
-              <span className="hidden sm:inline">ADD</span>
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
+                onClick={() => setAddFriendOpen(!addFriendOpen)}
+                title="Add Friend"
+              >
+                <UserPlus className="w-2.5 h-2.5" />
+                <span className="hidden sm:inline">ADD</span>
+              </button>
+              <button
+                className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 ${removeMode ? 'text-destructive border-destructive/50 bg-destructive/10' : 'text-destructive border-destructive/30 hover:bg-destructive/10'}`}
+                onClick={() => { setRemoveMode(!removeMode); setConfirmingFriend(null); }}
+                title="Remove Friend"
+              >
+                <UserMinus className="w-2.5 h-2.5" />
+                <span className="hidden sm:inline">REMOVE</span>
+              </button>
+            </div>
           </div>
 
           {addFriendOpen && (
@@ -570,8 +580,18 @@ const HomeScreen: React.FC = () => {
           )}
 
           <div id="social-friends-list" className="flex flex-col gap-0.5 max-h-[200px] overflow-y-auto">
-            {FAKE_FRIENDS.map(f => (
-              <div key={f.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors hover:bg-muted/30 cursor-pointer group">
+            {friends.map(f => (
+              <div
+                key={f.name}
+                className={`flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors cursor-pointer group ${
+                  removeMode ? 'hover:bg-destructive/10 border border-transparent hover:border-destructive/20' : 'hover:bg-muted/30'
+                } ${confirmingFriend === f.name ? 'bg-destructive/10 border border-destructive/20' : ''}`}
+                onClick={() => {
+                  if (removeMode) {
+                    setConfirmingFriend(confirmingFriend === f.name ? null : f.name);
+                  }
+                }}
+              >
                 <div className="flex items-center gap-2">
                   <div className={`w-1.5 h-1.5 rounded-full ${
                     f.status === 'online' ? 'bg-green-400' :
@@ -580,10 +600,32 @@ const HomeScreen: React.FC = () => {
                   <span className="font-rajdhani font-semibold text-xs text-foreground">{f.name}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider">IN GAME</span>}
-                  <button className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" title="Invite to party">
-                    <UserPlus className="w-2.5 h-2.5" />
-                  </button>
+                  {confirmingFriend === f.name ? (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[8px] font-orbitron text-destructive tracking-wider">REMOVE?</span>
+                      <button
+                        className="pill-btn !px-1.5 !py-0.5 text-[8px] text-destructive border-destructive/30 bg-destructive/10 hover:bg-destructive/20"
+                        onClick={(e) => { e.stopPropagation(); removeFriend(f.name); }}
+                      >
+                        YES
+                      </button>
+                      <button
+                        className="pill-btn !px-1.5 !py-0.5 text-[8px]"
+                        onClick={(e) => { e.stopPropagation(); setConfirmingFriend(null); }}
+                      >
+                        NO
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider">IN GAME</span>}
+                      {!removeMode && (
+                        <button className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" title="Invite to party">
+                          <UserPlus className="w-2.5 h-2.5" />
+                        </button>
+                      )}
+                    </>
+                  )}
                 </div>
               </div>
             ))}

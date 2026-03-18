@@ -55,6 +55,7 @@ const Index: React.FC = () => {
         </div>
       </div>
     </MenuNavProvider>
+    </AuthProvider>
   );
 };
 

@@ -471,6 +471,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setReadyPlayers(new Set());
     setIsPaused(false);
     if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
+    if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
   }, []);
 
   const returnToMenu = useCallback(() => {

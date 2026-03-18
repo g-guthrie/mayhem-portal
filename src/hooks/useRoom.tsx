@@ -445,7 +445,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <RoomContext.Provider value={{
       isInRoom, roomCode, mode, teamCount, isLocked, isCreator, players, teams,
       selectedPlayer, pendingInvites, matchState, countdownValue, readyPlayers,
-      disconnectedPlayers, isPaused,
+      disconnectedPlayers, isPaused, matchStats,
       createRoom, joinRoom, leaveRoom, setMode, setTeamCount, toggleLock,
       inviteParty, invitePlayer, selectPlayer, assignToTeam, movePlayer,
       randomizeTeams, startMatch, toggleReady, acceptInvite, dismissInvite, addMockInvite,

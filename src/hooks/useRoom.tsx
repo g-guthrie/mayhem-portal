@@ -249,6 +249,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setMatchResult(null);
         setMatchState('idle');
         if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
+        if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
         return;
       }
     }

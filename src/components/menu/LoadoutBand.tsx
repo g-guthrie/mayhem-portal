@@ -201,7 +201,7 @@ const LoadoutBand: React.FC = () => {
                     ABILITY 2
                   </button>
                 </div>
-                <div id="ability-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5">
+                <div id="ability-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5 overflow-y-auto max-h-[200px]">
                   {ABILITIES.map(a => (
                     <button
                       key={a.id}

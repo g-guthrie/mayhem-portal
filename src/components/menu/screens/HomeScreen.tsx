@@ -556,7 +556,7 @@ const HomeScreen: React.FC = () => {
             </div>
           )}
 
-          <div id="social-friends-list" className="flex flex-col gap-0.5">
+          <div id="social-friends-list" className="flex flex-col gap-0.5 max-h-[200px] overflow-y-auto">
             {FAKE_FRIENDS.map(f => (
               <div key={f.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors hover:bg-muted/30 cursor-pointer group">
                 <div className="flex items-center gap-2">

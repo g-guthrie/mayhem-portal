@@ -122,7 +122,7 @@ const LoadoutBand: React.FC = () => {
                     className={`slot-btn flex-1 ${weaponSlot === 0 ? 'active' : ''}`}
                     onClick={() => setWeaponSlot(0)}
                   >
-                    P1
+                    SLOT 1
                   </button>
                   <button
                     id="weapon-slot-secondary"

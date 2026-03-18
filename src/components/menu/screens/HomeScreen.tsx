@@ -595,12 +595,19 @@ const HomeScreen: React.FC = () => {
             <Users className="w-3 h-3" /> INVITE PARTY
           </button>
         )}
-        <button
-          className="launch-btn flex-1 !py-2 !text-[9px] gap-1"
-          onClick={room.startMatch}
-        >
-          <Play className="w-3 h-3" /> {room.isCreator ? 'START PRIVATE MATCH' : 'READY UP'}
-        </button>
+          <button
+            className="launch-btn flex-1 !py-2 !text-[9px] gap-1"
+            onClick={() => {
+              if (room.isCreator) {
+                room.startMatch();
+              } else {
+                room.toggleReady(actorId);
+                toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
+              }
+            }}
+          >
+            <Play className="w-3 h-3" /> {room.isCreator ? 'START PRIVATE MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
+          </button>
       </div>
     </div>
   ) : (

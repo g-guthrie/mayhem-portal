@@ -462,7 +462,7 @@ const HomeScreen: React.FC = () => {
   ) : (
     <div className="glass-card p-3 flex flex-col items-center justify-center gap-2">
       <button
-        className="launch-btn w-full !py-2.5 !text-[10px] gap-1.5 !rounded-xl"
+        className="launch-btn w-full !py-2.5 !text-[10px] gap-1.5"
         onClick={handleCreateRoom}
       >
         <DoorOpen className="w-3.5 h-3.5" /> CREATE ROOM

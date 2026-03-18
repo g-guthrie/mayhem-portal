@@ -407,7 +407,7 @@ const HomeScreen: React.FC = () => {
           <span className="section-label flex items-center gap-1 !mb-1.5">
             <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
           </span>
-          <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col gap-0.5 max-h-[120px] overflow-y-auto">
             {room.players.map(p => (
               <div key={p.id} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
                 <div className="flex items-center gap-2">

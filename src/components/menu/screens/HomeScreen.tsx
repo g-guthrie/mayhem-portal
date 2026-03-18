@@ -516,7 +516,7 @@ const HomeScreen: React.FC = () => {
             ))}
           </div>
           <div id="menu-party-actions" className="mt-1.5">
-            <button id="party-hero-leave-btn" className="pill-btn !rounded-lg w-full justify-center !py-1.5 !text-[9px] text-destructive border-destructive/30 hover:bg-destructive/10">
+            <button id="party-hero-leave-btn" className="pill-btn w-full justify-center !py-1.5 !text-[9px] text-destructive border-destructive/30 hover:bg-destructive/10">
               LEAVE PARTY
             </button>
           </div>

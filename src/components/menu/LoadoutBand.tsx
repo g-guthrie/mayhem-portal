@@ -198,7 +198,7 @@ const LoadoutBand: React.FC = () => {
                     className={`slot-btn flex-1 ${abilitySlot === 1 ? 'active' : ''}`}
                     onClick={() => setAbilitySlot(1)}
                   >
-                    A2
+                    ABILITY 2
                   </button>
                 </div>
                 <div id="ability-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5">

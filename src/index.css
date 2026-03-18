@@ -120,7 +120,7 @@
   }
 
   .launch-btn {
-    @apply inline-flex items-center justify-center px-8 py-4 text-sm font-extrabold uppercase tracking-wider rounded-full transition-all;
+    @apply inline-flex items-center justify-center px-8 py-4 text-sm font-extrabold uppercase tracking-wider rounded-xl transition-all;
     font-family: 'Orbitron', sans-serif;
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));

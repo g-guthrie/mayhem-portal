@@ -192,7 +192,7 @@ const HomeScreen: React.FC = () => {
       <div id="social-friend-id-stack" className="flex gap-1.5">
         <input
           id="party-id-input"
-          className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs !rounded-lg"
+          className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
           placeholder="Friend ID"
           value={friendId}
           onChange={e => setFriendId(e.target.value)}

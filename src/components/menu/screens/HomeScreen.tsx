@@ -531,7 +531,7 @@ const HomeScreen: React.FC = () => {
               <Users className="w-3 h-3 text-primary" /> FRIENDS
             </span>
             <button
-              className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] gap-0.5"
+              className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
               onClick={() => setAddFriendOpen(!addFriendOpen)}
               title="Add Friend"
             >

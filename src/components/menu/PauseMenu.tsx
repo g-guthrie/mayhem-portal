@@ -5,6 +5,7 @@ import { useMenuNav } from '@/hooks/useMenuNav';
 
 const PauseMenu: React.FC = () => {
   const { togglePause, invitePlayer, leaveRoom, isPaused, matchStats } = useRoom();
+  const menuNav = useMenuNav();
   const [view, setView] = useState<'main' | 'settings' | 'confirm-leave'>('main');
   const [inviteInput, setInviteInput] = useState('');
 

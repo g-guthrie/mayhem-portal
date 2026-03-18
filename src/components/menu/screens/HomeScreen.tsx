@@ -71,9 +71,6 @@ const HomeScreen: React.FC = () => {
   const [addFriendOpen, setAddFriendOpen] = useState(false);
   const [addFriendId, setAddFriendId] = useState('');
 
-  /* Room expanded (guest view) */
-  const [roomExpanded, setRoomExpanded] = useState(false);
-
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
 
@@ -95,7 +92,6 @@ const HomeScreen: React.FC = () => {
 
   const isSolo = partyMembers.length <= 1;
   const showSocialPanel = isLoggedIn || !isSolo;
-  const showExpandedLayout = showSocialPanel || roomExpanded || room.isInRoom;
 
   /* ─── Drag & Drop handlers ─── */
   const handleDragStart = (playerId: string, fromTeam: number) => {
@@ -131,14 +127,12 @@ const HomeScreen: React.FC = () => {
   /* ─── Create room ─── */
   const handleCreateRoom = () => {
     room.createRoom(displayName, actorId);
-    setRoomExpanded(true);
   };
 
   /* ─── Join room by code ─── */
   const handleJoinRoom = () => {
     if (roomCodeInput.trim().length >= 4) {
       room.joinRoom(roomCodeInput.trim(), displayName, actorId);
-      setRoomExpanded(true);
       setRoomCodeInput('');
     }
   };
@@ -148,7 +142,7 @@ const HomeScreen: React.FC = () => {
     <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2">
       <div id="play-mode-toolbar" className="flex items-center gap-2">
         <button id="primary-launch-btn" className="launch-btn flex-1 !py-2 !text-[10px] animate-pulse-glow">
-          PLAY {currentMode.label}
+          PLAY
         </button>
         <button
           id="game-modes-toggle-btn"
@@ -230,7 +224,7 @@ const HomeScreen: React.FC = () => {
           <div className="flex gap-1">
             <button
               className="pill-btn active !rounded-md !px-2 !py-1 !text-[8px]"
-              onClick={() => { room.acceptInvite(inv.roomCode); setRoomExpanded(true); }}
+              onClick={() => room.acceptInvite(inv.roomCode)}
             >
               <Check className="w-2.5 h-2.5" /> JOIN
             </button>
@@ -246,9 +240,9 @@ const HomeScreen: React.FC = () => {
     </div>
   ) : null;
 
-  /* ─── Room Panel (full) ─── */
-  const RoomPanel = room.isInRoom ? (
-    <div className="glass-card p-3 sm:p-4 flex flex-col gap-2.5 overflow-y-auto min-h-0">
+  /* ─── Room Panel (inline in third column) ─── */
+  const RoomCardContent = room.isInRoom ? (
+    <div className="glass-card p-3 flex flex-col gap-2.5 overflow-y-auto max-h-[400px]">
       {/* Room header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -269,15 +263,6 @@ const HomeScreen: React.FC = () => {
           <button className="pill-btn !rounded-md !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={room.leaveRoom} title="Leave Room">
             <LogOut className="w-2.5 h-2.5" />
           </button>
-        </div>
-      </div>
-
-      {/* Invite banner placeholder */}
-      <div id="room-social-invite-banner" className="hidden">
-        <div id="room-social-invite-copy" />
-        <div className="flex gap-1.5 mt-1">
-          <button id="room-social-invite-accept-btn" className="pill-btn active !rounded-lg flex-1 !text-[9px]">ACCEPT</button>
-          <button id="room-social-invite-dismiss-btn" className="pill-btn !rounded-lg flex-1 !text-[9px]">DISMISS</button>
         </div>
       </div>
 
@@ -358,7 +343,7 @@ const HomeScreen: React.FC = () => {
 
       {/* Team Roster — Hybrid: click + drag */}
       {room.mode !== 'ffa' ? (
-        <div className="flex-1 min-h-0">
+        <div className="min-h-0">
           <span className="section-label flex items-center gap-1 !mb-1.5">
             <Users className="w-3 h-3 text-primary" /> TEAMS
           </span>
@@ -406,7 +391,7 @@ const HomeScreen: React.FC = () => {
         </div>
       ) : (
         /* FFA player list */
-        <div className="flex-1 min-h-0">
+        <div className="min-h-0">
           <span className="section-label flex items-center gap-1 !mb-1.5">
             <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
           </span>
@@ -449,7 +434,7 @@ const HomeScreen: React.FC = () => {
       )}
 
       {/* Room Actions */}
-      <div className="flex gap-2 mt-auto pt-1">
+      <div className="flex gap-2 pt-1">
         {room.isCreator && (
           <button className="pill-btn !rounded-lg flex-1 justify-center !py-2 !text-[9px] gap-1" onClick={room.inviteParty}>
             <Users className="w-3 h-3" /> INVITE PARTY
@@ -463,7 +448,16 @@ const HomeScreen: React.FC = () => {
         </button>
       </div>
     </div>
-  ) : null;
+  ) : (
+    <div className="glass-card p-3 flex flex-col items-center justify-center gap-2">
+      <button
+        className="launch-btn w-full !py-2.5 !text-[10px] gap-1.5 !rounded-xl"
+        onClick={handleCreateRoom}
+      >
+        <DoorOpen className="w-3.5 h-3.5" /> CREATE ROOM
+      </button>
+    </div>
+  );
 
   /* ─── Social Panel ─── */
   const SocialPanel = (
@@ -575,74 +569,25 @@ const HomeScreen: React.FC = () => {
   );
 
   /* ═══════════════════════════════════════════
-     LAYOUT
+     LAYOUT — always 3 columns, room inline in col 3
      ═══════════════════════════════════════════ */
 
-  if (!showExpandedLayout) {
-    return (
-      <div className="flex flex-col gap-3 h-full min-h-0">
-        {InviteBanner}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {PlayCard}
-          {QuickJoinCard}
-          <div className="glass-card p-3 flex flex-col items-center justify-center gap-2">
-            <button
-              className="launch-btn w-full !py-2.5 !text-[10px] gap-1.5 !rounded-xl"
-              onClick={handleCreateRoom}
-            >
-              <DoorOpen className="w-3.5 h-3.5" /> CREATE ROOM
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  /* ─── EXPANDED ─── */
   return (
     <div className="flex flex-col gap-3 h-full min-h-0">
       {InviteBanner}
-      {/* Top row */}
-      <div className={`grid gap-3 ${showSocialPanel ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'}`}>
+      {/* Top row: always 3 columns */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {PlayCard}
         {QuickJoinCard}
-        {!showSocialPanel && !room.isInRoom && (
-          <div className="glass-card p-3 flex flex-col items-center justify-center gap-2">
-            <button
-              className="launch-btn w-full !py-2.5 !text-[10px] gap-1.5 !rounded-xl"
-              onClick={handleCreateRoom}
-            >
-              <DoorOpen className="w-3.5 h-3.5" /> CREATE ROOM
-            </button>
-          </div>
-        )}
+        {RoomCardContent}
       </div>
 
-      {/* Bottom row */}
-      <div className={`grid gap-3 flex-1 min-h-0 ${
-        showSocialPanel && room.isInRoom ? 'grid-cols-1 sm:grid-cols-2' :
-        'grid-cols-1'
-      }`}>
-        {showSocialPanel && SocialPanel}
-        {room.isInRoom ? RoomPanel : (
-          <div className="glass-card p-3 flex flex-col items-center justify-center gap-3">
-            <button
-              className="launch-btn !py-2.5 !text-[10px] gap-1.5 !rounded-xl !px-8"
-              onClick={handleCreateRoom}
-            >
-              <DoorOpen className="w-3.5 h-3.5" /> CREATE ROOM
-            </button>
-            {!showSocialPanel && (
-              <button
-                className="pill-btn !rounded-lg !text-[9px]"
-                onClick={() => setRoomExpanded(false)}
-              >
-                <X className="w-2.5 h-2.5" /> CLOSE
-              </button>
-            )}
-          </div>
-        )}
-      </div>
+      {/* Social panel below if applicable */}
+      {showSocialPanel && (
+        <div className="grid grid-cols-1 gap-3 flex-1 min-h-0">
+          {SocialPanel}
+        </div>
+      )}
     </div>
   );
 };

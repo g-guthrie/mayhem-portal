@@ -1,12 +1,15 @@
 import React, { useEffect } from 'react';
 import { useRoom } from '@/hooks/useRoom';
 import { useAuth } from '@/hooks/useAuth';
+import { useMenuNav } from '@/hooks/useMenuNav';
 import { Check, X, Loader2, Swords, Menu } from 'lucide-react';
 import PauseMenu from './PauseMenu';
+import PostMatchScreen from './PostMatchScreen';
 
 const MatchOverlay: React.FC = () => {
   const { matchState, countdownValue, players, readyPlayers, isCreator, startMatch, toggleReady, leaveRoom, togglePause, isPaused, disconnectedPlayers } = useRoom();
   const { actorId } = useAuth();
+  const menuNav = useMenuNav();
 
   // ESC key to toggle pause during match
   useEffect(() => {
@@ -22,7 +25,17 @@ const MatchOverlay: React.FC = () => {
 
   if (matchState === 'idle') return null;
 
+  // Post-match screen
+  if (matchState === 'post-match') {
+    return <PostMatchScreen />;
+  }
+
   if (matchState === 'in-match') {
+    const handleLeave = () => {
+      leaveRoom();
+      menuNav.reset();
+    };
+
     return (
       <>
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-md">
@@ -39,7 +52,7 @@ const MatchOverlay: React.FC = () => {
               </button>
               <button
                 className="pill-btn !rounded-xl !px-6 !py-2.5 text-destructive border-destructive/30 hover:bg-destructive/10"
-                onClick={leaveRoom}
+                onClick={handleLeave}
               >
                 LEAVE MATCH
               </button>
@@ -126,7 +139,7 @@ const MatchOverlay: React.FC = () => {
           )}
           <button
             className="pill-btn !rounded-xl !px-3 !py-2.5 text-destructive border-destructive/30 hover:bg-destructive/10"
-            onClick={leaveRoom}
+            onClick={() => { leaveRoom(); menuNav.reset(); }}
           >
             <X className="w-3.5 h-3.5" />
           </button>

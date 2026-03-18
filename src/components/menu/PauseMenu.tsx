@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Settings, LogOut, X, AlertTriangle, Send } from 'lucide-react';
 import { useRoom } from '@/hooks/useRoom';
+import { useMenuNav } from '@/hooks/useMenuNav';
 
 const PauseMenu: React.FC = () => {
   const { togglePause, invitePlayer, leaveRoom, isPaused, matchStats } = useRoom();

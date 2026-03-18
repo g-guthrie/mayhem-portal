@@ -4,11 +4,18 @@ import { toast } from '@/hooks/use-toast';
 /* ─── Constants ─── */
 export const MAX_PLAYERS = 16;
 const DISCONNECT_GRACE_MS = 60_000;
+const MATCH_DURATION_MS = 15_000; // Auto-end after 15s for demo
 
 export interface MatchStats {
   kills: number;
   deaths: number;
   assists: number;
+}
+
+export interface MatchResult {
+  isWinner: boolean;
+  placement: number;
+  totalPlayers: number;
 }
 
 /* ─── Types ─── */
@@ -38,12 +45,13 @@ interface RoomState {
   teams: Record<number, RoomPlayer[]>;
   selectedPlayer: RoomPlayer | null;
   pendingInvites: { from: string; roomCode: string }[];
-  matchState: 'idle' | 'ready-check' | 'countdown' | 'in-match';
+  matchState: 'idle' | 'ready-check' | 'countdown' | 'in-match' | 'post-match';
   countdownValue: number;
   readyPlayers: Set<string>;
   disconnectedPlayers: Map<string, DisconnectedPlayer>;
   isPaused: boolean;
   matchStats: MatchStats;
+  matchResult: MatchResult | null;
 
   // Actions
   createRoom: (creatorName: string, creatorId: string) => void;
@@ -66,6 +74,9 @@ interface RoomState {
   togglePause: () => void;
   kickPlayer: (playerId: string) => void;
   startPartyMatch: (partyMembers: { id: string; name: string }[]) => void;
+  endMatch: () => void;
+  returnToLobby: () => void;
+  returnToMenu: () => void;
 }
 
 const RoomContext = createContext<RoomState | null>(null);
@@ -94,13 +105,32 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [teams, setTeams] = useState<Record<number, RoomPlayer[]>>({});
   const [selectedPlayer, setSelectedPlayer] = useState<RoomPlayer | null>(null);
   const [pendingInvites, setPendingInvites] = useState<{ from: string; roomCode: string }[]>([]);
-  const [matchState, setMatchState] = useState<'idle' | 'ready-check' | 'countdown' | 'in-match'>('idle');
+  const [matchState, setMatchState] = useState<'idle' | 'ready-check' | 'countdown' | 'in-match' | 'post-match'>('idle');
   const [countdownValue, setCountdownValue] = useState(3);
   const [readyPlayers, setReadyPlayers] = useState<Set<string>>(new Set());
   const [matchStats] = useState<MatchStats>({ kills: 7, deaths: 3, assists: 4 });
+  const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
   const [disconnectedPlayers, setDisconnectedPlayers] = useState<Map<string, DisconnectedPlayer>>(new Map());
   const [isPaused, setIsPaused] = useState(false);
   const disconnectTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const matchTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  /* ─── Auto-end match after duration ─── */
+  useEffect(() => {
+    if (matchState === 'in-match') {
+      matchTimerRef.current = setTimeout(() => {
+        // Mock result: randomly winner or not
+        const totalPlayers = players.length;
+        const placement = Math.random() > 0.5 ? 1 : Math.floor(Math.random() * (totalPlayers - 1)) + 2;
+        setMatchResult({ isWinner: placement === 1, placement, totalPlayers });
+        setMatchState('post-match');
+        setIsPaused(false);
+      }, MATCH_DURATION_MS);
+      return () => {
+        if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
+      };
+    }
+  }, [matchState, players.length]);
 
   /* ─── Disconnect grace period tick ─── */
   useEffect(() => {
@@ -115,7 +145,6 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (remaining <= 0) {
             next.delete(id);
             changed = true;
-            // Auto-remove from players and teams
             setPlayers(p => p.filter(pl => pl.id !== id));
             setTeams(t => {
               const updated: Record<number, RoomPlayer[]> = {};
@@ -156,10 +185,17 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setReadyPlayers(new Set());
     setDisconnectedPlayers(new Map());
     setIsPaused(false);
+    setMatchResult(null);
     initTeams([creator], 2);
   }, [initTeams]);
 
   const joinRoom = useCallback((code: string, playerName: string, playerId: string) => {
+    // Enforce room lock
+    if (isLocked) {
+      toast({ title: 'Room Locked', description: 'This room is locked and not accepting new players.', variant: 'destructive' });
+      return;
+    }
+
     const joiner: RoomPlayer = { id: playerId, name: playerName, isCreator: false, isReady: false };
     const existingCreator: RoomPlayer = { id: 'host1', name: 'HostPlayer', isCreator: true, isReady: false };
     const mockExtra = MOCK_PLAYERS.slice(0, 2).map(p => ({ ...p, isCreator: false, isReady: false }));
@@ -178,37 +214,47 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setReadyPlayers(new Set());
     setDisconnectedPlayers(new Map());
     setIsPaused(false);
+    setMatchResult(null);
     initTeams(all, 2);
-  }, [initTeams]);
+  }, [initTeams, isLocked]);
 
   /* ─── Leave room with leadership transfer ─── */
   const leaveRoom = useCallback(() => {
     setPlayers(prev => {
-      const remaining = prev.filter(p => !p.isCreator || prev.length === 1 ? true : true);
-      // If the leaving player is the creator and others remain, transfer leadership
-      const self = prev.find(p => p.isCreator);
-      if (self && prev.length > 1) {
-        const others = prev.filter(p => !p.isCreator);
-        if (others.length > 0) {
-          // Transfer to next player — handled below
+      if (prev.length > 1 && isCreator) {
+        // Transfer leadership to next non-creator player
+        const remaining = prev.filter(p => !p.isCreator);
+        if (remaining.length > 0) {
+          remaining[0] = { ...remaining[0], isCreator: true };
+          // Update teams to reflect new creator
+          setTeams(t => {
+            const updated: Record<number, RoomPlayer[]> = {};
+            Object.keys(t).forEach(k => {
+              updated[Number(k)] = t[Number(k)]
+                .filter(pl => pl.id !== prev.find(p => p.isCreator)?.id)
+                .map(pl => pl.id === remaining[0].id ? { ...pl, isCreator: true } : pl);
+            });
+            return updated;
+          });
+          return remaining;
         }
       }
       return [];
     });
     setIsInRoom(false);
     setRoomCode('');
-    setPlayers([]);
     setTeams({});
     setIsCreator(false);
     setMatchState('idle');
     setSelectedPlayer(null);
     setDisconnectedPlayers(new Map());
     setIsPaused(false);
-  }, []);
+    setMatchResult(null);
+    if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
+  }, [isCreator]);
 
   /* ─── Kick player (also used for mock disconnect) ─── */
   const kickPlayer = useCallback((playerId: string) => {
-    // Add to disconnected with grace period
     setPlayers(prev => {
       const player = prev.find(p => p.id === playerId);
       if (!player || player.isCreator) return prev;
@@ -223,7 +269,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return next;
       });
 
-      return prev; // Keep in roster but will be shown as disconnected
+      return prev;
     });
   }, []);
 
@@ -297,7 +343,6 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { ...prevTeams, [minTeam]: [...(prevTeams[minTeam] || []), newPlayer] };
       });
 
-      // If mid-match, show join toast
       if (matchState === 'in-match') {
         toast({ title: `${name} joined the match` });
       }
@@ -390,6 +435,29 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [matchState]);
 
+  const endMatch = useCallback(() => {
+    if (matchState === 'in-match') {
+      const totalPlayers = players.length;
+      const placement = Math.random() > 0.5 ? 1 : Math.floor(Math.random() * (totalPlayers - 1)) + 2;
+      setMatchResult({ isWinner: placement === 1, placement, totalPlayers });
+      setMatchState('post-match');
+      setIsPaused(false);
+      if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
+    }
+  }, [matchState, players.length]);
+
+  const returnToLobby = useCallback(() => {
+    setMatchState('idle');
+    setMatchResult(null);
+    setReadyPlayers(new Set());
+    setIsPaused(false);
+    if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
+  }, []);
+
+  const returnToMenu = useCallback(() => {
+    leaveRoom();
+  }, [leaveRoom]);
+
   /* ─── Party → Match shortcut ─── */
   const startPartyMatch = useCallback((partyMembers: { id: string; name: string }[]) => {
     if (partyMembers.length === 0) return;
@@ -406,13 +474,13 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setPlayers(roomPlayers);
     setModeState('ffa');
     setTeamCountState(2);
-    setIsLocked(true); // Ephemeral room locked by default
+    setIsLocked(true);
     setMatchState('idle');
     setReadyPlayers(new Set());
     setDisconnectedPlayers(new Map());
     setIsPaused(false);
+    setMatchResult(null);
     initTeams(roomPlayers, 2);
-    // Auto-start ready check
     setTimeout(() => {
       setMatchState('ready-check');
       setReadyPlayers(new Set());
@@ -445,11 +513,11 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <RoomContext.Provider value={{
       isInRoom, roomCode, mode, teamCount, isLocked, isCreator, players, teams,
       selectedPlayer, pendingInvites, matchState, countdownValue, readyPlayers,
-      disconnectedPlayers, isPaused, matchStats,
+      disconnectedPlayers, isPaused, matchStats, matchResult,
       createRoom, joinRoom, leaveRoom, setMode, setTeamCount, toggleLock,
       inviteParty, invitePlayer, selectPlayer, assignToTeam, movePlayer,
       randomizeTeams, startMatch, toggleReady, acceptInvite, dismissInvite, addMockInvite,
-      togglePause, kickPlayer, startPartyMatch,
+      togglePause, kickPlayer, startPartyMatch, endMatch, returnToLobby, returnToMenu,
     }}>
       {children}
     </RoomContext.Provider>

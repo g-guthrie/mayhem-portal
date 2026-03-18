@@ -23,7 +23,7 @@ const WEAPONS: LoadoutItem[] = [
   { id: 'machinegun', name: 'MACHINE GUN', icon: <Crosshair className="w-4 h-4" /> },
   { id: 'shotgun', name: 'SHOTGUN', icon: <ShotgunSpread className="w-4 h-4" /> },
   { id: 'rifle', name: 'RIFLE', icon: <Crosshair className="w-4 h-4" /> },
-  { id: 'pistol', name: 'PISTOL', icon: <Crosshair className="w-4 h-4" /> },
+  { id: 'pistol', name: 'PISTOL', icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><circle cx="12" cy="12" r="8" /></svg> },
   { id: 'sniper', name: 'SNIPER', icon: <Target className="w-4 h-4" /> },
 ];
 

@@ -114,6 +114,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isPaused, setIsPaused] = useState(false);
   const disconnectTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
   const matchTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   /* ─── Auto-end match after duration ─── */
   useEffect(() => {

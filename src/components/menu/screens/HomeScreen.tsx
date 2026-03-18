@@ -223,7 +223,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Pending Invites ─── */
   const InviteBanner = room.pendingInvites.length > 0 ? (
-    <div className="glass-card p-3 flex flex-col gap-2 border-primary/20 animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
+    <div className="glass-card p-3 flex flex-col gap-2 border-primary/20 animate-fade-in-up max-h-[150px] overflow-y-auto" style={{ animationDuration: '0.2s' }}>
       <span className="section-label !mb-0 flex items-center gap-1.5">
         <Bell className="w-3 h-3 text-primary" /> ROOM INVITES
       </span>
@@ -359,7 +359,7 @@ const HomeScreen: React.FC = () => {
           <span className="section-label flex items-center gap-1 !mb-1.5">
             <Users className="w-3 h-3 text-primary" /> TEAMS
           </span>
-          <div className={`grid gap-2 ${room.teamCount <= 2 ? 'grid-cols-2' : room.teamCount === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
+          <div className={`grid gap-2 max-h-[160px] overflow-y-auto ${room.teamCount <= 2 ? 'grid-cols-2' : room.teamCount === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
             {Array.from({ length: room.teamCount }).map((_, tIdx) => (
               <div
                 key={tIdx}
@@ -407,7 +407,7 @@ const HomeScreen: React.FC = () => {
           <span className="section-label flex items-center gap-1 !mb-1.5">
             <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
           </span>
-          <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col gap-0.5 max-h-[120px] overflow-y-auto">
             {room.players.map(p => (
               <div key={p.id} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
                 <div className="flex items-center gap-2">
@@ -489,7 +489,7 @@ const HomeScreen: React.FC = () => {
           <span className="section-label flex items-center gap-1 !mb-1.5">
             <Users className="w-3 h-3 text-primary" /> YOUR PARTY
           </span>
-          <div id="party-hero-members" className="flex flex-col gap-1">
+          <div id="party-hero-members" className="flex flex-col gap-1 max-h-[120px] overflow-y-auto">
             {partyMembers.map(m => (
               <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
                 <div className="flex items-center gap-1.5">
@@ -556,7 +556,7 @@ const HomeScreen: React.FC = () => {
             </div>
           )}
 
-          <div id="social-friends-list" className="flex flex-col gap-0.5">
+          <div id="social-friends-list" className="flex flex-col gap-0.5 max-h-[200px] overflow-y-auto">
             {FAKE_FRIENDS.map(f => (
               <div key={f.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors hover:bg-muted/30 cursor-pointer group">
                 <div className="flex items-center gap-2">

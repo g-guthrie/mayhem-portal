@@ -29,7 +29,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = () => {
           {canGoBack && (
             <button
               id="menu-return-btn"
-              className="pill-btn w-8 h-8 !p-0 flex items-center justify-center !rounded-xl"
+              className="pill-btn w-8 h-8 !p-0 flex items-center justify-center"
               onClick={pop}
             >
               <ChevronLeft className="w-4 h-4" />
@@ -39,7 +39,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = () => {
             {SCREEN_TITLES[current]}
           </span>
           {current === 'home' && (
-            <div id="menu-party-id-btn" className="pill-btn !rounded-xl gap-1.5 cursor-pointer group ml-2">
+            <div id="menu-party-id-btn" className="pill-btn gap-1.5 cursor-pointer group ml-2">
               <span id="menu-party-id-label" className="text-muted-foreground group-hover:text-foreground transition-colors text-[10px]">PLAYER ID</span>
               <span id="menu-party-id-value" className="text-primary font-bold text-[10px] font-mono">{actorId.slice(0, 12)}</span>
               <Copy className="w-2.5 h-2.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -51,7 +51,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = () => {
           {!isLoggedIn && current === 'home' && (
             <button
               id="menu-login-btn"
-              className="pill-btn active !rounded-xl gap-1.5"
+              className="pill-btn active gap-1.5"
               onClick={() => push('auth')}
             >
               <LogIn className="w-3.5 h-3.5" />
@@ -61,7 +61,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = () => {
           {current !== 'settings' && (
             <button
               id="utility-toggle-btn"
-              className="pill-btn !rounded-xl gap-1.5"
+              className="pill-btn gap-1.5"
               onClick={() => push('settings')}
             >
               <Settings className="w-3.5 h-3.5" />

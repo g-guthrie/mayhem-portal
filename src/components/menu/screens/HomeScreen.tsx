@@ -188,20 +188,15 @@ const HomeScreen: React.FC = () => {
 
             {isSolo ? (
               /* ─── Solo / Empty Party State ─── */
-              <div className="flex flex-col items-center gap-2 py-3 px-2 rounded-lg bg-muted/10 border border-border/30">
+              <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/10 border border-border/30">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
                   <span className="font-rajdhani font-semibold text-xs text-foreground">{displayName}</span>
                   <span className="text-[8px] font-orbitron text-muted-foreground tracking-wider">SOLO</span>
                 </div>
-                <div className="flex gap-1.5 w-full">
-                  <button className="pill-btn active !rounded-lg flex-1 justify-center gap-1 !text-[9px] !py-1.5">
-                    <Share2 className="w-2.5 h-2.5" /> SHARE ID
-                  </button>
-                  <button className="pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !py-1.5">
-                    <UserPlus className="w-2.5 h-2.5" /> INVITE
-                  </button>
-                </div>
+                <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] gap-0.5">
+                  <UserPlus className="w-2.5 h-2.5" /> INVITE
+                </button>
               </div>
             ) : (
               /* ─── Party with members ─── */

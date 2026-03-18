@@ -123,6 +123,7 @@ const HomeScreen: React.FC = () => {
   const [dragOverTeam, setDragOverTeam] = useState<number | null>(null);
 
   const isSolo = partyMembers.length <= 1;
+  const isPartyLeader = partyMembers.find(m => m.isLeader)?.name === displayName;
   const showSocialPanel = isLoggedIn || !isSolo;
 
   /* ─── Drag & Drop handlers ─── */

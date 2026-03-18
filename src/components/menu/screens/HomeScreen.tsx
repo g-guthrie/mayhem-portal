@@ -85,6 +85,20 @@ const HomeScreen: React.FC = () => {
     if (friends.length <= 1) setRemoveMode(false);
   };
 
+  /* Click outside to close add/remove */
+  const socialPanelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (socialPanelRef.current && !socialPanelRef.current.contains(e.target as Node)) {
+        setAddFriendOpen(false);
+        setRemoveMode(false);
+        setConfirmingFriend(null);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
 

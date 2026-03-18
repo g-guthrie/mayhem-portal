@@ -82,15 +82,7 @@ const LoadoutBand: React.FC = () => {
       <div className="px-4 sm:px-6 py-3">
         {/* Collapse / Summary row */}
         <div className="flex items-center justify-between mb-2">
-          <button
-            id="loadout-collapse-btn"
-            className="pill-btn !py-1.5 !px-3 text-[10px]"
-            onClick={() => setCollapsed(!collapsed)}
-          >
-            {collapsed ? '▲ EXPAND LOADOUT' : '▼ COLLAPSE LOADOUT'}
-          </button>
-
-          {collapsed && (
+          {collapsed ? (
             <div id="loadout-collapsed-row" className="flex gap-3">
               <button id="weapon-slot-summary" className="pill-btn !py-1.5 text-[10px]" onClick={() => setCollapsed(false)}>
                 <Crosshair className="w-3 h-3" /> {getWeaponName(selectedWeapons[0])} / {getWeaponName(selectedWeapons[1])}
@@ -102,7 +94,16 @@ const LoadoutBand: React.FC = () => {
                 <Zap className="w-3 h-3" /> {getAbilityName(selectedAbilities[0])} / {getAbilityName(selectedAbilities[1])}
               </button>
             </div>
+          ) : (
+            <div />
           )}
+          <button
+            id="loadout-collapse-btn"
+            className="pill-btn !py-1.5 !px-3 text-[10px] ml-auto"
+            onClick={() => setCollapsed(!collapsed)}
+          >
+            {collapsed ? '▲ EXPAND LOADOUT' : '▼ COLLAPSE LOADOUT'}
+          </button>
         </div>
 
         {/* Expanded loadout */}

@@ -499,7 +499,7 @@ const HomeScreen: React.FC = () => {
                 <div className="flex items-center gap-1">
                   {!m.isLeader && partyMembers.find(p => p.isLeader)?.name === displayName && (
                     <button
-                      className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] gap-0.5"
+                      className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
                       title="Make Leader"
                       onClick={() => transferLeader(m.name)}
                     >

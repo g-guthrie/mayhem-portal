@@ -636,6 +636,10 @@ const HomeScreen: React.FC = () => {
             <button
               id="party-hero-leave-btn"
               className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
+              onClick={() => {
+                setPartyMembers([{ name: displayName, isLeader: true }]);
+                toast({ title: 'Left party' });
+              }}
             >
               <LogOut className="w-2.5 h-2.5" />
               <span className="hidden sm:inline">LEAVE</span>

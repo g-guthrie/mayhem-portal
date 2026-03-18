@@ -23,7 +23,7 @@ const AuthScreen: React.FC = () => {
     pop();
   };
 
-  if (isLoggedIn) {
+  if (isLoggedIn && !justLoggedIn) {
     return (
       <div className="flex flex-col gap-4">
         <div className="glass-card p-6 flex flex-col items-center gap-4">

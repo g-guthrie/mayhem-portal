@@ -171,7 +171,7 @@ const HomeScreen: React.FC = () => {
             <button
               key={mode.id}
               id={mode.id === 'practice' ? 'practice-mode-btn' : `play-mode-${mode.id}-btn`}
-              className={`item-grid-btn !rounded-lg !p-2 text-left !min-h-0 ${selectedMode === mode.id ? 'selected' : ''}`}
+              className={`item-grid-btn !p-2 text-left !min-h-0 ${selectedMode === mode.id ? 'selected' : ''}`}
               onClick={() => { setSelectedMode(mode.id); setModesOpen(false); }}
             >
               <div className="flex items-center gap-1.5 w-full">

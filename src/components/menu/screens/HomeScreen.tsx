@@ -664,7 +664,14 @@ const HomeScreen: React.FC = () => {
                     </button>
                   )}
                   {!m.isLeader && (
-                    <button className="pill-btn !px-1.5 !py-0.5 text-[8px]" title="Remove">
+                    <button
+                      className="pill-btn !px-1.5 !py-0.5 text-[8px]"
+                      title="Remove"
+                      onClick={() => {
+                        setPartyMembers(prev => prev.filter(p => p.name !== m.name));
+                        toast({ title: `Kicked ${m.name}`, description: 'Removed from party' });
+                      }}
+                    >
                       <UserMinus className="w-2.5 h-2.5" />
                     </button>
                   )}

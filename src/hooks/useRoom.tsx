@@ -97,6 +97,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [matchState, setMatchState] = useState<'idle' | 'ready-check' | 'countdown' | 'in-match'>('idle');
   const [countdownValue, setCountdownValue] = useState(3);
   const [readyPlayers, setReadyPlayers] = useState<Set<string>>(new Set());
+  const [matchStats] = useState<MatchStats>({ kills: 7, deaths: 3, assists: 4 });
   const [disconnectedPlayers, setDisconnectedPlayers] = useState<Map<string, DisconnectedPlayer>>(new Map());
   const [isPaused, setIsPaused] = useState(false);
   const disconnectTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());

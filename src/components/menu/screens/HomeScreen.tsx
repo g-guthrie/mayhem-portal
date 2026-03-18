@@ -514,9 +514,18 @@ const HomeScreen: React.FC = () => {
       {/* Party */}
       {!isSolo && (
         <div id="menu-party-hero">
-          <span className="section-label flex items-center gap-1 !mb-1.5">
-            <Users className="w-3 h-3 text-primary" /> YOUR PARTY
-          </span>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="section-label flex items-center gap-1 !mb-0">
+              <Users className="w-3 h-3 text-primary" /> YOUR PARTY
+            </span>
+            <button
+              id="party-hero-leave-btn"
+              className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
+            >
+              <LogOut className="w-2.5 h-2.5" />
+              <span className="hidden sm:inline">LEAVE</span>
+            </button>
+          </div>
           <div id="party-hero-members" className="flex flex-col gap-1 max-h-[120px] overflow-y-auto">
             {partyMembers.map(m => (
               <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
@@ -543,11 +552,6 @@ const HomeScreen: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
-          <div id="menu-party-actions" className="mt-1.5">
-            <button id="party-hero-leave-btn" className="pill-btn w-full justify-center !py-1.5 !text-[9px] text-destructive border-destructive/30 hover:bg-destructive/10">
-              LEAVE PARTY
-            </button>
           </div>
         </div>
       )}

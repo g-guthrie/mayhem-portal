@@ -8,11 +8,13 @@ const AuthScreen: React.FC = () => {
   const { pop } = useMenuNav();
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
+  const [justLoggedIn, setJustLoggedIn] = useState(false);
 
   const handleLogin = () => {
     if (username.trim()) {
-      pop();
+      setJustLoggedIn(true);
       login(username.trim());
+      pop();
     }
   };
 
@@ -21,7 +23,7 @@ const AuthScreen: React.FC = () => {
     pop();
   };
 
-  if (isLoggedIn) {
+  if (isLoggedIn && !justLoggedIn) {
     return (
       <div className="flex flex-col gap-4">
         <div className="glass-card p-6 flex flex-col items-center gap-4">

@@ -95,7 +95,7 @@ const LoadoutBand: React.FC = () => {
               <button id="weapon-slot-summary" className="pill-btn !py-1.5 text-[10px]" onClick={() => setCollapsed(false)}>
                 <Crosshair className="w-3 h-3" /> {getWeaponName(selectedWeapons[0])} / {getWeaponName(selectedWeapons[1])}
               </button>
-              <button id="throwable-slot-summary" className="pill-btn !rounded-xl !py-1.5 text-[10px]" onClick={() => setCollapsed(false)}>
+              <button id="throwable-slot-summary" className="pill-btn !py-1.5 text-[10px]" onClick={() => setCollapsed(false)}>
                 <Bomb className="w-3 h-3" /> {selectedThrowable.toUpperCase()}
               </button>
               <button id="ability-slot-summary" className="pill-btn !rounded-xl !py-1.5 text-[10px]" onClick={() => setCollapsed(false)}>

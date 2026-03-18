@@ -477,8 +477,8 @@ const HomeScreen: React.FC = () => {
       <div id="social-direct-invite-banner" className="hidden border-primary/30">
         <div id="social-direct-invite-copy" className="text-xs font-rajdhani text-foreground mb-1.5" />
         <div id="social-direct-invite-actions" className="flex gap-1.5">
-          <button id="social-direct-invite-accept-btn" className="pill-btn active !rounded-lg flex-1 !text-[9px] !py-1.5">ACCEPT</button>
-          <button id="social-direct-invite-dismiss-btn" className="pill-btn !rounded-lg flex-1 !text-[9px] !py-1.5">DISMISS</button>
+          <button id="social-direct-invite-accept-btn" className="pill-btn active flex-1 !text-[9px] !py-1.5">ACCEPT</button>
+          <button id="social-direct-invite-dismiss-btn" className="pill-btn flex-1 !text-[9px] !py-1.5">DISMISS</button>
         </div>
       </div>
 

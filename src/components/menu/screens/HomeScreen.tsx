@@ -298,7 +298,7 @@ const HomeScreen: React.FC = () => {
               {TEAM_COUNTS.map(n => (
                 <button
                   key={n}
-                  className={`pill-btn !rounded-lg flex-1 justify-center !text-[9px] !px-2 !py-1.5 ${room.teamCount === n ? 'active' : ''}`}
+                  className={`pill-btn flex-1 justify-center !text-[9px] !px-2 !py-1.5 ${room.teamCount === n ? 'active' : ''}`}
                   onClick={() => room.setTeamCount(n)}
                 >
                   {n} TEAMS

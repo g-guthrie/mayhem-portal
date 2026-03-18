@@ -1,15 +1,28 @@
 import React, { useState } from 'react';
-import { UserPlus, ArrowRight, Users, Hash, Globe } from 'lucide-react';
+import { UserPlus, ArrowRight, Users, Hash, Globe, UserMinus } from 'lucide-react';
+
+interface FakeFriend {
+  name: string;
+  status: 'online' | 'away';
+  inGame: boolean;
+}
+
+const INITIAL_FRIENDS: FakeFriend[] = [
+  { name: 'xVortex', status: 'online', inGame: true },
+  { name: 'NightOwl', status: 'online', inGame: false },
+  { name: 'BlazeFury', status: 'away', inGame: false },
+];
 
 const SocialHero: React.FC = () => {
   const [friendId, setFriendId] = useState('');
   const [roomCode, setRoomCode] = useState('');
+  const [friends, setFriends] = useState<FakeFriend[]>(INITIAL_FRIENDS);
+  const [expandedFriend, setExpandedFriend] = useState<string | null>(null);
 
-  const fakeFriends = [
-    { name: 'xVortex', status: 'online', inGame: true },
-    { name: 'NightOwl', status: 'online', inGame: false },
-    { name: 'BlazeFury', status: 'away', inGame: false },
-  ];
+  const removeFriend = (name: string) => {
+    setFriends(prev => prev.filter(f => f.name !== name));
+    setExpandedFriend(null);
+  };
 
   return (
     <div id="menu-social-hero" className="glass-card p-6 flex flex-col gap-5 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
@@ -64,15 +77,33 @@ const SocialHero: React.FC = () => {
             <Users className="w-3 h-3" /> FRIENDS
           </span>
           <div id="social-friends-list" className="flex flex-col gap-1.5 mt-1">
-            {fakeFriends.map(f => (
-              <div key={f.name} className="flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors hover:bg-muted/30 cursor-pointer">
+            {friends.map(f => (
+              <div
+                key={f.name}
+                className="flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors hover:bg-muted/30 cursor-pointer"
+                onClick={() => setExpandedFriend(expandedFriend === f.name ? null : f.name)}
+              >
                 <div className="flex items-center gap-2.5">
                   <div className={`w-2 h-2 rounded-full ${f.status === 'online' ? 'bg-green-400' : 'bg-yellow-500'}`} />
                   <span className="font-rajdhani font-semibold text-sm text-foreground">{f.name}</span>
                 </div>
-                {f.inGame && (
-                  <span className="text-[10px] font-orbitron text-primary tracking-wider">IN GAME</span>
-                )}
+                <div className="flex items-center gap-2">
+                  {f.inGame && (
+                    <span className="text-[10px] font-orbitron text-primary tracking-wider">IN GAME</span>
+                  )}
+                  {expandedFriend === f.name && (
+                    <button
+                      className="pill-btn !rounded-xl !px-3 text-destructive border-destructive/30 hover:bg-destructive/10"
+                      title="Remove Friend"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFriend(f.name);
+                      }}
+                    >
+                      <UserMinus className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

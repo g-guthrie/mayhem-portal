@@ -46,22 +46,31 @@ const MenuHeader: React.FC<MenuHeaderProps> = () => {
               onClick={() => {
                 if (isLoggedIn) {
                   push('auth');
-                } else {
-                  navigator.clipboard.writeText(actorId);
-                  toast({ title: 'Copied to clipboard', description: actorId });
+                } else if (actorId) {
+                  try {
+                    navigator.clipboard.writeText(actorId);
+                    toast({ title: 'Copied to clipboard', description: actorId });
+                  } catch {
+                    toast({ title: 'Failed to copy', description: 'Clipboard not available', variant: 'destructive' });
+                  }
                 }
               }}
             >
               <span id="menu-party-id-label" className="text-muted-foreground group-hover:text-foreground transition-colors text-[10px]">
                 {isLoggedIn ? displayName : 'PLAYER ID'}
               </span>
-              <span id="menu-party-id-value" className="text-primary font-bold text-[10px] font-mono">{actorId.slice(0, 12)}</span>
+              <span id="menu-party-id-value" className="text-primary font-bold text-[10px] font-mono">{actorId?.slice(0, 12)}</span>
               <button
                 className="opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigator.clipboard.writeText(actorId);
-                  toast({ title: 'Copied to clipboard', description: actorId });
+                  if (!actorId) return;
+                  try {
+                    navigator.clipboard.writeText(actorId);
+                    toast({ title: 'Copied to clipboard', description: actorId });
+                  } catch {
+                    toast({ title: 'Failed to copy', description: 'Clipboard not available', variant: 'destructive' });
+                  }
                 }}
               >
                 <Copy className="w-2.5 h-2.5 text-muted-foreground hover:text-foreground" />

@@ -1,20 +1,33 @@
 import React, { useState } from 'react';
 import { UserPlus, ArrowRight, Users, UserMinus, MessageSquare } from 'lucide-react';
 
+interface FakeFriend {
+  name: string;
+  status: 'online' | 'away' | 'offline';
+  inGame: boolean;
+}
+
+const INITIAL_FRIENDS: FakeFriend[] = [
+  { name: 'xVortex', status: 'online', inGame: true },
+  { name: 'NightOwl', status: 'online', inGame: false },
+  { name: 'BlazeFury', status: 'away', inGame: false },
+  { name: 'ShadowKnight', status: 'offline', inGame: false },
+];
+
 const SocialScreen: React.FC = () => {
   const [friendId, setFriendId] = useState('');
-
-  const fakeFriends = [
-    { name: 'xVortex', status: 'online' as const, inGame: true },
-    { name: 'NightOwl', status: 'online' as const, inGame: false },
-    { name: 'BlazeFury', status: 'away' as const, inGame: false },
-    { name: 'ShadowKnight', status: 'offline' as const, inGame: false },
-  ];
+  const [friends, setFriends] = useState<FakeFriend[]>(INITIAL_FRIENDS);
+  const [expandedFriend, setExpandedFriend] = useState<string | null>(null);
 
   const partyMembers = [
     { name: 'You', isLeader: true },
     { name: 'xVortex', isLeader: false },
   ];
+
+  const removeFriend = (name: string) => {
+    setFriends(prev => prev.filter(f => f.name !== name));
+    setExpandedFriend(null);
+  };
 
   return (
     <div className="flex flex-col gap-4 h-full">
@@ -80,8 +93,12 @@ const SocialScreen: React.FC = () => {
           <Users className="w-3 h-3 text-primary" /> FRIENDS ONLINE
         </span>
         <div id="social-friends-list" className="flex flex-col gap-1">
-          {fakeFriends.map(f => (
-            <div key={f.name} className="flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors hover:bg-muted/30 cursor-pointer group">
+          {friends.map(f => (
+            <div
+              key={f.name}
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors hover:bg-muted/30 cursor-pointer group"
+              onClick={() => setExpandedFriend(expandedFriend === f.name ? null : f.name)}
+            >
               <div className="flex items-center gap-2.5">
                 <div className={`w-2 h-2 rounded-full ${
                   f.status === 'online' ? 'bg-green-400' :
@@ -93,9 +110,22 @@ const SocialScreen: React.FC = () => {
                 {f.inGame && (
                   <span className="text-[9px] font-orbitron text-primary tracking-wider">IN GAME</span>
                 )}
-                <button className="pill-btn !rounded-lg !px-2 !py-1 text-[9px] opacity-0 group-hover:opacity-100 transition-opacity">
-                  <UserPlus className="w-3 h-3" />
-                </button>
+                {expandedFriend === f.name ? (
+                  <button
+                    className="pill-btn !rounded-xl !px-3 text-destructive border-destructive/30 hover:bg-destructive/10"
+                    title="Remove Friend"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeFriend(f.name);
+                    }}
+                  >
+                    <UserMinus className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <button className="pill-btn !rounded-lg !px-2 !py-1 text-[9px] opacity-0 group-hover:opacity-100 transition-opacity">
+                    <UserPlus className="w-3 h-3" />
+                  </button>
+                )}
               </div>
             </div>
           ))}

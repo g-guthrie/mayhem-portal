@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMenuNav } from '@/hooks/useMenuNav';
-import { useRoom, type RoomPlayer } from '@/hooks/useRoom';
+import { useRoom, type RoomPlayer, MAX_PLAYERS } from '@/hooks/useRoom';
 
 /* ─── Game Modes ─── */
 interface GameMode { id: string; label: string; icon: React.ReactNode }
@@ -401,7 +401,7 @@ const HomeScreen: React.FC = () => {
         /* FFA player list */
         <div className="flex-1 min-h-0">
           <span className="section-label flex items-center gap-1 !mb-1.5">
-            <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length})
+            <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
           </span>
           <div className="flex flex-col gap-0.5">
             {room.players.map(p => (

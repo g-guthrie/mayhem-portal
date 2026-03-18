@@ -658,7 +658,10 @@ const HomeScreen: React.FC = () => {
                     <button
                       className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
                       title="Make Leader"
-                      onClick={() => transferLeader(m.name)}
+                      onClick={() => {
+                        transferLeader(m.name);
+                        toast({ title: `${m.name} is now party leader` });
+                      }}
                     >
                       <Crown className="w-2.5 h-2.5 text-primary" />
                     </button>

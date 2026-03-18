@@ -140,7 +140,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Play Card ─── */
   const PlayCard = (
-    <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2">
+    <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2 h-full">
       <div id="play-mode-toolbar" className="flex items-center gap-2">
         <button
           id="primary-launch-btn"

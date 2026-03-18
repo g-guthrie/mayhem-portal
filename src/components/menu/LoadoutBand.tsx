@@ -151,11 +151,11 @@ const LoadoutBand: React.FC = () => {
                 <span className="section-label flex items-center gap-1.5">
                   <Bomb className="w-3 h-3 text-primary" /> TACTICAL
                 </span>
-                <div id="throwable-category-tabs" className="category-tabs flex gap-1">
+                <div id="throwable-category-tabs" className="slot-row flex gap-2">
                   {THROWABLE_CATEGORIES.map(cat => (
                     <button
                       key={cat.id}
-                      className={`throwable-cat-btn tab-btn flex-1 ${throwableCategory === cat.id ? 'active' : ''}`}
+                      className={`slot-btn flex-1 ${throwableCategory === cat.id ? 'active' : ''}`}
                       data-cat-id={cat.id}
                       onClick={() => setThrowableCategory(cat.id)}
                     >

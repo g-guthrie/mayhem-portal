@@ -29,7 +29,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = () => {
           {canGoBack && (
             <button
               id="menu-return-btn"
-              className="pill-btn w-8 h-8 !p-0 flex items-center justify-center !rounded-xl"
+              className="pill-btn w-8 h-8 !p-0 flex items-center justify-center"
               onClick={pop}
             >
               <ChevronLeft className="w-4 h-4" />

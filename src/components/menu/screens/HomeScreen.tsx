@@ -207,7 +207,7 @@ const HomeScreen: React.FC = () => {
       <div id="social-room-join-stack" className="flex gap-1.5">
         <input
           id="room-code-input"
-          className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs !rounded-lg"
+          className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
           placeholder="Room Code"
           value={roomCodeInput}
           onChange={e => setRoomCodeInput(e.target.value)}

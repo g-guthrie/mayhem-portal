@@ -84,7 +84,7 @@ const LoadoutBand: React.FC = () => {
         <div className="flex items-center justify-between mb-2">
           <button
             id="loadout-collapse-btn"
-            className="pill-btn !rounded-xl !py-1.5 !px-3 text-[10px]"
+            className="pill-btn !py-1.5 !px-3 text-[10px]"
             onClick={() => setCollapsed(!collapsed)}
           >
             {collapsed ? '▲ EXPAND LOADOUT' : '▼ COLLAPSE'}

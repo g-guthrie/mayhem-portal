@@ -11,7 +11,7 @@ interface LoadoutItem {
 
 const WEAPONS: LoadoutItem[] = [
   { id: 'machinegun', name: 'MACHINE GUN', icon: <Crosshair className="w-4 h-4" /> },
-  { id: 'shotgun', name: 'SHOTGUN', icon: <Crosshair className="w-4 h-4" /> },
+  { id: 'shotgun', name: 'SHOTGUN', icon: <CircleDot className="w-4 h-4" /> },
   { id: 'rifle', name: 'RIFLE', icon: <Crosshair className="w-4 h-4" /> },
   { id: 'pistol', name: 'PISTOL', icon: <Crosshair className="w-4 h-4" /> },
   { id: 'sniper', name: 'SNIPER', icon: <Target className="w-4 h-4" /> },

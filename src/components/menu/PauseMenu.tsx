@@ -14,10 +14,12 @@ const PauseMenu: React.FC = () => {
     if (isPaused) setView('main');
   }, [isPaused]);
 
-  // ESC to close sub-views or resume
+  // ESC to close sub-views or resume — only when paused to avoid conflict with MatchOverlay
   useEffect(() => {
+    if (!isPaused) return;
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        e.stopImmediatePropagation();
         if (view !== 'main') {
           setView('main');
         } else {
@@ -27,7 +29,7 @@ const PauseMenu: React.FC = () => {
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [view, togglePause]);
+  }, [isPaused, view, togglePause]);
 
   if (!isPaused) return null;
 

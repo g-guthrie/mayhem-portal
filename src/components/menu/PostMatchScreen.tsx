@@ -75,7 +75,7 @@ const PostMatchScreen: React.FC = () => {
             </button>
           )}
           <button
-            className={`pill-btn !rounded-xl ${isInRoom ? '' : 'flex-1'} justify-center !py-2.5 gap-1.5 ${!isInRoom ? '' : 'text-muted-foreground border-border/30 hover:bg-muted/10'}`}
+            className={`pill-btn !rounded-xl flex-1 justify-center !py-2.5 gap-1.5 ${isInRoom ? 'text-muted-foreground border-border/30 hover:bg-muted/10' : ''}`}
             onClick={handleMainMenu}
           >
             <Home className="w-3.5 h-3.5" /> MAIN MENU

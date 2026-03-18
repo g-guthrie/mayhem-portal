@@ -326,7 +326,7 @@ const HomeScreen: React.FC = () => {
       <div className="flex gap-1.5">
         {room.isCreator && (
           <button
-            className={`pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.isLocked ? 'active' : ''}`}
+            className={`pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.isLocked ? 'active' : ''}`}
             onClick={room.toggleLock}
           >
             {room.isLocked ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}

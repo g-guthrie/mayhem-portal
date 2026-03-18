@@ -597,7 +597,7 @@ const HomeScreen: React.FC = () => {
             {friends.map(f => (
               <div
                 key={f.name}
-                className={`flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors cursor-pointer group ${
+                className={`flex items-center px-2 py-1.5 rounded-lg transition-colors cursor-pointer group ${
                   removeMode ? 'hover:bg-destructive/10 border border-transparent hover:border-destructive/20' : 'hover:bg-muted/30'
                 } ${confirmingFriend === f.name ? 'bg-destructive/10 border border-destructive/20' : ''}`}
                 onClick={() => {
@@ -612,8 +612,6 @@ const HomeScreen: React.FC = () => {
                     f.status === 'away' ? 'bg-yellow-500' : 'bg-muted-foreground/40'
                   }`} />
                   <span className="font-rajdhani font-semibold text-xs text-foreground">{f.name}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
                   {confirmingFriend === f.name ? (
                     <div className="flex items-center gap-1.5">
                       <span className="text-[8px] font-orbitron text-destructive tracking-wider">REMOVE?</span>
@@ -632,9 +630,9 @@ const HomeScreen: React.FC = () => {
                     </div>
                   ) : (
                     <>
-                      {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider">IN GAME</span>}
+                      {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider ml-1">IN GAME</span>}
                       {!removeMode && (
-                        <button className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" title="Invite to party">
+                        <button className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity ml-1" title="Invite to party">
                           <UserPlus className="w-2.5 h-2.5" />
                         </button>
                       )}

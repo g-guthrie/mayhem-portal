@@ -89,7 +89,7 @@ const AuthScreen: React.FC = () => {
       </div>
 
       <button
-        className="pill-btn !rounded-xl w-full justify-center !py-3"
+        className="pill-btn w-full justify-center !py-3"
         onClick={pop}
       >
         PLAY AS GUEST

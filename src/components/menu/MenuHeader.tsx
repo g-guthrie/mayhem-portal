@@ -61,7 +61,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = () => {
           {current !== 'settings' && (
             <button
               id="utility-toggle-btn"
-              className="pill-btn !rounded-xl gap-1.5"
+              className="pill-btn gap-1.5"
               onClick={() => push('settings')}
             >
               <Settings className="w-3.5 h-3.5" />

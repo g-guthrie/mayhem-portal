@@ -85,7 +85,7 @@ const PauseMenu: React.FC = () => {
               </button>
               <button
                 className="pill-btn !rounded-xl flex-1 justify-center !py-2.5 !text-[9px] text-destructive border-destructive/30 hover:bg-destructive/10"
-                onClick={leaveRoom}
+                onClick={() => { leaveRoom(); menuNav.reset(); }}
               >
                 LEAVE
               </button>

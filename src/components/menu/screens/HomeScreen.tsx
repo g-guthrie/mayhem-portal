@@ -223,7 +223,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Pending Invites ─── */
   const InviteBanner = room.pendingInvites.length > 0 ? (
-    <div className="glass-card p-3 flex flex-col gap-2 border-primary/20 animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
+    <div className="glass-card p-3 flex flex-col gap-2 border-primary/20 animate-fade-in-up max-h-[150px] overflow-y-auto" style={{ animationDuration: '0.2s' }}>
       <span className="section-label !mb-0 flex items-center gap-1.5">
         <Bell className="w-3 h-3 text-primary" /> ROOM INVITES
       </span>

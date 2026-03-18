@@ -543,7 +543,7 @@ const HomeScreen: React.FC = () => {
           {addFriendOpen && (
             <div className="flex gap-1.5 mb-1.5 animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
               <input
-                className="glass-input flex-1 !py-1 !px-2 !text-xs !rounded-lg"
+                className="glass-input flex-1 !py-1 !px-2 !text-xs"
                 placeholder="Enter player ID..."
                 value={addFriendId}
                 onChange={e => setAddFriendId(e.target.value)}

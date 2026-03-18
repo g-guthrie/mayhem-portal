@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { Crosshair, Bomb, Sword, Zap, Shield, Wind, Flame, Sparkles, Target, Eye, Heart, Anchor, Aperture } from 'lucide-react';
 
+type ThrowableCategory = 'grenade' | 'blade';
+
+interface LoadoutItem {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+}
+
 const WEAPONS: LoadoutItem[] = [
   { id: 'machinegun', name: 'MACHINE GUN', icon: <Crosshair className="w-4 h-4" /> },
   { id: 'shotgun', name: 'SHOTGUN', icon: <Aperture className="w-4 h-4" /> },

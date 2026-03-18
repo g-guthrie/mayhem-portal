@@ -3,10 +3,11 @@ import {
   Crosshair, ChevronDown, Swords, Target, Dumbbell,
   UserPlus, ArrowRight, Globe, Users, UserMinus,
   Copy, Lock, Unlock, Shuffle, Play, GripVertical,
-  DoorOpen, X,
+  DoorOpen, X, LogOut, Bell, Check, Shield,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMenuNav } from '@/hooks/useMenuNav';
+import { useRoom, type RoomPlayer } from '@/hooks/useRoom';
 
 /* ─── Game Modes ─── */
 interface GameMode { id: string; label: string; icon: React.ReactNode }
@@ -17,17 +18,15 @@ const GAME_MODES: GameMode[] = [
   { id: 'practice', label: 'PRACTICE', icon: <Dumbbell className="w-3.5 h-3.5" /> },
 ];
 
-/* ─── Room config ─── */
+/* ─── Room mode config ─── */
 const ROOM_MODES = [
-  { id: 'ffa', label: 'FFA', icon: <Crosshair className="w-3 h-3" /> },
-  { id: 'tdm', label: 'TDM', icon: <Swords className="w-3 h-3" /> },
-  { id: 'lms', label: 'LMS', icon: <Target className="w-3 h-3" /> },
+  { id: 'ffa' as const, label: 'FFA', icon: <Crosshair className="w-3 h-3" /> },
+  { id: 'tdm' as const, label: 'TDM', icon: <Swords className="w-3 h-3" /> },
+  { id: 'lms' as const, label: 'LMS', icon: <Target className="w-3 h-3" /> },
 ];
 const TEAM_COUNTS = [2, 3, 4];
 
-interface TeamMember { id: string; name: string }
-
-/* ─── Fake data (shown when logged in) ─── */
+/* ─── Fake friends data ─── */
 const FAKE_FRIENDS = [
   { name: 'xVortex', status: 'online' as const, inGame: true },
   { name: 'NightOwl', status: 'online' as const, inGame: false },
@@ -35,9 +34,29 @@ const FAKE_FRIENDS = [
   { name: 'ShadowKnight', status: 'offline' as const, inGame: false },
 ];
 
+const TEAM_COLORS = [
+  'text-cyan-400',
+  'text-rose-400',
+  'text-amber-400',
+  'text-emerald-400',
+];
+const TEAM_BORDER_COLORS = [
+  'border-cyan-400/30',
+  'border-rose-400/30',
+  'border-amber-400/30',
+  'border-emerald-400/30',
+];
+const TEAM_BG_COLORS = [
+  'bg-cyan-400/5',
+  'bg-rose-400/5',
+  'bg-amber-400/5',
+  'bg-emerald-400/5',
+];
+
 const HomeScreen: React.FC = () => {
-  const { isLoggedIn, displayName } = useAuth();
+  const { isLoggedIn, displayName, actorId } = useAuth();
   const { push } = useMenuNav();
+  const room = useRoom();
 
   /* Play state */
   const [selectedMode, setSelectedMode] = useState('ffa');
@@ -46,7 +65,7 @@ const HomeScreen: React.FC = () => {
 
   /* Quick join */
   const [friendId, setFriendId] = useState('');
-  const [roomCode, setRoomCode] = useState('');
+  const [roomCodeInput, setRoomCodeInput] = useState('');
 
   /* Add friend */
   const [addFriendOpen, setAddFriendOpen] = useState(false);
@@ -55,55 +74,69 @@ const HomeScreen: React.FC = () => {
   /* Room expanded (guest view) */
   const [roomExpanded, setRoomExpanded] = useState(false);
 
+  /* Invite player input */
+  const [inviteInput, setInviteInput] = useState('');
+
   /* Party state */
   const [partyMembers] = useState<{ name: string; isLeader: boolean }[]>([
     { name: displayName, isLeader: true },
   ]);
 
-  /* Room state */
-  const [roomShareCode] = useState('7F3A');
-  const [roomMode, setRoomMode] = useState('ffa');
-  const [teamCount, setTeamCount] = useState(2);
-  const [isLocked, setIsLocked] = useState(false);
-  const [teams, setTeams] = useState<Record<number, TeamMember[]>>({
-    0: [{ id: '1', name: 'You' }],
-    1: [],
-  });
-  const [dragItem, setDragItem] = useState<{ teamIdx: number; memberIdx: number } | null>(null);
-
-  const handleDragStart = (teamIdx: number, memberIdx: number) => setDragItem({ teamIdx, memberIdx });
-  const handleDrop = useCallback((targetTeamIdx: number) => {
-    if (!dragItem) return;
-    const { teamIdx: srcTeam, memberIdx: srcIdx } = dragItem;
-    if (srcTeam === targetTeamIdx) return;
-    setTeams(prev => {
-      const next = { ...prev };
-      const srcMembers = [...(next[srcTeam] || [])];
-      const targetMembers = [...(next[targetTeamIdx] || [])];
-      const [moved] = srcMembers.splice(srcIdx, 1);
-      targetMembers.push(moved);
-      next[srcTeam] = srcMembers;
-      next[targetTeamIdx] = targetMembers;
-      return next;
-    });
-    setDragItem(null);
-  }, [dragItem]);
-
-  const randomizeTeams = () => {
-    const all = Object.values(teams).flat();
-    const shuffled = [...all].sort(() => Math.random() - 0.5);
-    const newTeams: Record<number, TeamMember[]> = {};
-    for (let i = 0; i < teamCount; i++) newTeams[i] = [];
-    shuffled.forEach((m, i) => newTeams[i % teamCount].push(m));
-    setTeams(newTeams);
-  };
+  /* Drag state for desktop */
+  const [dragItem, setDragItem] = useState<{ playerId: string; fromTeam: number } | null>(null);
+  const [dragOverTeam, setDragOverTeam] = useState<number | null>(null);
 
   const isSolo = partyMembers.length <= 1;
   const showSocialPanel = isLoggedIn || !isSolo;
-  // Show expanded layout when: logged in, has party, or room is expanded
-  const showExpandedLayout = showSocialPanel || roomExpanded;
+  const showExpandedLayout = showSocialPanel || roomExpanded || room.isInRoom;
 
-  /* ─── Play Card (shared between layouts) ─── */
+  /* ─── Drag & Drop handlers ─── */
+  const handleDragStart = (playerId: string, fromTeam: number) => {
+    setDragItem({ playerId, fromTeam });
+  };
+  const handleDragOver = (e: React.DragEvent, teamIdx: number) => {
+    e.preventDefault();
+    setDragOverTeam(teamIdx);
+  };
+  const handleDragLeave = () => setDragOverTeam(null);
+  const handleDrop = (targetTeam: number) => {
+    if (dragItem) {
+      room.movePlayer(dragItem.playerId, dragItem.fromTeam, targetTeam);
+    }
+    setDragItem(null);
+    setDragOverTeam(null);
+  };
+
+  /* ─── Click-to-assign handler ─── */
+  const handlePlayerClick = (player: RoomPlayer) => {
+    if (room.selectedPlayer?.id === player.id) {
+      room.selectPlayer(null);
+    } else {
+      room.selectPlayer(player);
+    }
+  };
+  const handleTeamClick = (teamIdx: number) => {
+    if (room.selectedPlayer) {
+      room.assignToTeam(teamIdx);
+    }
+  };
+
+  /* ─── Create room ─── */
+  const handleCreateRoom = () => {
+    room.createRoom(displayName, actorId);
+    setRoomExpanded(true);
+  };
+
+  /* ─── Join room by code ─── */
+  const handleJoinRoom = () => {
+    if (roomCodeInput.trim().length >= 4) {
+      room.joinRoom(roomCodeInput.trim(), displayName, actorId);
+      setRoomExpanded(true);
+      setRoomCodeInput('');
+    }
+  };
+
+  /* ─── Play Card ─── */
   const PlayCard = (
     <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2">
       <div id="play-mode-toolbar" className="flex items-center gap-2">
@@ -140,7 +173,7 @@ const HomeScreen: React.FC = () => {
     </div>
   );
 
-  /* ─── Quick Join Card (shared) ─── */
+  /* ─── Quick Join Card ─── */
   const QuickJoinCard = (
     <div className="glass-card p-3 flex flex-col gap-2">
       <span className="section-label !mb-0">QUICK JOIN</span>
@@ -164,39 +197,75 @@ const HomeScreen: React.FC = () => {
           id="room-code-input"
           className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs !rounded-lg"
           placeholder="Room Code"
-          value={roomCode}
-          onChange={e => setRoomCode(e.target.value)}
+          value={roomCodeInput}
+          onChange={e => setRoomCodeInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleJoinRoom()}
         />
-        <button id="join-room-btn" className="pill-btn !rounded-lg !px-2 !py-1.5" title="Join Room">
+        <button id="join-room-btn" className="pill-btn !rounded-lg !px-2 !py-1.5" title="Join Room" onClick={handleJoinRoom}>
           <Globe className="w-3 h-3" />
         </button>
       </div>
     </div>
   );
 
-  /* ─── Room Panel (full, shared) ─── */
-  const RoomPanel = (
+  /* ─── Pending Invites ─── */
+  const InviteBanner = room.pendingInvites.length > 0 ? (
+    <div className="glass-card p-3 flex flex-col gap-2 border-primary/20 animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
+      <span className="section-label !mb-0 flex items-center gap-1.5">
+        <Bell className="w-3 h-3 text-primary" /> ROOM INVITES
+      </span>
+      {room.pendingInvites.map(inv => (
+        <div key={inv.roomCode} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
+          <div className="flex flex-col">
+            <span className="font-rajdhani font-semibold text-xs text-foreground">{inv.from}</span>
+            <span className="font-orbitron text-[8px] text-muted-foreground tracking-wider">Room {inv.roomCode}</span>
+          </div>
+          <div className="flex gap-1">
+            <button
+              className="pill-btn active !rounded-md !px-2 !py-1 !text-[8px]"
+              onClick={() => { room.acceptInvite(inv.roomCode); setRoomExpanded(true); }}
+            >
+              <Check className="w-2.5 h-2.5" /> JOIN
+            </button>
+            <button
+              className="pill-btn !rounded-md !px-1.5 !py-1"
+              onClick={() => room.dismissInvite(inv.roomCode)}
+            >
+              <X className="w-2.5 h-2.5" />
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  ) : null;
+
+  /* ─── Room Panel (full) ─── */
+  const RoomPanel = room.isInRoom ? (
     <div className="glass-card p-3 sm:p-4 flex flex-col gap-2.5 overflow-y-auto min-h-0">
       {/* Room header */}
       <div className="flex items-center justify-between">
-        <span className="section-label !mb-0">PRIVATE ROOM</span>
+        <div className="flex items-center gap-2">
+          <span className="section-label !mb-0">PRIVATE ROOM</span>
+          {room.isCreator && (
+            <span className="font-orbitron text-[7px] text-primary tracking-wider px-1.5 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+              <Shield className="w-2 h-2 inline mr-0.5" />HOST
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-1.5">
           <div id="room-share-panel" className="flex items-center gap-1.5">
-            <span id="room-share-code" className="font-orbitron text-xs font-bold text-primary tracking-wider">{roomShareCode}</span>
+            <span id="room-share-code" className="font-orbitron text-xs font-bold text-primary tracking-wider">{room.roomCode}</span>
             <button id="copy-room-code-btn" className="pill-btn !rounded-md !px-1.5 !py-1" title="Copy">
               <Copy className="w-2.5 h-2.5" />
             </button>
           </div>
-          {/* Close button for guest expanded view */}
-          {!showSocialPanel && roomExpanded && (
-            <button className="pill-btn !rounded-md !px-1.5 !py-1" onClick={() => setRoomExpanded(false)} title="Close">
-              <X className="w-2.5 h-2.5" />
-            </button>
-          )}
+          <button className="pill-btn !rounded-md !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={room.leaveRoom} title="Leave Room">
+            <LogOut className="w-2.5 h-2.5" />
+          </button>
         </div>
       </div>
 
-      {/* Room invite banner */}
+      {/* Invite banner placeholder */}
       <div id="room-social-invite-banner" className="hidden">
         <div id="room-social-invite-copy" />
         <div className="flex gap-1.5 mt-1">
@@ -205,75 +274,122 @@ const HomeScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Mode selector */}
-      <div className="flex gap-1.5">
-        {ROOM_MODES.map(mode => (
-          <button
-            key={mode.id}
-            id={`private-room-mode-${mode.id}-btn`}
-            className={`pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${roomMode === mode.id ? 'active' : ''}`}
-            onClick={() => setRoomMode(mode.id)}
-          >
-            {mode.icon} {mode.label}
-          </button>
-        ))}
-      </div>
+      {/* Mode selector — creator only */}
+      {room.isCreator && (
+        <>
+          <div className="flex gap-1.5">
+            {ROOM_MODES.map(mode => (
+              <button
+                key={mode.id}
+                id={`private-room-mode-${mode.id}-btn`}
+                className={`pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.mode === mode.id ? 'active' : ''}`}
+                onClick={() => room.setMode(mode.id)}
+              >
+                {mode.icon} {mode.label}
+              </button>
+            ))}
+          </div>
 
-      {roomMode !== 'ffa' && (
-        <div className="flex gap-1.5">
-          {TEAM_COUNTS.map(n => (
-            <button
-              key={n}
-              className={`pill-btn !rounded-lg flex-1 justify-center !text-[9px] !px-2 !py-1.5 ${teamCount === n ? 'active' : ''}`}
-              onClick={() => setTeamCount(n)}
-            >
-              {n} TEAMS
-            </button>
-          ))}
+          {room.mode !== 'ffa' && (
+            <div className="flex gap-1.5">
+              {TEAM_COUNTS.map(n => (
+                <button
+                  key={n}
+                  className={`pill-btn !rounded-lg flex-1 justify-center !text-[9px] !px-2 !py-1.5 ${room.teamCount === n ? 'active' : ''}`}
+                  onClick={() => room.setTeamCount(n)}
+                >
+                  {n} TEAMS
+                </button>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Non-creator mode display */}
+      {!room.isCreator && (
+        <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-muted/10">
+          <span className="font-orbitron text-[9px] text-muted-foreground tracking-wider">MODE</span>
+          <span className="font-orbitron text-[9px] font-bold text-foreground tracking-wider">
+            {ROOM_MODES.find(m => m.id === room.mode)?.label || room.mode.toUpperCase()}
+          </span>
+          {room.mode !== 'ffa' && (
+            <span className="font-orbitron text-[9px] text-muted-foreground tracking-wider ml-2">{room.teamCount} TEAMS</span>
+          )}
         </div>
       )}
 
-      {/* Lock + Randomize */}
+      {/* Lock + Randomize — creator controls */}
       <div className="flex gap-1.5">
-        <button
-          className={`pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${isLocked ? 'active' : ''}`}
-          onClick={() => setIsLocked(!isLocked)}
-        >
-          {isLocked ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
-          {isLocked ? 'LOCKED' : 'OPEN'}
-        </button>
-        <button className="pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5" onClick={randomizeTeams}>
-          <Shuffle className="w-2.5 h-2.5" /> RANDOMIZE
-        </button>
+        {room.isCreator && (
+          <button
+            className={`pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.isLocked ? 'active' : ''}`}
+            onClick={room.toggleLock}
+          >
+            {room.isLocked ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
+            {room.isLocked ? 'LOCKED' : 'OPEN'}
+          </button>
+        )}
+        {!room.isCreator && room.isLocked && (
+          <div className="pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 opacity-60 cursor-default">
+            <Lock className="w-2.5 h-2.5" /> ROOM LOCKED
+          </div>
+        )}
+        {room.isCreator && room.mode !== 'ffa' && (
+          <button className="pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5" onClick={room.randomizeTeams}>
+            <Shuffle className="w-2.5 h-2.5" /> RANDOMIZE
+          </button>
+        )}
       </div>
 
-      {/* Team Roster - Drag & Drop */}
-      {roomMode !== 'ffa' && (
+      {/* Player roster with hint */}
+      {room.selectedPlayer && (
+        <div className="text-[9px] font-orbitron text-primary tracking-wider text-center animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
+          TAP A TEAM TO ASSIGN {room.selectedPlayer.name.toUpperCase()}
+        </div>
+      )}
+
+      {/* Team Roster — Hybrid: click + drag */}
+      {room.mode !== 'ffa' ? (
         <div className="flex-1 min-h-0">
           <span className="section-label flex items-center gap-1 !mb-1.5">
             <Users className="w-3 h-3 text-primary" /> TEAMS
           </span>
-          <div className="grid grid-cols-2 gap-2">
-            {Array.from({ length: teamCount }).map((_, tIdx) => (
+          <div className={`grid gap-2 ${room.teamCount <= 2 ? 'grid-cols-2' : room.teamCount === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
+            {Array.from({ length: room.teamCount }).map((_, tIdx) => (
               <div
                 key={tIdx}
-                className="rounded-lg border border-border/50 p-2 min-h-[60px] transition-colors bg-muted/10 hover:bg-muted/20"
-                onDragOver={e => e.preventDefault()}
+                className={`rounded-lg border p-2 min-h-[60px] transition-all cursor-pointer ${
+                  dragOverTeam === tIdx
+                    ? `${TEAM_BORDER_COLORS[tIdx]} ${TEAM_BG_COLORS[tIdx]} scale-[1.02]`
+                    : room.selectedPlayer
+                      ? `${TEAM_BORDER_COLORS[tIdx]} ${TEAM_BG_COLORS[tIdx]} hover:scale-[1.01]`
+                      : 'border-border/50 bg-muted/10 hover:bg-muted/20'
+                }`}
+                onDragOver={e => handleDragOver(e, tIdx)}
+                onDragLeave={handleDragLeave}
                 onDrop={() => handleDrop(tIdx)}
+                onClick={() => handleTeamClick(tIdx)}
               >
-                <span className="font-orbitron text-[8px] font-bold text-primary tracking-wider mb-1 block">
+                <span className={`font-orbitron text-[8px] font-bold tracking-wider mb-1.5 block ${TEAM_COLORS[tIdx]}`}>
                   TEAM {tIdx + 1}
                 </span>
                 <div className="flex flex-col gap-0.5">
-                  {(teams[tIdx] || []).map((member, mIdx) => (
+                  {(room.teams[tIdx] || []).map(member => (
                     <div
                       key={member.id}
                       draggable
-                      onDragStart={() => handleDragStart(tIdx, mIdx)}
-                      className="flex items-center gap-1.5 px-1.5 py-1 rounded-md bg-muted/20 cursor-grab active:cursor-grabbing hover:bg-primary/10 transition-colors group"
+                      onDragStart={() => handleDragStart(member.id, tIdx)}
+                      onClick={e => { e.stopPropagation(); handlePlayerClick(member); }}
+                      className={`flex items-center gap-1.5 px-1.5 py-1 rounded-md transition-all group ${
+                        room.selectedPlayer?.id === member.id
+                          ? 'bg-primary/20 border border-primary/40 ring-1 ring-primary/20'
+                          : 'bg-muted/20 cursor-grab active:cursor-grabbing hover:bg-primary/10 border border-transparent'
+                      }`}
                     >
-                      <GripVertical className="w-2.5 h-2.5 text-muted-foreground group-hover:text-primary transition-colors" />
-                      <span className="font-rajdhani font-semibold text-[10px] text-foreground">{member.name}</span>
+                      <GripVertical className="w-2.5 h-2.5 text-muted-foreground group-hover:text-primary transition-colors hidden sm:block" />
+                      <span className="font-rajdhani font-semibold text-[10px] text-foreground flex-1">{member.name}</span>
+                      {member.isCreator && <Shield className="w-2 h-2 text-primary" />}
                     </div>
                   ))}
                 </div>
@@ -281,21 +397,68 @@ const HomeScreen: React.FC = () => {
             ))}
           </div>
         </div>
+      ) : (
+        /* FFA player list */
+        <div className="flex-1 min-h-0">
+          <span className="section-label flex items-center gap-1 !mb-1.5">
+            <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length})
+          </span>
+          <div className="flex flex-col gap-0.5">
+            {room.players.map(p => (
+              <div key={p.id} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                  <span className="font-rajdhani font-semibold text-xs text-foreground">{p.name}</span>
+                </div>
+                {p.isCreator && <Shield className="w-2.5 h-2.5 text-primary" />}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Invite controls */}
+      {(!room.isLocked || room.isCreator) && (
+        <div className="flex gap-1.5">
+          <input
+            className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs !rounded-lg"
+            placeholder="Player name..."
+            value={inviteInput}
+            onChange={e => setInviteInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && inviteInput.trim()) {
+                room.invitePlayer(inviteInput.trim());
+                setInviteInput('');
+              }
+            }}
+          />
+          <button
+            className="pill-btn !rounded-lg !px-2 !py-1.5 !text-[9px] gap-1"
+            onClick={() => { if (inviteInput.trim()) { room.invitePlayer(inviteInput.trim()); setInviteInput(''); } }}
+          >
+            <UserPlus className="w-2.5 h-2.5" /> INVITE
+          </button>
+        </div>
       )}
 
       {/* Room Actions */}
       <div className="flex gap-2 mt-auto pt-1">
-        <button className="pill-btn !rounded-lg flex-1 justify-center !py-2 !text-[9px] gap-1">
-          <Users className="w-3 h-3" /> INVITE
-        </button>
-        <button className="launch-btn flex-1 !py-2 !text-[9px] gap-1 !rounded-xl">
-          <Play className="w-3 h-3" /> START
+        {room.isCreator && (
+          <button className="pill-btn !rounded-lg flex-1 justify-center !py-2 !text-[9px] gap-1" onClick={room.inviteParty}>
+            <Users className="w-3 h-3" /> INVITE PARTY
+          </button>
+        )}
+        <button
+          className="launch-btn flex-1 !py-2 !text-[9px] gap-1 !rounded-xl"
+          onClick={room.startMatch}
+        >
+          <Play className="w-3 h-3" /> {room.isCreator ? 'START MATCH' : 'READY UP'}
         </button>
       </div>
     </div>
-  );
+  ) : null;
 
-  /* ─── Social Panel (party + friends) ─── */
+  /* ─── Social Panel ─── */
   const SocialPanel = (
     <div className="glass-card p-3 sm:p-4 flex flex-col gap-2.5 overflow-y-auto min-h-0">
       {/* Invite banner */}
@@ -337,7 +500,7 @@ const HomeScreen: React.FC = () => {
         </div>
       )}
 
-      {/* Friends List — logged-in only */}
+      {/* Friends List */}
       {isLoggedIn && (
         <div id="menu-social-friends-pane" className="flex-1 min-h-0">
           <div className="flex items-center justify-between mb-1.5">
@@ -394,21 +557,20 @@ const HomeScreen: React.FC = () => {
   );
 
   /* ═══════════════════════════════════════════
-     LAYOUT: Adapts based on auth + party state
+     LAYOUT
      ═══════════════════════════════════════════ */
 
   if (!showExpandedLayout) {
-    /* ─── COMPACT: Guest + Solo + Room collapsed ─── */
-    /* 3 equal columns: Play | Quick Join | Create Room */
     return (
       <div className="flex flex-col gap-3 h-full min-h-0">
+        {InviteBanner}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {PlayCard}
           {QuickJoinCard}
           <div className="glass-card p-3 flex flex-col items-center justify-center gap-2">
             <button
               className="launch-btn w-full !py-2.5 !text-[10px] gap-1.5 !rounded-xl"
-              onClick={() => setRoomExpanded(true)}
+              onClick={handleCreateRoom}
             >
               <DoorOpen className="w-3.5 h-3.5" /> CREATE ROOM
             </button>
@@ -418,25 +580,50 @@ const HomeScreen: React.FC = () => {
     );
   }
 
-  /* ─── EXPANDED: Logged in / has party / room expanded ─── */
+  /* ─── EXPANDED ─── */
   return (
     <div className="flex flex-col gap-3 h-full min-h-0">
+      {InviteBanner}
       {/* Top row */}
       <div className={`grid gap-3 ${showSocialPanel ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1 sm:grid-cols-3'}`}>
         {PlayCard}
         {QuickJoinCard}
-        {/* If no social panel but room expanded, show nothing here (room goes below) */}
-        {!showSocialPanel && (
+        {!showSocialPanel && !room.isInRoom && (
           <div className="glass-card p-3 flex flex-col items-center justify-center gap-2">
-            <span className="font-orbitron text-[9px] font-bold text-muted-foreground tracking-wider">ROOM OPEN</span>
+            <button
+              className="launch-btn w-full !py-2.5 !text-[10px] gap-1.5 !rounded-xl"
+              onClick={handleCreateRoom}
+            >
+              <DoorOpen className="w-3.5 h-3.5" /> CREATE ROOM
+            </button>
           </div>
         )}
       </div>
 
       {/* Bottom row */}
-      <div className={`grid gap-3 flex-1 min-h-0 ${showSocialPanel ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
+      <div className={`grid gap-3 flex-1 min-h-0 ${
+        showSocialPanel && room.isInRoom ? 'grid-cols-1 sm:grid-cols-2' :
+        'grid-cols-1'
+      }`}>
         {showSocialPanel && SocialPanel}
-        {RoomPanel}
+        {room.isInRoom ? RoomPanel : (
+          <div className="glass-card p-3 flex flex-col items-center justify-center gap-3">
+            <button
+              className="launch-btn !py-2.5 !text-[10px] gap-1.5 !rounded-xl !px-8"
+              onClick={handleCreateRoom}
+            >
+              <DoorOpen className="w-3.5 h-3.5" /> CREATE ROOM
+            </button>
+            {!showSocialPanel && (
+              <button
+                className="pill-btn !rounded-lg !text-[9px]"
+                onClick={() => setRoomExpanded(false)}
+              >
+                <X className="w-2.5 h-2.5" /> CLOSE
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

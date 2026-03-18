@@ -2,13 +2,16 @@ import React from 'react';
 import menuBg from '@/assets/menu-bg.jpg';
 import { MenuNavProvider } from '@/hooks/useMenuNav';
 import { AuthProvider } from '@/hooks/useAuth';
+import { RoomProvider } from '@/hooks/useRoom';
 import MenuHeader from '@/components/menu/MenuHeader';
 import ScreenRouter from '@/components/menu/ScreenRouter';
 import LoadoutBand from '@/components/menu/LoadoutBand';
+import MatchOverlay from '@/components/menu/MatchOverlay';
 
 const Index: React.FC = () => {
   return (
     <AuthProvider>
+    <RoomProvider>
     <MenuNavProvider>
       <div
         id="overlay"
@@ -53,8 +56,10 @@ const Index: React.FC = () => {
             </div>
           </main>
         </div>
+        <MatchOverlay />
       </div>
     </MenuNavProvider>
+    </RoomProvider>
     </AuthProvider>
   );
 };

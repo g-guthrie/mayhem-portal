@@ -101,7 +101,7 @@
   }
 
   .pill-btn {
-    @apply inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-full transition-all;
+    @apply inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold uppercase tracking-widest rounded-xl transition-all;
     font-family: 'Orbitron', sans-serif;
     background: hsl(var(--glass-highlight));
     border: 1px solid hsl(var(--glass-border));
@@ -120,7 +120,7 @@
   }
 
   .launch-btn {
-    @apply inline-flex items-center justify-center px-8 py-4 text-sm font-extrabold uppercase tracking-wider rounded-full transition-all;
+    @apply inline-flex items-center justify-center px-8 py-4 text-sm font-extrabold uppercase tracking-wider rounded-xl transition-all;
     font-family: 'Orbitron', sans-serif;
     background: hsl(var(--primary));
     color: hsl(var(--primary-foreground));

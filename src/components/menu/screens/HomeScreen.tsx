@@ -157,12 +157,12 @@ const HomeScreen: React.FC = () => {
         </button>
         <button
           id="game-modes-toggle-btn"
-          className={`pill-btn !rounded-xl !px-2 !py-2 gap-1.5 transition-transform ${modesOpen ? 'active' : ''}`}
+          className={`pill-btn !px-2 !py-2 gap-1.5 min-w-0 transition-transform ${modesOpen ? 'active' : ''}`}
           onClick={() => setModesOpen(!modesOpen)}
         >
           {currentMode.icon}
-          <span className="font-orbitron text-[9px] font-bold tracking-wider">{currentMode.label}</span>
-          <ChevronDown className={`w-3 h-3 transition-transform ${modesOpen ? 'rotate-180' : ''}`} />
+          <span className="font-orbitron text-[9px] font-bold tracking-wider truncate max-w-[100px]">{currentMode.label}</span>
+          <ChevronDown className={`w-3 h-3 shrink-0 transition-transform ${modesOpen ? 'rotate-180' : ''}`} />
         </button>
       </div>
       {modesOpen && (
@@ -171,7 +171,7 @@ const HomeScreen: React.FC = () => {
             <button
               key={mode.id}
               id={mode.id === 'practice' ? 'practice-mode-btn' : `play-mode-${mode.id}-btn`}
-              className={`item-grid-btn !rounded-lg !p-2 text-left !min-h-0 ${selectedMode === mode.id ? 'selected' : ''}`}
+              className={`item-grid-btn !p-2 text-left !min-h-0 ${selectedMode === mode.id ? 'selected' : ''}`}
               onClick={() => { setSelectedMode(mode.id); setModesOpen(false); }}
             >
               <div className="flex items-center gap-1.5 w-full">
@@ -192,28 +192,28 @@ const HomeScreen: React.FC = () => {
       <div id="social-friend-id-stack" className="flex gap-1.5">
         <input
           id="party-id-input"
-          className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs !rounded-lg"
+          className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
           placeholder="Friend ID"
           value={friendId}
           onChange={e => setFriendId(e.target.value)}
         />
-        <button id="invite-friend-btn" className="pill-btn active !rounded-lg !px-2 !py-1.5" title="Invite">
+        <button id="invite-friend-btn" className="pill-btn active !px-2 !py-1.5" title="Invite">
           <UserPlus className="w-3 h-3" />
         </button>
-        <button id="join-friend-btn" className="pill-btn !rounded-lg !px-2 !py-1.5" title="Join">
+        <button id="join-friend-btn" className="pill-btn !px-2 !py-1.5" title="Join">
           <ArrowRight className="w-3 h-3" />
         </button>
       </div>
       <div id="social-room-join-stack" className="flex gap-1.5">
         <input
           id="room-code-input"
-          className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs !rounded-lg"
+          className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
           placeholder="Room Code"
           value={roomCodeInput}
           onChange={e => setRoomCodeInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleJoinRoom()}
         />
-        <button id="join-room-btn" className="pill-btn !rounded-lg !px-2 !py-1.5" title="Join Room" onClick={handleJoinRoom}>
+        <button id="join-room-btn" className="pill-btn !px-2 !py-1.5" title="Join Room" onClick={handleJoinRoom}>
           <Globe className="w-3 h-3" />
         </button>
       </div>
@@ -234,13 +234,13 @@ const HomeScreen: React.FC = () => {
           </div>
           <div className="flex gap-1">
             <button
-              className="pill-btn active !rounded-md !px-2 !py-1 !text-[8px]"
+              className="pill-btn active !px-2 !py-1 !text-[8px]"
               onClick={() => room.acceptInvite(inv.roomCode)}
             >
               <Check className="w-2.5 h-2.5" /> JOIN
             </button>
             <button
-              className="pill-btn !rounded-md !px-1.5 !py-1"
+              className="pill-btn !px-1.5 !py-1"
               onClick={() => room.dismissInvite(inv.roomCode)}
             >
               <X className="w-2.5 h-2.5" />
@@ -267,11 +267,11 @@ const HomeScreen: React.FC = () => {
         <div className="flex items-center gap-1.5">
           <div id="room-share-panel" className="flex items-center gap-1.5">
             <span id="room-share-code" className="font-orbitron text-xs font-bold text-primary tracking-wider">{room.roomCode}</span>
-            <button id="copy-room-code-btn" className="pill-btn !rounded-md !px-1.5 !py-1" title="Copy">
+            <button id="copy-room-code-btn" className="pill-btn !px-1.5 !py-1" title="Copy">
               <Copy className="w-2.5 h-2.5" />
             </button>
           </div>
-          <button className="pill-btn !rounded-md !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={room.leaveRoom} title="Leave Room">
+          <button className="pill-btn !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={room.leaveRoom} title="Leave Room">
             <LogOut className="w-2.5 h-2.5" />
           </button>
         </div>
@@ -285,7 +285,7 @@ const HomeScreen: React.FC = () => {
               <button
                 key={mode.id}
                 id={`private-room-mode-${mode.id}-btn`}
-                className={`pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.mode === mode.id ? 'active' : ''}`}
+                className={`pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.mode === mode.id ? 'active' : ''}`}
                 onClick={() => room.setMode(mode.id)}
               >
                 {mode.icon} {mode.label}
@@ -298,7 +298,7 @@ const HomeScreen: React.FC = () => {
               {TEAM_COUNTS.map(n => (
                 <button
                   key={n}
-                  className={`pill-btn !rounded-lg flex-1 justify-center !text-[9px] !px-2 !py-1.5 ${room.teamCount === n ? 'active' : ''}`}
+                  className={`pill-btn flex-1 justify-center !text-[9px] !px-2 !py-1.5 ${room.teamCount === n ? 'active' : ''}`}
                   onClick={() => room.setTeamCount(n)}
                 >
                   {n} TEAMS
@@ -326,7 +326,7 @@ const HomeScreen: React.FC = () => {
       <div className="flex gap-1.5">
         {room.isCreator && (
           <button
-            className={`pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.isLocked ? 'active' : ''}`}
+            className={`pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.isLocked ? 'active' : ''}`}
             onClick={room.toggleLock}
           >
             {room.isLocked ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
@@ -334,12 +334,12 @@ const HomeScreen: React.FC = () => {
           </button>
         )}
         {!room.isCreator && room.isLocked && (
-          <div className="pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 opacity-60 cursor-default">
+          <div className="pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 opacity-60 cursor-default">
             <Lock className="w-2.5 h-2.5" /> ROOM LOCKED
           </div>
         )}
         {room.isCreator && room.mode !== 'ffa' && (
-          <button className="pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5" onClick={room.randomizeTeams}>
+          <button className="pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5" onClick={room.randomizeTeams}>
             <Shuffle className="w-2.5 h-2.5" /> RANDOMIZE
           </button>
         )}
@@ -424,7 +424,7 @@ const HomeScreen: React.FC = () => {
       {(!room.isLocked || room.isCreator) && (
         <div className="flex gap-1.5">
           <input
-            className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs !rounded-lg"
+            className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
             placeholder="Player name..."
             value={inviteInput}
             onChange={e => setInviteInput(e.target.value)}
@@ -436,7 +436,7 @@ const HomeScreen: React.FC = () => {
             }}
           />
           <button
-            className="pill-btn !rounded-lg !px-2 !py-1.5 !text-[9px] gap-1"
+            className="pill-btn !px-2 !py-1.5 !text-[9px] gap-1"
             onClick={() => { if (inviteInput.trim()) { room.invitePlayer(inviteInput.trim()); setInviteInput(''); } }}
           >
             <UserPlus className="w-2.5 h-2.5" /> INVITE
@@ -447,12 +447,12 @@ const HomeScreen: React.FC = () => {
       {/* Room Actions */}
       <div className="flex gap-2 pt-1">
         {room.isCreator && (
-          <button className="pill-btn !rounded-lg flex-1 justify-center !py-2 !text-[9px] gap-1" onClick={room.inviteParty}>
+          <button className="pill-btn flex-1 justify-center !py-2 !text-[9px] gap-1" onClick={room.inviteParty}>
             <Users className="w-3 h-3" /> INVITE PARTY
           </button>
         )}
         <button
-          className="launch-btn flex-1 !py-2 !text-[9px] gap-1 !rounded-xl"
+          className="launch-btn flex-1 !py-2 !text-[9px] gap-1"
           onClick={room.startMatch}
         >
           <Play className="w-3 h-3" /> {room.isCreator ? 'START MATCH' : 'READY UP'}
@@ -462,7 +462,7 @@ const HomeScreen: React.FC = () => {
   ) : (
     <div className="glass-card p-3 flex flex-col items-center justify-center gap-2">
       <button
-        className="launch-btn w-full !py-2.5 !text-[10px] gap-1.5 !rounded-xl"
+        className="launch-btn w-full !py-2.5 !text-[10px] gap-1.5"
         onClick={handleCreateRoom}
       >
         <DoorOpen className="w-3.5 h-3.5" /> CREATE ROOM
@@ -477,8 +477,8 @@ const HomeScreen: React.FC = () => {
       <div id="social-direct-invite-banner" className="hidden border-primary/30">
         <div id="social-direct-invite-copy" className="text-xs font-rajdhani text-foreground mb-1.5" />
         <div id="social-direct-invite-actions" className="flex gap-1.5">
-          <button id="social-direct-invite-accept-btn" className="pill-btn active !rounded-lg flex-1 !text-[9px] !py-1.5">ACCEPT</button>
-          <button id="social-direct-invite-dismiss-btn" className="pill-btn !rounded-lg flex-1 !text-[9px] !py-1.5">DISMISS</button>
+          <button id="social-direct-invite-accept-btn" className="pill-btn active flex-1 !text-[9px] !py-1.5">ACCEPT</button>
+          <button id="social-direct-invite-dismiss-btn" className="pill-btn flex-1 !text-[9px] !py-1.5">DISMISS</button>
         </div>
       </div>
 
@@ -499,7 +499,7 @@ const HomeScreen: React.FC = () => {
                 <div className="flex items-center gap-1">
                   {!m.isLeader && partyMembers.find(p => p.isLeader)?.name === displayName && (
                     <button
-                      className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] gap-0.5"
+                      className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
                       title="Make Leader"
                       onClick={() => transferLeader(m.name)}
                     >
@@ -507,7 +507,7 @@ const HomeScreen: React.FC = () => {
                     </button>
                   )}
                   {!m.isLeader && (
-                    <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px]" title="Remove">
+                    <button className="pill-btn !px-1.5 !py-0.5 text-[8px]" title="Remove">
                       <UserMinus className="w-2.5 h-2.5" />
                     </button>
                   )}
@@ -516,7 +516,7 @@ const HomeScreen: React.FC = () => {
             ))}
           </div>
           <div id="menu-party-actions" className="mt-1.5">
-            <button id="party-hero-leave-btn" className="pill-btn !rounded-lg w-full justify-center !py-1.5 !text-[9px] text-destructive border-destructive/30 hover:bg-destructive/10">
+            <button id="party-hero-leave-btn" className="pill-btn w-full justify-center !py-1.5 !text-[9px] text-destructive border-destructive/30 hover:bg-destructive/10">
               LEAVE PARTY
             </button>
           </div>
@@ -531,7 +531,7 @@ const HomeScreen: React.FC = () => {
               <Users className="w-3 h-3 text-primary" /> FRIENDS
             </span>
             <button
-              className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] gap-0.5"
+              className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
               onClick={() => setAddFriendOpen(!addFriendOpen)}
               title="Add Friend"
             >
@@ -543,13 +543,13 @@ const HomeScreen: React.FC = () => {
           {addFriendOpen && (
             <div className="flex gap-1.5 mb-1.5 animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
               <input
-                className="glass-input flex-1 !py-1 !px-2 !text-xs !rounded-lg"
+                className="glass-input flex-1 !py-1 !px-2 !text-xs"
                 placeholder="Enter player ID..."
                 value={addFriendId}
                 onChange={e => setAddFriendId(e.target.value)}
                 autoFocus
               />
-              <button className="pill-btn active !rounded-lg !px-2 !py-1 !text-[9px]">
+              <button className="pill-btn active !px-2 !py-1 !text-[9px]">
                 SEND
               </button>
             </div>
@@ -567,7 +567,7 @@ const HomeScreen: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider">IN GAME</span>}
-                  <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" title="Invite to party">
+                  <button className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" title="Invite to party">
                     <UserPlus className="w-2.5 h-2.5" />
                   </button>
                 </div>
@@ -580,17 +580,29 @@ const HomeScreen: React.FC = () => {
   );
 
   /* ═══════════════════════════════════════════
-     LAYOUT — always 3 columns, room inline in col 3
+     LAYOUT — conditional 2-col when room open
      ═══════════════════════════════════════════ */
 
   return (
     <div className="flex flex-col gap-3 h-full min-h-0">
       {InviteBanner}
-      {/* Top row: always 3 columns */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {PlayCard}
-        {QuickJoinCard}
-        {RoomCardContent}
+      {/* Top row: 3-col default, 2-col when room is open */}
+      <div className={`grid gap-3 ${room.isInRoom ? 'grid-cols-1 sm:grid-cols-[minmax(250px,1fr)_2fr]' : 'grid-cols-1 sm:grid-cols-3'}`}>
+        {room.isInRoom ? (
+          <>
+            <div className="flex flex-col gap-3">
+              {PlayCard}
+              {QuickJoinCard}
+            </div>
+            {RoomCardContent}
+          </>
+        ) : (
+          <>
+            {PlayCard}
+            {QuickJoinCard}
+            {RoomCardContent}
+          </>
+        )}
       </div>
 
       {/* Social panel below if applicable */}

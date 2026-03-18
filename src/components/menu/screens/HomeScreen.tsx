@@ -140,7 +140,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Play Card ─── */
   const PlayCard = (
-    <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2 h-full">
+    <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2">
       <div id="play-mode-toolbar" className="flex items-center gap-2">
         <button
           id="primary-launch-btn"
@@ -153,7 +153,7 @@ const HomeScreen: React.FC = () => {
             toast({ title: `Searching for ${currentMode.label}...`, description: 'Finding the best match for you.' });
           }}
         >
-          PLAY {currentMode.label}
+          <Play className="w-3.5 h-3.5" /> START MATCH
         </button>
         <button
           id="game-modes-toggle-btn"
@@ -166,7 +166,7 @@ const HomeScreen: React.FC = () => {
         </button>
       </div>
       {modesOpen && (
-        <div id="play-mode-options" className="grid grid-cols-2 gap-1.5 animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
+        <div id="play-mode-options" className="grid grid-cols-2 gap-1.5 max-h-[120px] overflow-y-auto animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
           {GAME_MODES.map(mode => (
             <button
               key={mode.id}
@@ -455,7 +455,7 @@ const HomeScreen: React.FC = () => {
           className="launch-btn flex-1 !py-2 !text-[9px] gap-1"
           onClick={room.startMatch}
         >
-          <Play className="w-3 h-3" /> {room.isCreator ? 'START MATCH' : 'READY UP'}
+          <Play className="w-3 h-3" /> {room.isCreator ? 'START PRIVATE MATCH' : 'READY UP'}
         </button>
       </div>
     </div>
@@ -590,9 +590,9 @@ const HomeScreen: React.FC = () => {
       <div className={`grid gap-3 ${room.isInRoom ? 'grid-cols-1 sm:grid-cols-[minmax(250px,1fr)_2fr]' : 'grid-cols-1 sm:grid-cols-3'}`}>
         {room.isInRoom ? (
           <>
-            <div className="flex flex-col gap-3 h-full">
-              <div className="flex-1">{PlayCard}</div>
-              <div className="flex-none">{QuickJoinCard}</div>
+            <div className="flex flex-col justify-between h-full gap-3">
+              {PlayCard}
+              {QuickJoinCard}
             </div>
             {RoomCardContent}
           </>

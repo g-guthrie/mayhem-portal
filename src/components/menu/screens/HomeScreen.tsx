@@ -799,10 +799,17 @@ const HomeScreen: React.FC = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             setPartyMembers(prev => {
-                              if (prev.find(m => m.name === f.name)) return prev;
+                              if (prev.find(m => m.name === f.name)) {
+                                toast({ title: `${f.name} is already in your party` });
+                                return prev;
+                              }
+                              if (prev.length >= MAX_PLAYERS) {
+                                toast({ title: 'Party full', description: `Maximum ${MAX_PLAYERS} members.`, variant: 'destructive' });
+                                return prev;
+                              }
+                              toast({ title: `${f.name} joined your party` });
                               return [...prev, { name: f.name, isLeader: false }];
                             });
-                            toast({ title: `${f.name} joined your party` });
                           }}
                         >
                           <UserPlus className="w-2.5 h-2.5" />

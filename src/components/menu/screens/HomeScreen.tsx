@@ -197,7 +197,7 @@ const HomeScreen: React.FC = () => {
           value={friendId}
           onChange={e => setFriendId(e.target.value)}
         />
-        <button id="invite-friend-btn" className="pill-btn active !rounded-lg !px-2 !py-1.5" title="Invite">
+        <button id="invite-friend-btn" className="pill-btn active !px-2 !py-1.5" title="Invite">
           <UserPlus className="w-3 h-3" />
         </button>
         <button id="join-friend-btn" className="pill-btn !rounded-lg !px-2 !py-1.5" title="Join">

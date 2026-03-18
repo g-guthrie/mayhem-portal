@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
   Crosshair, ChevronDown, Swords, Target, Dumbbell,
   UserPlus, ArrowRight, Globe, Users, UserMinus,
@@ -84,6 +84,20 @@ const HomeScreen: React.FC = () => {
     setConfirmingFriend(null);
     if (friends.length <= 1) setRemoveMode(false);
   };
+
+  /* Click outside to close add/remove */
+  const socialPanelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (socialPanelRef.current && !socialPanelRef.current.contains(e.target as Node)) {
+        setAddFriendOpen(false);
+        setRemoveMode(false);
+        setConfirmingFriend(null);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
@@ -486,7 +500,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Social Panel ─── */
   const SocialPanel = (
-    <div className="glass-card p-3 sm:p-4 flex flex-col gap-2.5 overflow-y-auto min-h-0">
+    <div ref={socialPanelRef} className="glass-card p-3 sm:p-4 flex flex-col gap-2.5 overflow-y-auto min-h-0">
       {/* Invite banner */}
       <div id="social-direct-invite-banner" className="hidden border-primary/30">
         <div id="social-direct-invite-copy" className="text-xs font-rajdhani text-foreground mb-1.5" />

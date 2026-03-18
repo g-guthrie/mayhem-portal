@@ -424,7 +424,7 @@ const HomeScreen: React.FC = () => {
       {(!room.isLocked || room.isCreator) && (
         <div className="flex gap-1.5">
           <input
-            className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs !rounded-lg"
+            className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
             placeholder="Player name..."
             value={inviteInput}
             onChange={e => setInviteInput(e.target.value)}

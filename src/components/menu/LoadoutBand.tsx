@@ -10,12 +10,12 @@ interface LoadoutItem {
 }
 
 const ShotgunSpread = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 16 16" fill="currentColor" className={className}>
-    <circle cx="8" cy="8" r="1.5" />
-    <circle cx="4" cy="5" r="1.2" />
-    <circle cx="12" cy="5" r="1.2" />
-    <circle cx="5" cy="12" r="1.2" />
-    <circle cx="11" cy="12" r="1.2" />
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className} xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="2" />
+    <circle cx="6" cy="7" r="1.8" />
+    <circle cx="18" cy="7" r="1.8" />
+    <circle cx="7" cy="18" r="1.8" />
+    <circle cx="17" cy="18" r="1.8" />
   </svg>
 );
 

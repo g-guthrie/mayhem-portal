@@ -43,6 +43,7 @@ interface RoomState {
   readyPlayers: Set<string>;
   disconnectedPlayers: Map<string, DisconnectedPlayer>;
   isPaused: boolean;
+  matchStats: MatchStats;
 
   // Actions
   createRoom: (creatorName: string, creatorId: string) => void;

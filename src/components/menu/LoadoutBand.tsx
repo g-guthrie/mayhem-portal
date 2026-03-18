@@ -132,7 +132,7 @@ const LoadoutBand: React.FC = () => {
                     SLOT 2
                   </button>
                 </div>
-                <div id="weapon-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5">
+                <div id="weapon-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5 overflow-y-auto max-h-[200px]">
                   {WEAPONS.map(w => (
                     <button
                       key={w.id}

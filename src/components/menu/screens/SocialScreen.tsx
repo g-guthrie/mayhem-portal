@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserPlus, ArrowRight, Users, UserMinus, MessageSquare } from 'lucide-react';
+import { UserPlus, ArrowRight, Users, UserMinus } from 'lucide-react';
 
 interface FakeFriend {
   name: string;
@@ -17,7 +17,8 @@ const INITIAL_FRIENDS: FakeFriend[] = [
 const SocialScreen: React.FC = () => {
   const [friendId, setFriendId] = useState('');
   const [friends, setFriends] = useState<FakeFriend[]>(INITIAL_FRIENDS);
-  const [expandedFriend, setExpandedFriend] = useState<string | null>(null);
+  const [removeMode, setRemoveMode] = useState(false);
+  const [confirmingFriend, setConfirmingFriend] = useState<string | null>(null);
 
   const partyMembers = [
     { name: 'You', isLeader: true },
@@ -26,7 +27,8 @@ const SocialScreen: React.FC = () => {
 
   const removeFriend = (name: string) => {
     setFriends(prev => prev.filter(f => f.name !== name));
-    setExpandedFriend(null);
+    setConfirmingFriend(null);
+    if (friends.length <= 1) setRemoveMode(false);
   };
 
   return (
@@ -55,6 +57,17 @@ const SocialScreen: React.FC = () => {
           </button>
           <button className="pill-btn !rounded-xl !px-3" title="Join">
             <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+          <button
+            className={`pill-btn !rounded-xl !px-3 gap-1.5 ${removeMode ? 'text-destructive border-destructive/50 bg-destructive/10' : 'text-destructive border-destructive/30 hover:bg-destructive/10'}`}
+            title="Remove Friend"
+            onClick={() => {
+              setRemoveMode(!removeMode);
+              setConfirmingFriend(null);
+            }}
+          >
+            <UserMinus className="w-3.5 h-3.5" />
+            <span className="text-[10px] font-orbitron">REMOVE</span>
           </button>
         </div>
       </div>
@@ -96,8 +109,14 @@ const SocialScreen: React.FC = () => {
           {friends.map(f => (
             <div
               key={f.name}
-              className="flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors hover:bg-muted/30 cursor-pointer group"
-              onClick={() => setExpandedFriend(expandedFriend === f.name ? null : f.name)}
+              className={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors cursor-pointer group ${
+                removeMode ? 'hover:bg-destructive/10 border border-transparent hover:border-destructive/20' : 'hover:bg-muted/30'
+              } ${confirmingFriend === f.name ? 'bg-destructive/10 border border-destructive/20' : ''}`}
+              onClick={() => {
+                if (removeMode) {
+                  setConfirmingFriend(confirmingFriend === f.name ? null : f.name);
+                }
+              }}
             >
               <div className="flex items-center gap-2.5">
                 <div className={`w-2 h-2 rounded-full ${
@@ -107,24 +126,31 @@ const SocialScreen: React.FC = () => {
                 <span className="font-rajdhani font-semibold text-sm text-foreground">{f.name}</span>
               </div>
               <div className="flex items-center gap-2">
-                {f.inGame && (
+                {f.inGame && !confirmingFriend && (
                   <span className="text-[9px] font-orbitron text-primary tracking-wider">IN GAME</span>
                 )}
-                {expandedFriend === f.name ? (
-                  <button
-                    className="pill-btn !rounded-xl !px-3 text-destructive border-destructive/30 hover:bg-destructive/10"
-                    title="Remove Friend"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      removeFriend(f.name);
-                    }}
-                  >
-                    <UserMinus className="w-3.5 h-3.5" />
-                  </button>
-                ) : (
-                  <button className="pill-btn !rounded-lg !px-2 !py-1 text-[9px] opacity-0 group-hover:opacity-100 transition-opacity">
-                    <UserPlus className="w-3 h-3" />
-                  </button>
+                {confirmingFriend === f.name && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-orbitron text-destructive tracking-wider">REMOVE?</span>
+                    <button
+                      className="pill-btn !rounded-xl !px-3 !py-1 text-destructive border-destructive/30 bg-destructive/10 hover:bg-destructive/20"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeFriend(f.name);
+                      }}
+                    >
+                      <span className="text-[10px] font-orbitron">YES</span>
+                    </button>
+                    <button
+                      className="pill-btn !rounded-xl !px-3 !py-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setConfirmingFriend(null);
+                      }}
+                    >
+                      <span className="text-[10px] font-orbitron">NO</span>
+                    </button>
+                  </div>
                 )}
               </div>
             </div>

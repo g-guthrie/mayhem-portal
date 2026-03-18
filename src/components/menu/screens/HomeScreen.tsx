@@ -141,7 +141,7 @@ const HomeScreen: React.FC = () => {
     <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2">
       <div id="play-mode-toolbar" className="flex items-center gap-2">
         <button id="primary-launch-btn" className="launch-btn flex-1 !py-2 !text-[10px] animate-pulse-glow">
-          PLAY
+          PLAY {currentMode.label}
         </button>
         <button
           id="game-modes-toggle-btn"
@@ -149,7 +149,7 @@ const HomeScreen: React.FC = () => {
           onClick={() => setModesOpen(!modesOpen)}
         >
           {currentMode.icon}
-          <span className="font-orbitron text-[9px] font-bold tracking-wider">{currentMode.label}</span>
+          <span className="font-orbitron text-[9px] font-bold tracking-wider">CHANGE MODE</span>
           <ChevronDown className={`w-3 h-3 transition-transform ${modesOpen ? 'rotate-180' : ''}`} />
         </button>
       </div>

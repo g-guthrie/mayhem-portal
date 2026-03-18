@@ -234,7 +234,7 @@ const HomeScreen: React.FC = () => {
           </div>
           <div className="flex gap-1">
             <button
-              className="pill-btn active !rounded-md !px-2 !py-1 !text-[8px]"
+              className="pill-btn active !px-2 !py-1 !text-[8px]"
               onClick={() => room.acceptInvite(inv.roomCode)}
             >
               <Check className="w-2.5 h-2.5" /> JOIN

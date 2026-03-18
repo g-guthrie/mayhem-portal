@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { User, LogIn, LogOut, UserCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMenuNav } from '@/hooks/useMenuNav';
@@ -8,11 +8,10 @@ const AuthScreen: React.FC = () => {
   const { pop } = useMenuNav();
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
-  const [justLoggedIn, setJustLoggedIn] = useState(false);
+  const wasLoggedInOnMount = useRef(isLoggedIn);
 
   const handleLogin = () => {
     if (username.trim()) {
-      setJustLoggedIn(true);
       login(username.trim());
       pop();
     }

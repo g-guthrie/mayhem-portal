@@ -168,10 +168,13 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Join room by code ─── */
   const handleJoinRoom = () => {
-    if (roomCodeInput.trim().length >= 4) {
-      room.joinRoom(roomCodeInput.trim(), displayName, actorId);
-      setRoomCodeInput('');
+    if (roomCodeInput.trim().length < 4) return;
+    if (room.isInRoom) {
+      toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+      return;
     }
+    room.joinRoom(roomCodeInput.trim(), displayName, actorId);
+    setRoomCodeInput('');
   };
 
   /* ─── Play Card ─── */

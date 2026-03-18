@@ -213,7 +213,7 @@ const HomeScreen: React.FC = () => {
           onChange={e => setRoomCodeInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleJoinRoom()}
         />
-        <button id="join-room-btn" className="pill-btn !rounded-lg !px-2 !py-1.5" title="Join Room" onClick={handleJoinRoom}>
+        <button id="join-room-btn" className="pill-btn !px-2 !py-1.5" title="Join Room" onClick={handleJoinRoom}>
           <Globe className="w-3 h-3" />
         </button>
       </div>

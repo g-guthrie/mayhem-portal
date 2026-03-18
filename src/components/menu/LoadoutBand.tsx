@@ -164,7 +164,7 @@ const LoadoutBand: React.FC = () => {
                     </button>
                   ))}
                 </div>
-                <div id="throwable-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5">
+                <div id="throwable-choice-grid" className="item-selection-grid grid grid-cols-3 gap-1.5 overflow-y-auto max-h-[200px]">
                   {THROWABLES[throwableCategory].map(t => (
                     <button
                       key={t.id}

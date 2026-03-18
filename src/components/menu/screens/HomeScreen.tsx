@@ -78,9 +78,16 @@ const HomeScreen: React.FC = () => {
   const [inviteInput, setInviteInput] = useState('');
 
   /* Party state */
-  const [partyMembers] = useState<{ name: string; isLeader: boolean }[]>([
+  const [partyMembers, setPartyMembers] = useState<{ name: string; isLeader: boolean }[]>([
     { name: displayName, isLeader: true },
   ]);
+
+  const transferLeader = (name: string) => {
+    setPartyMembers(prev => prev.map(m => ({
+      ...m,
+      isLeader: m.name === name,
+    })));
+  };
 
   /* Drag state for desktop */
   const [dragItem, setDragItem] = useState<{ playerId: string; fromTeam: number } | null>(null);

@@ -45,7 +45,7 @@ const AuthScreen: React.FC = () => {
         </div>
 
         <button
-          className="pill-btn !rounded-xl w-full justify-center !py-3 text-destructive border-destructive/30 hover:bg-destructive/10 gap-2"
+          className="pill-btn w-full justify-center !py-3 text-destructive border-destructive/30 hover:bg-destructive/10 gap-2"
           onClick={handleLogout}
         >
           <LogOut className="w-3.5 h-3.5" /> LOG OUT

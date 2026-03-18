@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMenuNav } from '@/hooks/useMenuNav';
-import { useRoom, type RoomPlayer } from '@/hooks/useRoom';
+import { useRoom, type RoomPlayer, MAX_PLAYERS } from '@/hooks/useRoom';
 
 /* ─── Game Modes ─── */
 interface GameMode { id: string; label: string; icon: React.ReactNode }

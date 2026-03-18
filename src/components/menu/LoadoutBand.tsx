@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Crosshair, Bomb, Sword, Zap, Shield, Wind, Flame, Sparkles, Target, Eye, Heart, Anchor, CircleDot } from 'lucide-react';
+import { Crosshair, Bomb, Sword, Zap, Shield, Wind, Flame, Sparkles, Target, Eye, Heart, Anchor } from 'lucide-react';
 
 type ThrowableCategory = 'grenade' | 'blade';
 
@@ -9,9 +9,19 @@ interface LoadoutItem {
   icon: React.ReactNode;
 }
 
+const ShotgunSpread = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 16 16" fill="currentColor" className={className}>
+    <circle cx="8" cy="8" r="1.5" />
+    <circle cx="4" cy="5" r="1.2" />
+    <circle cx="12" cy="5" r="1.2" />
+    <circle cx="5" cy="12" r="1.2" />
+    <circle cx="11" cy="12" r="1.2" />
+  </svg>
+);
+
 const WEAPONS: LoadoutItem[] = [
   { id: 'machinegun', name: 'MACHINE GUN', icon: <Crosshair className="w-4 h-4" /> },
-  { id: 'shotgun', name: 'SHOTGUN', icon: <CircleDot className="w-4 h-4" /> },
+  { id: 'shotgun', name: 'SHOTGUN', icon: <ShotgunSpread className="w-4 h-4" /> },
   { id: 'rifle', name: 'RIFLE', icon: <Crosshair className="w-4 h-4" /> },
   { id: 'pistol', name: 'PISTOL', icon: <Crosshair className="w-4 h-4" /> },
   { id: 'sniper', name: 'SNIPER', icon: <Target className="w-4 h-4" /> },

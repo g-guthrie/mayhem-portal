@@ -271,7 +271,7 @@ const HomeScreen: React.FC = () => {
               <Copy className="w-2.5 h-2.5" />
             </button>
           </div>
-          <button className="pill-btn !rounded-md !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={room.leaveRoom} title="Leave Room">
+          <button className="pill-btn !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={room.leaveRoom} title="Leave Room">
             <LogOut className="w-2.5 h-2.5" />
           </button>
         </div>

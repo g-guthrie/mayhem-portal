@@ -159,6 +159,10 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Create room ─── */
   const handleCreateRoom = () => {
+    if (room.isInRoom) {
+      toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+      return;
+    }
     room.createRoom(displayName, actorId);
   };
 

@@ -359,7 +359,7 @@ const HomeScreen: React.FC = () => {
           <span className="section-label flex items-center gap-1 !mb-1.5">
             <Users className="w-3 h-3 text-primary" /> TEAMS
           </span>
-          <div className={`grid gap-2 ${room.teamCount <= 2 ? 'grid-cols-2' : room.teamCount === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
+          <div className={`grid gap-2 max-h-[160px] overflow-y-auto ${room.teamCount <= 2 ? 'grid-cols-2' : room.teamCount === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'}`}>
             {Array.from({ length: room.teamCount }).map((_, tIdx) => (
               <div
                 key={tIdx}

@@ -13,7 +13,6 @@ const Index: React.FC = () => {
     <AuthProvider>
     <RoomProvider>
     <MenuNavProvider>
-    <MenuNavProvider>
       <div
         id="overlay"
         className="grid place-items-center w-screen h-screen p-3 sm:p-5"

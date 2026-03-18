@@ -1,12 +1,19 @@
 import React from 'react';
-import { User, Gamepad2, Volume2, BookOpen, X } from 'lucide-react';
+import { User, Gamepad2, Volume2, BookOpen, LogIn } from 'lucide-react';
 import { useMenuNav } from '@/hooks/useMenuNav';
+import { useAuth } from '@/hooks/useAuth';
 
 const SettingsScreen: React.FC = () => {
-  const { push, pop } = useMenuNav();
+  const { push } = useMenuNav();
+  const { isLoggedIn } = useAuth();
 
   const items = [
-    { id: 'auth', label: 'ACCOUNT', icon: <User className="w-4 h-4" />, action: () => push('auth') },
+    {
+      id: 'auth',
+      label: isLoggedIn ? 'PROFILE' : 'LOGIN',
+      icon: isLoggedIn ? <User className="w-4 h-4" /> : <LogIn className="w-4 h-4" />,
+      action: () => push('auth'),
+    },
     { id: 'controls', label: 'CONTROLS', icon: <Gamepad2 className="w-4 h-4" />, action: () => push('controls') },
     { id: 'sound', label: 'SOUND', icon: <Volume2 className="w-4 h-4" />, action: undefined },
     { id: 'manual', label: 'INSTRUCTIONS', icon: <BookOpen className="w-4 h-4" />, action: () => push('manual') },

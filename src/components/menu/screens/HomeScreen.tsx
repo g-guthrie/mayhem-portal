@@ -3,7 +3,10 @@ import {
   Crosshair, ChevronDown, Swords, Target, Dumbbell,
   UserPlus, ArrowRight, Globe, Users, UserMinus,
   Copy, Lock, Unlock, Shuffle, Play, GripVertical,
+  LogIn, Share2,
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useMenuNav } from '@/hooks/useMenuNav';
 
 /* ─── Game Modes ─── */
 interface GameMode { id: string; label: string; icon: React.ReactNode; description: string }
@@ -24,19 +27,18 @@ const TEAM_COUNTS = [2, 3, 4];
 
 interface TeamMember { id: string; name: string }
 
-/* ─── Fake data ─── */
+/* ─── Fake data (shown when logged in) ─── */
 const FAKE_FRIENDS = [
   { name: 'xVortex', status: 'online' as const, inGame: true },
   { name: 'NightOwl', status: 'online' as const, inGame: false },
   { name: 'BlazeFury', status: 'away' as const, inGame: false },
   { name: 'ShadowKnight', status: 'offline' as const, inGame: false },
 ];
-const PARTY_MEMBERS = [
-  { name: 'You', isLeader: true },
-  { name: 'xVortex', isLeader: false },
-];
 
 const HomeScreen: React.FC = () => {
+  const { isLoggedIn, displayName, actorId } = useAuth();
+  const { push } = useMenuNav();
+
   /* Play state */
   const [selectedMode, setSelectedMode] = useState('ffa');
   const [modesOpen, setModesOpen] = useState(false);
@@ -46,14 +48,23 @@ const HomeScreen: React.FC = () => {
   const [friendId, setFriendId] = useState('');
   const [roomCode, setRoomCode] = useState('');
 
+  /* Add friend */
+  const [addFriendOpen, setAddFriendOpen] = useState(false);
+  const [addFriendId, setAddFriendId] = useState('');
+
+  /* Party state - solo when alone */
+  const [partyMembers, setPartyMembers] = useState<{ name: string; isLeader: boolean }[]>([
+    { name: displayName, isLeader: true },
+  ]);
+
   /* Room state */
   const [roomShareCode] = useState('7F3A');
   const [roomMode, setRoomMode] = useState('ffa');
   const [teamCount, setTeamCount] = useState(2);
   const [isLocked, setIsLocked] = useState(false);
   const [teams, setTeams] = useState<Record<number, TeamMember[]>>({
-    0: [{ id: '1', name: 'You' }, { id: '2', name: 'xVortex' }],
-    1: [{ id: '3', name: 'NightOwl' }, { id: '4', name: 'BlazeFury' }],
+    0: [{ id: '1', name: 'You' }],
+    1: [],
   });
   const [dragItem, setDragItem] = useState<{ teamIdx: number; memberIdx: number } | null>(null);
 
@@ -83,6 +94,8 @@ const HomeScreen: React.FC = () => {
     shuffled.forEach((m, i) => newTeams[i % teamCount].push(m));
     setTeams(newTeams);
   };
+
+  const isSolo = partyMembers.length <= 1;
 
   return (
     <div className="flex flex-col gap-3 h-full min-h-0">
@@ -119,7 +132,6 @@ const HomeScreen: React.FC = () => {
               ))}
             </div>
           )}
-          <div id="room-access-status" className="text-[10px] text-muted-foreground font-rajdhani font-medium" />
         </div>
 
         {/* Quick Join Card */}
@@ -152,7 +164,6 @@ const HomeScreen: React.FC = () => {
               <Globe className="w-3 h-3" />
             </button>
           </div>
-          <div id="social-hero-status" className="text-[10px] text-muted-foreground font-rajdhani" />
         </div>
       </div>
 
@@ -174,53 +185,121 @@ const HomeScreen: React.FC = () => {
             <span className="section-label flex items-center gap-1 !mb-1.5">
               <Users className="w-3 h-3 text-primary" /> YOUR PARTY
             </span>
-            <div id="party-hero-members" className="flex flex-col gap-1">
-              {PARTY_MEMBERS.map(m => (
-                <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                    <span className="font-rajdhani font-semibold text-xs text-foreground">{m.name}</span>
-                    {m.isLeader && <span className="text-[8px] font-orbitron text-primary tracking-wider">LEADER</span>}
-                  </div>
-                  {!m.isLeader && (
-                    <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px]" title="Remove">
-                      <UserMinus className="w-2.5 h-2.5" />
-                    </button>
-                  )}
+
+            {isSolo ? (
+              /* ─── Solo / Empty Party State ─── */
+              <div className="flex flex-col items-center gap-2 py-3 px-2 rounded-lg bg-muted/10 border border-border/30">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                  <span className="font-rajdhani font-semibold text-xs text-foreground">{displayName}</span>
+                  <span className="text-[8px] font-orbitron text-muted-foreground tracking-wider">SOLO</span>
                 </div>
-              ))}
-            </div>
-            <div id="menu-party-actions" className="mt-1.5">
-              <button id="party-hero-leave-btn" className="pill-btn !rounded-lg w-full justify-center !py-1.5 !text-[9px] text-destructive border-destructive/30 hover:bg-destructive/10">
-                LEAVE PARTY
-              </button>
-            </div>
+                <div className="flex gap-1.5 w-full">
+                  <button className="pill-btn active !rounded-lg flex-1 justify-center gap-1 !text-[9px] !py-1.5">
+                    <Share2 className="w-2.5 h-2.5" /> SHARE ID
+                  </button>
+                  <button className="pill-btn !rounded-lg flex-1 justify-center gap-1 !text-[9px] !py-1.5">
+                    <UserPlus className="w-2.5 h-2.5" /> INVITE
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* ─── Party with members ─── */
+              <>
+                <div id="party-hero-members" className="flex flex-col gap-1">
+                  {partyMembers.map(m => (
+                    <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                        <span className="font-rajdhani font-semibold text-xs text-foreground">{m.name}</span>
+                        {m.isLeader && <span className="text-[8px] font-orbitron text-primary tracking-wider">LEADER</span>}
+                      </div>
+                      {!m.isLeader && (
+                        <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px]" title="Remove">
+                          <UserMinus className="w-2.5 h-2.5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div id="menu-party-actions" className="mt-1.5">
+                  <button id="party-hero-leave-btn" className="pill-btn !rounded-lg w-full justify-center !py-1.5 !text-[9px] text-destructive border-destructive/30 hover:bg-destructive/10">
+                    LEAVE PARTY
+                  </button>
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Friends List */}
+          {/* Friends List — logged-in only */}
           <div id="menu-social-friends-pane" className="flex-1 min-h-0">
-            <span className="section-label flex items-center gap-1 !mb-1.5">
-              <Users className="w-3 h-3 text-primary" /> FRIENDS
-            </span>
-            <div id="social-friends-list" className="flex flex-col gap-0.5">
-              {FAKE_FRIENDS.map(f => (
-                <div key={f.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors hover:bg-muted/30 cursor-pointer group">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${
-                      f.status === 'online' ? 'bg-green-400' :
-                      f.status === 'away' ? 'bg-yellow-500' : 'bg-muted-foreground/40'
-                    }`} />
-                    <span className="font-rajdhani font-semibold text-xs text-foreground">{f.name}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider">IN GAME</span>}
-                    <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity">
-                      <UserPlus className="w-2.5 h-2.5" />
+            {isLoggedIn ? (
+              <>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="section-label flex items-center gap-1 !mb-0">
+                    <Users className="w-3 h-3 text-primary" /> FRIENDS
+                  </span>
+                  <button
+                    className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] gap-0.5"
+                    onClick={() => setAddFriendOpen(!addFriendOpen)}
+                    title="Add Friend"
+                  >
+                    <UserPlus className="w-2.5 h-2.5" />
+                    <span className="hidden sm:inline">ADD</span>
+                  </button>
+                </div>
+
+                {/* Add friend inline input */}
+                {addFriendOpen && (
+                  <div className="flex gap-1.5 mb-1.5 animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
+                    <input
+                      className="glass-input flex-1 !py-1 !px-2 !text-xs !rounded-lg"
+                      placeholder="Enter player ID..."
+                      value={addFriendId}
+                      onChange={e => setAddFriendId(e.target.value)}
+                      autoFocus
+                    />
+                    <button className="pill-btn active !rounded-lg !px-2 !py-1 !text-[9px]">
+                      SEND
                     </button>
                   </div>
+                )}
+
+                <div id="social-friends-list" className="flex flex-col gap-0.5">
+                  {FAKE_FRIENDS.map(f => (
+                    <div key={f.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg transition-colors hover:bg-muted/30 cursor-pointer group">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-1.5 h-1.5 rounded-full ${
+                          f.status === 'online' ? 'bg-green-400' :
+                          f.status === 'away' ? 'bg-yellow-500' : 'bg-muted-foreground/40'
+                        }`} />
+                        <span className="font-rajdhani font-semibold text-xs text-foreground">{f.name}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider">IN GAME</span>}
+                        <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity" title="Invite to party">
+                          <UserPlus className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </>
+            ) : (
+              /* ─── Guest: Login prompt ─── */
+              <div className="flex flex-col items-center gap-2 py-4 px-3 rounded-lg bg-muted/10 border border-border/30 text-center">
+                <LogIn className="w-4 h-4 text-muted-foreground" />
+                <p className="font-rajdhani text-xs text-muted-foreground leading-tight">
+                  Log in to save friends and track your stats
+                </p>
+                <button
+                  className="pill-btn active !rounded-lg !text-[9px] !py-1.5 !px-4 gap-1"
+                  onClick={() => push('auth')}
+                >
+                  <LogIn className="w-2.5 h-2.5" /> LOG IN
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -236,7 +315,6 @@ const HomeScreen: React.FC = () => {
               </button>
             </div>
           </div>
-          <div id="private-room-status" className="text-[10px] text-muted-foreground font-rajdhani" />
 
           {/* Room invite banner */}
           <div id="room-social-invite-banner" className="hidden">

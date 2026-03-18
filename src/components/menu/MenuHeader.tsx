@@ -1,6 +1,7 @@
 import React from 'react';
-import { Settings, ChevronLeft, Copy } from 'lucide-react';
+import { Settings, ChevronLeft, Copy, LogIn, User } from 'lucide-react';
 import { useMenuNav, type MenuScreen } from '@/hooks/useMenuNav';
+import { useAuth } from '@/hooks/useAuth';
 
 const SCREEN_TITLES: Record<MenuScreen, string> = {
   home: 'MAYHEM',
@@ -13,11 +14,12 @@ const SCREEN_TITLES: Record<MenuScreen, string> = {
 };
 
 interface MenuHeaderProps {
-  partyId: string;
+  partyId?: string;
 }
 
-const MenuHeader: React.FC<MenuHeaderProps> = ({ partyId }) => {
+const MenuHeader: React.FC<MenuHeaderProps> = () => {
   const { current, history, pop, push } = useMenuNav();
+  const { isLoggedIn, actorId, displayName } = useAuth();
   const canGoBack = history.length > 1;
 
   return (
@@ -38,13 +40,24 @@ const MenuHeader: React.FC<MenuHeaderProps> = ({ partyId }) => {
           </span>
           {current === 'home' && (
             <div id="menu-party-id-btn" className="pill-btn !rounded-xl gap-1.5 cursor-pointer group ml-2">
-              <span id="menu-party-id-label" className="text-muted-foreground group-hover:text-foreground transition-colors text-[10px]">ID</span>
-              <span id="menu-party-id-value" className="text-primary font-bold text-[10px]">{partyId}</span>
+              <span id="menu-party-id-label" className="text-muted-foreground group-hover:text-foreground transition-colors text-[10px]">PLAYER ID</span>
+              <span id="menu-party-id-value" className="text-primary font-bold text-[10px] font-mono">{actorId.slice(0, 12)}</span>
               <Copy className="w-2.5 h-2.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           )}
         </div>
-        <div id="menu-header-actions">
+        <div id="menu-header-actions" className="flex items-center gap-2">
+          {/* Login button — guest only, visible on home */}
+          {!isLoggedIn && current === 'home' && (
+            <button
+              id="menu-login-btn"
+              className="pill-btn active !rounded-xl gap-1.5"
+              onClick={() => push('auth')}
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span className="text-[10px]">LOGIN</span>
+            </button>
+          )}
           {current !== 'settings' && (
             <button
               id="utility-toggle-btn"

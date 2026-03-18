@@ -1,10 +1,24 @@
 import React, { useState } from 'react';
 import { User, LogIn, LogOut, UserCircle } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useMenuNav } from '@/hooks/useMenuNav';
 
 const AuthScreen: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, user, displayName, login, logout } = useAuth();
+  const { pop } = useMenuNav();
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
+
+  const handleLogin = () => {
+    if (username.trim()) {
+      login(username.trim());
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    pop();
+  };
 
   if (isLoggedIn) {
     return (
@@ -14,7 +28,7 @@ const AuthScreen: React.FC = () => {
             <UserCircle className="w-8 h-8 text-primary" />
           </div>
           <div className="text-center">
-            <h2 className="font-orbitron text-lg font-bold text-foreground">{username || 'GHOST_UNIT'}</h2>
+            <h2 className="font-orbitron text-lg font-bold text-foreground">{displayName}</h2>
             <p className="text-xs text-muted-foreground font-rajdhani mt-1">K/D: 2.4 · MATCHES: 142 · WIN RATE: 58%</p>
           </div>
         </div>
@@ -32,7 +46,7 @@ const AuthScreen: React.FC = () => {
 
         <button
           className="pill-btn !rounded-xl w-full justify-center !py-3 text-destructive border-destructive/30 hover:bg-destructive/10 gap-2"
-          onClick={() => setIsLoggedIn(false)}
+          onClick={handleLogout}
         >
           <LogOut className="w-3.5 h-3.5" /> LOG OUT
         </button>
@@ -68,13 +82,16 @@ const AuthScreen: React.FC = () => {
 
         <button
           className="launch-btn w-full gap-2"
-          onClick={() => setIsLoggedIn(true)}
+          onClick={handleLogin}
         >
           <LogIn className="w-4 h-4" /> ENTER
         </button>
       </div>
 
-      <button className="pill-btn !rounded-xl w-full justify-center !py-3">
+      <button
+        className="pill-btn !rounded-xl w-full justify-center !py-3"
+        onClick={pop}
+      >
         PLAY AS GUEST
       </button>
     </div>

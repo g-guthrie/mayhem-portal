@@ -1,12 +1,14 @@
 import React from 'react';
 import menuBg from '@/assets/menu-bg.jpg';
 import { MenuNavProvider } from '@/hooks/useMenuNav';
+import { AuthProvider } from '@/hooks/useAuth';
 import MenuHeader from '@/components/menu/MenuHeader';
 import ScreenRouter from '@/components/menu/ScreenRouter';
 import LoadoutBand from '@/components/menu/LoadoutBand';
 
 const Index: React.FC = () => {
   return (
+    <AuthProvider>
     <MenuNavProvider>
       <div
         id="overlay"
@@ -27,7 +29,7 @@ const Index: React.FC = () => {
             style={{ borderRadius: 'var(--radius-xl)', boxShadow: 'var(--shadow-lift)' }}
           >
             <div id="menu-surface" className="flex flex-col h-full overflow-hidden">
-              <MenuHeader partyId="#4A7F" />
+              <MenuHeader />
 
               {/* Inline toast */}
               <div id="menu-inline-toast" className="hidden px-5 py-1.5 text-xs text-primary font-orbitron" />
@@ -53,6 +55,7 @@ const Index: React.FC = () => {
         </div>
       </div>
     </MenuNavProvider>
+    </AuthProvider>
   );
 };
 

@@ -200,7 +200,7 @@ const HomeScreen: React.FC = () => {
         <button id="invite-friend-btn" className="pill-btn active !px-2 !py-1.5" title="Invite">
           <UserPlus className="w-3 h-3" />
         </button>
-        <button id="join-friend-btn" className="pill-btn !rounded-lg !px-2 !py-1.5" title="Join">
+        <button id="join-friend-btn" className="pill-btn !px-2 !py-1.5" title="Join">
           <ArrowRight className="w-3 h-3" />
         </button>
       </div>

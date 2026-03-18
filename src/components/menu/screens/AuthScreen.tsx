@@ -11,8 +11,8 @@ const AuthScreen: React.FC = () => {
 
   const handleLogin = () => {
     if (username.trim()) {
-      login(username.trim());
       pop();
+      login(username.trim());
     }
   };
 

@@ -191,7 +191,7 @@ const LoadoutBand: React.FC = () => {
                     className={`slot-btn flex-1 ${abilitySlot === 0 ? 'active' : ''}`}
                     onClick={() => setAbilitySlot(0)}
                   >
-                    A1
+                    ABILITY 1
                   </button>
                   <button
                     id="ability-slot-secondary"

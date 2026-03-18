@@ -507,7 +507,7 @@ const HomeScreen: React.FC = () => {
                     </button>
                   )}
                   {!m.isLeader && (
-                    <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px]" title="Remove">
+                    <button className="pill-btn !px-1.5 !py-0.5 text-[8px]" title="Remove">
                       <UserMinus className="w-2.5 h-2.5" />
                     </button>
                   )}

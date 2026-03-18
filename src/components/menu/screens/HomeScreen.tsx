@@ -140,7 +140,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Play Card ─── */
   const PlayCard = (
-    <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2 h-full">
+    <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2">
       <div id="play-mode-toolbar" className="flex items-center gap-2">
         <button
           id="primary-launch-btn"
@@ -153,7 +153,7 @@ const HomeScreen: React.FC = () => {
             toast({ title: `Searching for ${currentMode.label}...`, description: 'Finding the best match for you.' });
           }}
         >
-          PLAY {currentMode.label}
+          <Play className="w-3.5 h-3.5" /> START MATCH
         </button>
         <button
           id="game-modes-toggle-btn"
@@ -166,7 +166,7 @@ const HomeScreen: React.FC = () => {
         </button>
       </div>
       {modesOpen && (
-        <div id="play-mode-options" className="grid grid-cols-2 gap-1.5 animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
+        <div id="play-mode-options" className="grid grid-cols-2 gap-1.5 max-h-[120px] overflow-y-auto animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
           {GAME_MODES.map(mode => (
             <button
               key={mode.id}

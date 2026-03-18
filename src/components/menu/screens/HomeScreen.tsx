@@ -3,7 +3,7 @@ import {
   Crosshair, ChevronDown, Swords, Target, Dumbbell,
   UserPlus, ArrowRight, Globe, Users, UserMinus,
   Copy, Lock, Unlock, Shuffle, Play, GripVertical,
-  DoorOpen, X, LogOut, Bell, Check, Shield,
+  DoorOpen, X, LogOut, Bell, Check, Shield, Crown,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useMenuNav } from '@/hooks/useMenuNav';
@@ -78,9 +78,16 @@ const HomeScreen: React.FC = () => {
   const [inviteInput, setInviteInput] = useState('');
 
   /* Party state */
-  const [partyMembers] = useState<{ name: string; isLeader: boolean }[]>([
+  const [partyMembers, setPartyMembers] = useState<{ name: string; isLeader: boolean }[]>([
     { name: displayName, isLeader: true },
   ]);
+
+  const transferLeader = (name: string) => {
+    setPartyMembers(prev => prev.map(m => ({
+      ...m,
+      isLeader: m.name === name,
+    })));
+  };
 
   /* Drag state for desktop */
   const [dragItem, setDragItem] = useState<{ playerId: string; fromTeam: number } | null>(null);
@@ -141,7 +148,7 @@ const HomeScreen: React.FC = () => {
     <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2">
       <div id="play-mode-toolbar" className="flex items-center gap-2">
         <button id="primary-launch-btn" className="launch-btn flex-1 !py-2 !text-[10px] animate-pulse-glow">
-          PLAY
+          PLAY {currentMode.label}
         </button>
         <button
           id="game-modes-toggle-btn"
@@ -149,7 +156,7 @@ const HomeScreen: React.FC = () => {
           onClick={() => setModesOpen(!modesOpen)}
         >
           {currentMode.icon}
-          <span className="font-orbitron text-[9px] font-bold tracking-wider">{currentMode.label}</span>
+          <span className="font-orbitron text-[9px] font-bold tracking-wider">CHANGE MODE</span>
           <ChevronDown className={`w-3 h-3 transition-transform ${modesOpen ? 'rotate-180' : ''}`} />
         </button>
       </div>
@@ -484,11 +491,22 @@ const HomeScreen: React.FC = () => {
                   <span className="font-rajdhani font-semibold text-xs text-foreground">{m.name}</span>
                   {m.isLeader && <span className="text-[8px] font-orbitron text-primary tracking-wider">LEADER</span>}
                 </div>
-                {!m.isLeader && (
-                  <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px]" title="Remove">
-                    <UserMinus className="w-2.5 h-2.5" />
-                  </button>
-                )}
+                <div className="flex items-center gap-1">
+                  {!m.isLeader && partyMembers.find(p => p.isLeader)?.name === displayName && (
+                    <button
+                      className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] gap-0.5"
+                      title="Make Leader"
+                      onClick={() => transferLeader(m.name)}
+                    >
+                      <Crown className="w-2.5 h-2.5 text-primary" />
+                    </button>
+                  )}
+                  {!m.isLeader && (
+                    <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px]" title="Remove">
+                      <UserMinus className="w-2.5 h-2.5" />
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

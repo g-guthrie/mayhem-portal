@@ -491,11 +491,22 @@ const HomeScreen: React.FC = () => {
                   <span className="font-rajdhani font-semibold text-xs text-foreground">{m.name}</span>
                   {m.isLeader && <span className="text-[8px] font-orbitron text-primary tracking-wider">LEADER</span>}
                 </div>
-                {!m.isLeader && (
-                  <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px]" title="Remove">
-                    <UserMinus className="w-2.5 h-2.5" />
-                  </button>
-                )}
+                <div className="flex items-center gap-1">
+                  {!m.isLeader && partyMembers.find(p => p.isLeader)?.name === displayName && (
+                    <button
+                      className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px] gap-0.5"
+                      title="Make Leader"
+                      onClick={() => transferLeader(m.name)}
+                    >
+                      <Crown className="w-2.5 h-2.5 text-primary" />
+                    </button>
+                  )}
+                  {!m.isLeader && (
+                    <button className="pill-btn !rounded-md !px-1.5 !py-0.5 text-[8px]" title="Remove">
+                      <UserMinus className="w-2.5 h-2.5" />
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

@@ -8,6 +8,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useMenuNav } from '@/hooks/useMenuNav';
 import { useRoom, type RoomPlayer, MAX_PLAYERS } from '@/hooks/useRoom';
+import { toast } from '@/hooks/use-toast';
 
 /* ─── Game Modes ─── */
 interface GameMode { id: string; label: string; icon: React.ReactNode }

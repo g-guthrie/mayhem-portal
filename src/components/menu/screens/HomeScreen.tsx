@@ -500,7 +500,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Social Panel ─── */
   const SocialPanel = (
-    <div className="glass-card p-3 sm:p-4 flex flex-col gap-2.5 overflow-y-auto min-h-0">
+    <div ref={socialPanelRef} className="glass-card p-3 sm:p-4 flex flex-col gap-2.5 overflow-y-auto min-h-0">
       {/* Invite banner */}
       <div id="social-direct-invite-banner" className="hidden border-primary/30">
         <div id="social-direct-invite-copy" className="text-xs font-rajdhani text-foreground mb-1.5" />

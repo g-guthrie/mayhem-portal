@@ -774,7 +774,18 @@ const HomeScreen: React.FC = () => {
                     <>
                       {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider ml-1">IN GAME</span>}
                       {!removeMode && (
-                        <button className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity ml-1" title="Invite to party">
+                        <button
+                          className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity ml-1"
+                          title="Invite to party"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPartyMembers(prev => {
+                              if (prev.find(m => m.name === f.name)) return prev;
+                              return [...prev, { name: f.name, isLeader: false }];
+                            });
+                            toast({ title: `${f.name} joined your party` });
+                          }}
+                        >
                           <UserPlus className="w-2.5 h-2.5" />
                         </button>
                       )}

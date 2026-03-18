@@ -99,6 +99,9 @@ const HomeScreen: React.FC = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
+  /* Join confirmation for party members */
+  const [joinConfirm, setJoinConfirm] = useState<'friend' | 'room' | null>(null);
+
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
 
@@ -120,6 +123,7 @@ const HomeScreen: React.FC = () => {
   const [dragOverTeam, setDragOverTeam] = useState<number | null>(null);
 
   const isSolo = partyMembers.length <= 1;
+  const isPartyLeader = partyMembers.find(m => m.isLeader)?.name === displayName;
   const showSocialPanel = isLoggedIn || !isSolo;
 
   /* ─── Drag & Drop handlers ─── */
@@ -218,34 +222,124 @@ const HomeScreen: React.FC = () => {
   const QuickJoinCard = (
     <div className="glass-card p-3 flex flex-col gap-2">
       <span className="section-label !mb-0">QUICK JOIN</span>
-      <div id="social-friend-id-stack" className="flex gap-1.5">
-        <input
-          id="party-id-input"
-          className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
-          placeholder="Friend ID"
-          value={friendId}
-          onChange={e => setFriendId(e.target.value)}
-        />
-        <button id="invite-friend-btn" className="pill-btn active !px-2 !py-1.5" title="Invite">
-          <UserPlus className="w-3 h-3" />
-        </button>
-        <button id="join-friend-btn" className="pill-btn !px-2 !py-1.5" title="Join">
-          <ArrowRight className="w-3 h-3" />
-        </button>
-      </div>
-      <div id="social-room-join-stack" className="flex gap-1.5">
-        <input
-          id="room-code-input"
-          className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
-          placeholder="Room Code"
-          value={roomCodeInput}
-          onChange={e => setRoomCodeInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && handleJoinRoom()}
-        />
-        <button id="join-room-btn" className="pill-btn !px-2 !py-1.5" title="Join Room" onClick={handleJoinRoom}>
-          <Globe className="w-3 h-3" />
-        </button>
-      </div>
+
+      {/* Friend ID row */}
+      {joinConfirm === 'friend' ? (
+        <div className="flex items-center gap-1.5 animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
+          <span className="text-[9px] font-orbitron text-foreground tracking-wider">
+            {isPartyLeader ? 'BRING PARTY?' : 'LEAVE PARTY & JOIN?'}
+          </span>
+          <button
+            className="pill-btn active !px-2 !py-1.5 !text-[9px]"
+            onClick={() => {
+              toast({ title: isPartyLeader ? 'Joining with party...' : 'Left party, joining friend...' });
+              setJoinConfirm(null);
+              setFriendId('');
+            }}
+          >
+            YES
+          </button>
+          <button
+            className="pill-btn !px-2 !py-1.5 !text-[9px]"
+            onClick={() => setJoinConfirm(null)}
+          >
+            NO
+          </button>
+        </div>
+      ) : (
+        <div id="social-friend-id-stack" className="flex gap-1.5">
+          <input
+            id="party-id-input"
+            className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
+            placeholder="Friend ID"
+            value={friendId}
+            onChange={e => setFriendId(e.target.value)}
+          />
+          <button id="invite-friend-btn" className="pill-btn active !px-2 !py-1.5" title="Invite">
+            <UserPlus className="w-3 h-3" />
+          </button>
+          <button
+            id="join-friend-btn"
+            className="pill-btn !px-2 !py-1.5"
+            title="Join"
+            onClick={() => {
+              if (!friendId.trim()) return;
+              if (!isSolo) {
+                setJoinConfirm('friend');
+              } else {
+                toast({ title: 'Joining friend...', description: friendId });
+                setFriendId('');
+              }
+            }}
+          >
+            <ArrowRight className="w-3 h-3" />
+          </button>
+        </div>
+      )}
+
+      {/* Room code row */}
+      {joinConfirm === 'room' ? (
+        <div className="flex items-center gap-1.5 animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
+          <span className="text-[9px] font-orbitron text-foreground tracking-wider">
+            {isPartyLeader ? 'BRING PARTY?' : 'LEAVE PARTY & JOIN?'}
+          </span>
+          <button
+            className="pill-btn active !px-2 !py-1.5 !text-[9px]"
+            onClick={() => {
+              if (isPartyLeader) {
+                room.joinRoom(roomCodeInput.trim(), displayName, actorId);
+              } else {
+                room.joinRoom(roomCodeInput.trim(), displayName, actorId);
+              }
+              toast({ title: isPartyLeader ? 'Joining room with party...' : 'Left party, joining room...' });
+              setJoinConfirm(null);
+              setRoomCodeInput('');
+            }}
+          >
+            YES
+          </button>
+          <button
+            className="pill-btn !px-2 !py-1.5 !text-[9px]"
+            onClick={() => setJoinConfirm(null)}
+          >
+            NO
+          </button>
+        </div>
+      ) : (
+        <div id="social-room-join-stack" className="flex gap-1.5">
+          <input
+            id="room-code-input"
+            className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
+            placeholder="Room Code"
+            value={roomCodeInput}
+            onChange={e => setRoomCodeInput(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                if (!isSolo) {
+                  setJoinConfirm('room');
+                } else {
+                  handleJoinRoom();
+                }
+              }
+            }}
+          />
+          <button
+            id="join-room-btn"
+            className="pill-btn !px-2 !py-1.5"
+            title="Join Room"
+            onClick={() => {
+              if (!roomCodeInput.trim()) return;
+              if (!isSolo) {
+                setJoinConfirm('room');
+              } else {
+                handleJoinRoom();
+              }
+            }}
+          >
+            <Globe className="w-3 h-3" />
+          </button>
+        </div>
+      )}
     </div>
   );
 

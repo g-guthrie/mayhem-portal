@@ -787,7 +787,7 @@ const HomeScreen: React.FC = () => {
                   )}
                   {!m.isLeader && (
                     <button
-                      className="pill-btn !px-1.5 !py-0.5 text-[8px]"
+                      className="pill-btn !px-1.5 !py-0.5 text-[8px] text-destructive border-destructive/30 hover:bg-destructive/10"
                       title="Remove"
                       onClick={() => {
                         setPartyMembers(prev => prev.filter(p => p.name !== m.name));

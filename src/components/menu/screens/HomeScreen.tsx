@@ -751,7 +751,7 @@ const HomeScreen: React.FC = () => {
               <div className="flex items-center gap-1 flex-1 min-w-0 justify-end">
                 {(!room.isLocked || room.isCreator) && (
                   <div className="flex items-center gap-1 min-w-0">
-                    <span className="pill-btn !px-1.5 !py-0.5 text-[8px] cursor-default font-orbitron font-bold tracking-wider shrink-0">PLAYER ID</span>
+                    
                     <input
                       className="glass-input !py-0.5 !px-2 !text-[10px] min-w-0 w-24"
                       placeholder="Enter ID..."

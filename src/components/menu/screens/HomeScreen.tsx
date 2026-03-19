@@ -87,6 +87,10 @@ const HomeScreen: React.FC = () => {
   const [inviteInput, setInviteInput] = useState('');
   const [invitePartyOpen, setInvitePartyOpen] = useState(false);
 
+  /* Quick join state */
+  const [quickFriendId, setQuickFriendId] = useState('');
+  const [quickRoomCode, setQuickRoomCode] = useState('');
+
   /* Room mode dropdown */
   const [roomModeDropdownOpen, setRoomModeDropdownOpen] = useState(false);
   const [teamCountDropdownOpen, setTeamCountDropdownOpen] = useState(false);

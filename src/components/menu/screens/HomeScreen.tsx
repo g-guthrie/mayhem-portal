@@ -564,7 +564,7 @@ const HomeScreen: React.FC = () => {
 
       {/* Team Roster — Hybrid: click + drag */}
       {room.mode !== 'ffa' ? (
-        <div className="flex flex-col gap-1.5">
+        <div className="rounded-xl border border-border/20 bg-muted/5 p-2 max-h-[300px] overflow-y-auto">
           <span className="section-label flex items-center gap-1 !mb-1.5">
             <Users className="w-3 h-3 text-primary" /> TEAMS
           </span>
@@ -656,7 +656,7 @@ const HomeScreen: React.FC = () => {
         </div>
       ) : (
         /* FFA player list */
-        <div className="flex flex-col gap-1.5">
+        <div className="rounded-xl border border-border/20 bg-muted/5 p-2 max-h-[300px] overflow-y-auto">
           <span className="section-label flex items-center gap-1 !mb-1.5">
             <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
           </span>

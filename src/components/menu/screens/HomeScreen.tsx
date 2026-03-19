@@ -797,14 +797,6 @@ const HomeScreen: React.FC = () => {
   /* ─── Social Panel ─── */
   const SocialPanel = (
     <div ref={socialPanelRef} className="glass-card p-3 sm:p-4 flex flex-col gap-2.5 overflow-y-auto min-h-0">
-      {/* Invite banner */}
-      <div id="social-direct-invite-banner" className="hidden border-primary/30">
-        <div id="social-direct-invite-copy" className="text-xs font-rajdhani text-foreground mb-1.5" />
-        <div id="social-direct-invite-actions" className="flex gap-1.5">
-          <button id="social-direct-invite-accept-btn" className="pill-btn active flex-1 !text-[9px] !py-1.5">ACCEPT</button>
-          <button id="social-direct-invite-dismiss-btn" className="pill-btn flex-1 !text-[9px] !py-1.5">DISMISS</button>
-        </div>
-      </div>
 
       {/* Party — only show here when NOT in a room (party moves into room card) */}
       {!isSolo && !room.isInRoom && (

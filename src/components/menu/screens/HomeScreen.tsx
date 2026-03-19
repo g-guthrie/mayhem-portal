@@ -1187,8 +1187,8 @@ const HomeScreen: React.FC = () => {
         )}
       </div>
 
-      {/* Social panel below if applicable */}
-      {showSocialPanel && (
+      {/* Social panel below — only when NOT in a room */}
+      {showSocialPanel && !room.isInRoom && (
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
           <div className="sm:col-span-1">
             {SocialPanel}

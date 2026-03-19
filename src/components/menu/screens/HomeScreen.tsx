@@ -108,7 +108,6 @@ const HomeScreen: React.FC = () => {
   /* Party state — sync leader name with displayName */
   const [partyMembers, setPartyMembers] = useState<{ name: string; isLeader: boolean }[]>([
     { name: displayName, isLeader: true },
-    { name: 'xVortex', isLeader: false },
   ]);
 
 

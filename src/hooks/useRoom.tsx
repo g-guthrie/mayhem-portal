@@ -484,6 +484,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsPaused(false);
     if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
     if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
+    if (countdownTransitionRef.current) { clearTimeout(countdownTransitionRef.current); countdownTransitionRef.current = null; }
   }, []);
 
   const returnToMenu = useCallback(() => {

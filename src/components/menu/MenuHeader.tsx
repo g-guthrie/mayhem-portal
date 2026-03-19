@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { Settings, ChevronLeft, Copy, LogIn, UserPlus, ArrowRight, Globe } from 'lucide-react';
+import React from 'react';
+import { Settings, ChevronLeft, Copy, LogIn } from 'lucide-react';
 import { useMenuNav, type MenuScreen } from '@/hooks/useMenuNav';
 import { useAuth } from '@/hooks/useAuth';
-import { useRoom } from '@/hooks/useRoom';
 import { toast } from '@/hooks/use-toast';
 
 const SCREEN_TITLES: Record<MenuScreen, string> = {
@@ -17,34 +16,7 @@ const SCREEN_TITLES: Record<MenuScreen, string> = {
 const MenuHeader: React.FC = () => {
   const { current, history, pop, push } = useMenuNav();
   const { isLoggedIn, actorId, displayName } = useAuth();
-  const room = useRoom();
   const canGoBack = history.length > 1;
-
-  /* Quick join state */
-  const [friendId, setFriendId] = useState('');
-  const [roomCodeInput, setRoomCodeInput] = useState('');
-
-  const isMatchActive = room.matchState !== 'idle';
-
-  const handleJoinFriend = () => {
-    if (!friendId.trim()) return;
-    toast({ title: 'Joining friend...', description: friendId });
-    setFriendId('');
-  };
-
-  const handleJoinRoom = () => {
-    if (roomCodeInput.trim().length < 4) return;
-    if (room.isInRoom) {
-      toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
-      return;
-    }
-    if (isMatchActive) {
-      toast({ title: 'Match in progress', variant: 'destructive' });
-      return;
-    }
-    room.joinRoom(roomCodeInput.trim(), displayName, actorId);
-    setRoomCodeInput('');
-  };
 
   return (
     <header id="menu-header" className="px-4 sm:px-5 py-3 flex-shrink-0">
@@ -113,51 +85,6 @@ const MenuHeader: React.FC = () => {
           )}
         </div>
         <div id="menu-header-actions" className="flex items-center gap-2">
-          {/* Quick join — home screen only */}
-          {current === 'home' && (
-            <div className="flex items-center gap-1.5">
-              <input
-                className="glass-input !py-0.5 !px-2 !text-[10px] w-20"
-                placeholder="Friend ID"
-                value={friendId}
-                onChange={e => setFriendId(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleJoinFriend(); }}
-              />
-              <button
-                className="pill-btn !px-1 !py-0.5"
-                title="Invite friend"
-                onClick={() => {
-                  if (!friendId.trim()) return;
-                  toast({ title: 'Invite sent', description: `Invited ${friendId} to your party` });
-                  setFriendId('');
-                }}
-              >
-                <UserPlus className="w-2.5 h-2.5" />
-              </button>
-              <button
-                className="pill-btn !px-1 !py-0.5"
-                title="Join friend"
-                onClick={handleJoinFriend}
-              >
-                <ArrowRight className="w-2.5 h-2.5" />
-              </button>
-              <div className="w-px h-4 bg-border/30" />
-              <input
-                className="glass-input !py-0.5 !px-2 !text-[10px] w-20"
-                placeholder="Room Code"
-                value={roomCodeInput}
-                onChange={e => setRoomCodeInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') handleJoinRoom(); }}
-              />
-              <button
-                className="pill-btn !px-1 !py-0.5"
-                title="Join room"
-                onClick={handleJoinRoom}
-              >
-                <Globe className="w-2.5 h-2.5" />
-              </button>
-            </div>
-          )}
           {current !== 'settings' && (
             <button
               id="utility-toggle-btn"

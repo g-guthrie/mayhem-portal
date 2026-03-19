@@ -1196,7 +1196,7 @@ const HomeScreen: React.FC = () => {
      ═══════════════════════════════════════════ */
 
   return (
-    <div className="flex flex-col gap-3 min-h-full">
+    <div className="flex flex-col gap-3 min-h-full flex-1">
       {InviteBanner}
       {/* Main content area */}
       <div className={room.isInRoom ? '' : 'grid gap-3 grid-cols-1 sm:grid-cols-3'}>

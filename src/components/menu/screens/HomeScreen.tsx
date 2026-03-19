@@ -722,28 +722,6 @@ const HomeScreen: React.FC = () => {
 
       {/* Invite + Room Actions — all inline */}
       <div className="flex items-center gap-1.5 flex-nowrap">
-        {(!room.isLocked || room.isCreator) && (
-          <>
-            <input
-              className="glass-input !py-1.5 !px-2 !text-xs min-w-0 flex-1"
-              placeholder="Player..."
-              value={inviteInput}
-              onChange={e => setInviteInput(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && inviteInput.trim()) {
-                  room.invitePlayer(inviteInput.trim());
-                  setInviteInput('');
-                }
-              }}
-            />
-            <button
-              className="pill-btn !px-2 !py-1.5 !text-[9px] gap-1 whitespace-nowrap flex-1"
-              onClick={() => { if (inviteInput.trim()) { room.invitePlayer(inviteInput.trim()); setInviteInput(''); } }}
-            >
-              <UserPlus className="w-2.5 h-2.5" /> INVITE
-            </button>
-          </>
-        )}
         {room.isCreator && (
           <button className="pill-btn !py-1.5 !px-2 !text-[9px] gap-1 whitespace-nowrap flex-1" onClick={room.inviteParty}>
             <Users className="w-3 h-3" /> INVITE PARTY

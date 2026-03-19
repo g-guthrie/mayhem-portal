@@ -573,7 +573,7 @@ const HomeScreen: React.FC = () => {
             room.teamCount === 2 ? 'grid-cols-2' :
             room.teamCount === 3 ? 'grid-cols-3' :
             'grid-cols-2'
-          }`} style={{ maxHeight: room.teamCount <= 2 ? '200px' : '280px' }}>
+          }`} style={{ maxHeight: room.teamCount <= 2 ? '200px' : '280px', overflowY: 'auto' }}>
             {Array.from({ length: room.teamCount }).map((_, tIdx) => {
               const isDropTarget = dragOverTeam === tIdx;
               const isAssignTarget = room.selectedPlayer != null;

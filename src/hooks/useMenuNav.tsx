@@ -6,7 +6,8 @@ export type MenuScreen =
   | 'settings' 
   | 'auth' 
   | 'manual' 
-  | 'controls';
+  | 'controls'
+  | 'loadout';
 
 interface MenuNavState {
   current: MenuScreen;

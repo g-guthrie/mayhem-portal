@@ -4,7 +4,7 @@ import { AuthProvider } from '@/hooks/useAuth';
 import { RoomProvider, useRoom } from '@/hooks/useRoom';
 import MenuHeader from '@/components/menu/MenuHeader';
 import ScreenRouter from '@/components/menu/ScreenRouter';
-import LoadoutBand from '@/components/menu/LoadoutBand';
+
 import MatchOverlay from '@/components/menu/MatchOverlay';
 import { GameBridgeSync } from '@/components/menu/GameBridgeSync';
 
@@ -62,7 +62,7 @@ const OverlayShell: React.FC = () => {
                     <ScreenRouter />
                   </div>
                 </section>
-                <LoadoutBand />
+                
               </div>
             </main>
           </div>

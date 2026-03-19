@@ -6,6 +6,7 @@ import SettingsScreen from './screens/SettingsScreen';
 import AuthScreen from './screens/AuthScreen';
 import ManualScreen from './screens/ManualScreen';
 import ControlsScreen from './screens/ControlsScreen';
+import LoadoutScreen from './screens/LoadoutScreen';
 
 const screens = {
   home: HomeScreen,
@@ -14,6 +15,7 @@ const screens = {
   auth: AuthScreen,
   manual: ManualScreen,
   controls: ControlsScreen,
+  loadout: LoadoutScreen,
 };
 
 const ScreenRouter: React.FC = () => {

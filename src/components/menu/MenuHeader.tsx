@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, ChevronLeft, Copy, LogIn, User } from 'lucide-react';
+import { Settings, ChevronLeft, Copy, LogIn, User, Crosshair } from 'lucide-react';
 import { useMenuNav, type MenuScreen } from '@/hooks/useMenuNav';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
@@ -11,6 +11,7 @@ const SCREEN_TITLES: Record<MenuScreen, string> = {
   auth: 'ACCOUNT',
   manual: 'FIELD MANUAL',
   controls: 'CONTROLS',
+  loadout: 'LOADOUT',
 };
 
 interface MenuHeaderProps {
@@ -75,6 +76,16 @@ const MenuHeader: React.FC<MenuHeaderProps> = () => {
                 <Copy className="w-2.5 h-2.5 text-muted-foreground hover:text-foreground" />
               </button>
             </div>
+          )}
+          {current === 'home' && (
+            <button
+              id="menu-loadout-btn"
+              className="pill-btn gap-1.5 ml-1 !border-destructive/50 !bg-destructive/10 hover:!bg-destructive/20 text-destructive"
+              onClick={() => push('loadout')}
+            >
+              <Crosshair className="w-3 h-3" />
+              <span className="text-[10px] font-orbitron font-bold">LOADOUT</span>
+            </button>
           )}
         </div>
         <div id="menu-header-actions" className="flex items-center gap-2">

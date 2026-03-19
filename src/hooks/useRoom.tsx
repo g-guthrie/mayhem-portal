@@ -625,9 +625,9 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, 300);
   }, [initTeams, isInRoom, matchState]);
 
-  const acceptInvite = useCallback((code: string) => {
+  const acceptInvite = useCallback((code: string, playerName?: string, playerId?: string) => {
     setPendingInvites(prev => prev.filter(i => i.roomCode !== code));
-    joinRoom(code, 'You', 'self_' + Date.now().toString(36));
+    joinRoom(code, playerName || 'You', playerId || 'self_' + Date.now().toString(36));
   }, [joinRoom]);
 
   const dismissInvite = useCallback((code: string) => {

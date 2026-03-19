@@ -7,7 +7,6 @@ import { toast } from '@/hooks/use-toast';
 const SCREEN_TITLES: Record<MenuScreen, string> = {
   home: 'MAYHEM',
   social: 'SOCIAL',
-  room: 'PRIVATE ROOM',
   settings: 'SETTINGS',
   auth: 'ACCOUNT',
   manual: 'FIELD MANUAL',

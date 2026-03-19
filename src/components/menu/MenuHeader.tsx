@@ -158,17 +158,6 @@ const MenuHeader: React.FC = () => {
               </button>
             </div>
           )}
-          {/* Login button — guest only, visible on home */}
-          {!isLoggedIn && current === 'home' && (
-            <button
-              id="menu-login-btn"
-              className="pill-btn active gap-1.5"
-              onClick={() => push('auth')}
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span className="text-[10px]">LOGIN</span>
-            </button>
-          )}
           {current !== 'settings' && (
             <button
               id="utility-toggle-btn"

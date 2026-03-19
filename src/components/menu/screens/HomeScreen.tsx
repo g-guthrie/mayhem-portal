@@ -677,9 +677,25 @@ const HomeScreen: React.FC = () => {
                 <Users className="w-3 h-3 text-primary" /> FRIENDS
               </span>
               <div className="flex items-center gap-1">
+                <input
+                  className="glass-input !py-0.5 !px-2 !text-[10px] w-24 min-w-0"
+                  placeholder="Enter ID..."
+                  value={addFriendId}
+                  onChange={e => setAddFriendId(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && addFriendId.trim()) {
+                      toast({ title: 'Friend request sent', description: `Sent to ${addFriendId}` });
+                      setAddFriendId('');
+                    }
+                  }}
+                />
                 <button
                   className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
-                  onClick={() => setAddFriendOpen(!addFriendOpen)}
+                  onClick={() => {
+                    if (!addFriendId.trim()) return;
+                    toast({ title: 'Friend request sent', description: `Sent to ${addFriendId}` });
+                    setAddFriendId('');
+                  }}
                   title="Add Friend"
                 >
                   <UserPlus className="w-2.5 h-2.5" />
@@ -695,29 +711,6 @@ const HomeScreen: React.FC = () => {
                 </button>
               </div>
             </div>
-
-            {addFriendOpen && (
-              <div className="flex gap-1.5 animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
-                <input
-                  className="glass-input flex-1 !py-1 !px-2 !text-xs"
-                  placeholder="Enter player ID..."
-                  value={addFriendId}
-                  onChange={e => setAddFriendId(e.target.value)}
-                  autoFocus
-                />
-                <button
-                  className="pill-btn active !px-2 !py-1 !text-[9px]"
-                  onClick={() => {
-                    if (!addFriendId.trim()) return;
-                    toast({ title: 'Friend request sent', description: `Sent to ${addFriendId}` });
-                    setAddFriendId('');
-                    setAddFriendOpen(false);
-                  }}
-                >
-                  SEND
-                </button>
-              </div>
-            )}
 
             <div className="flex flex-col gap-0.5 max-h-[160px] overflow-y-auto">
               {friends.length === 0 && (

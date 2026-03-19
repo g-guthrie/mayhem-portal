@@ -942,7 +942,7 @@ const HomeScreen: React.FC = () => {
     <div className="flex flex-col gap-3 h-full min-h-0">
       {InviteBanner}
       {/* Main content area */}
-      <div className={`min-h-0 ${room.isInRoom ? 'flex-1 flex flex-col' : 'grid gap-3 grid-cols-1 sm:grid-cols-3'}`}>
+      <div className={room.isInRoom ? '' : 'grid gap-3 grid-cols-1 sm:grid-cols-3'}>
         {room.isInRoom ? (
           RoomCardContent
         ) : (
@@ -956,7 +956,7 @@ const HomeScreen: React.FC = () => {
 
       {/* Social panel below if applicable */}
       {showSocialPanel && (
-        <div className="grid grid-cols-1 gap-3 flex-1 min-h-0">
+        <div className="grid grid-cols-1 gap-3">
           {SocialPanel}
         </div>
       )}

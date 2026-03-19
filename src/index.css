@@ -82,7 +82,7 @@
 /* Glass material utilities */
 @layer components {
   .glass-surface {
-    background: hsl(var(--glass-bg) / 0.72);
+    background: hsl(var(--glass-bg) / 0.50);
     backdrop-filter: blur(var(--glass-blur)) saturate(180%);
     border: 1px solid hsl(var(--glass-border));
   }

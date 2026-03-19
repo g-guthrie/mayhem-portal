@@ -677,50 +677,48 @@ const HomeScreen: React.FC = () => {
         </div>
       )}
 
-      {/* Invite controls */}
-      {(!room.isLocked || room.isCreator) && (
-        <div className="flex gap-1.5">
-          <input
-            className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
-            placeholder="Player name..."
-            value={inviteInput}
-            onChange={e => setInviteInput(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && inviteInput.trim()) {
-                room.invitePlayer(inviteInput.trim());
-                setInviteInput('');
-              }
-            }}
-          />
-          <button
-            className="pill-btn !px-2 !py-1.5 !text-[9px] gap-1"
-            onClick={() => { if (inviteInput.trim()) { room.invitePlayer(inviteInput.trim()); setInviteInput(''); } }}
-          >
-            <UserPlus className="w-2.5 h-2.5" /> INVITE
-          </button>
-        </div>
-      )}
-
-      {/* Room Actions */}
-      <div className="flex gap-2 pt-1">
+      {/* Invite + Room Actions — all inline */}
+      <div className="flex items-center gap-1.5 flex-nowrap">
+        {(!room.isLocked || room.isCreator) && (
+          <>
+            <input
+              className="glass-input !py-1.5 !px-2 !text-xs min-w-0 w-28"
+              placeholder="Player..."
+              value={inviteInput}
+              onChange={e => setInviteInput(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && inviteInput.trim()) {
+                  room.invitePlayer(inviteInput.trim());
+                  setInviteInput('');
+                }
+              }}
+            />
+            <button
+              className="pill-btn !px-2 !py-1.5 !text-[9px] gap-1 whitespace-nowrap shrink-0"
+              onClick={() => { if (inviteInput.trim()) { room.invitePlayer(inviteInput.trim()); setInviteInput(''); } }}
+            >
+              <UserPlus className="w-2.5 h-2.5" /> INVITE
+            </button>
+          </>
+        )}
         {room.isCreator && (
-          <button className="pill-btn justify-center !py-2 !px-3 !text-[9px] gap-1 shrink-0" onClick={room.inviteParty}>
+          <button className="pill-btn !py-1.5 !px-2 !text-[9px] gap-1 whitespace-nowrap shrink-0" onClick={room.inviteParty}>
             <Users className="w-3 h-3" /> INVITE PARTY
           </button>
         )}
-          <button
-            className="launch-btn flex-1 !py-2 !text-[9px] gap-1"
-            onClick={() => {
-              if (room.isCreator) {
-                room.startMatch();
-              } else {
-                room.toggleReady(actorId);
-                toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
-              }
-            }}
-          >
-            <Play className="w-3 h-3" /> {room.isCreator ? 'START PRIVATE MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
-          </button>
+        <button
+          className="launch-btn flex-1 !py-1.5 !text-[9px] gap-1 whitespace-nowrap"
+          onClick={() => {
+            if (room.isCreator) {
+              room.startMatch();
+            } else {
+              room.toggleReady(actorId);
+              toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
+            }
+          }}
+        >
+          <Play className="w-3 h-3" /> {room.isCreator ? 'START MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
+        </button>
       </div>
     </div>
   ) : (

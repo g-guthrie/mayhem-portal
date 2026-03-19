@@ -479,7 +479,7 @@ const HomeScreen: React.FC = () => {
           {room.isCreator ? (
             <div className="relative" ref={modeDropdownRef}>
               <button
-                className="pill-btn gap-1 !text-[9px] !px-2 !py-1"
+                className="pill-btn active gap-1 !text-[9px] !px-2 !py-1"
                 onClick={() => setRoomModeDropdownOpen(!roomModeDropdownOpen)}
               >
                 {ROOM_MODES.find(m => m.id === room.mode)?.icon}

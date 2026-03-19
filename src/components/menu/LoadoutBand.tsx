@@ -44,6 +44,10 @@ const ABILITIES: LoadoutItem[] = [
 ];
 
 const LoadoutBand: React.FC = () => {
+  const { isLoggedIn } = useAuth();
+  const { isInRoom } = useRoom();
+  const needsCollapse = isLoggedIn || isInRoom;
+
   const [weaponSlot, setWeaponSlot] = useState<0 | 1>(0);
   const [selectedWeapons, setSelectedWeapons] = useState<[string, string]>(['machinegun', 'shotgun']);
   const [throwableCategory, setThrowableCategory] = useState<ThrowableCategory>('grenade');

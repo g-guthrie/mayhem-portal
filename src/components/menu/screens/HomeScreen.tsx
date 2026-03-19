@@ -105,11 +105,22 @@ const HomeScreen: React.FC = () => {
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
 
-  /* Party state */
+  /* Party state — sync leader name with displayName */
   const [partyMembers, setPartyMembers] = useState<{ name: string; isLeader: boolean }[]>([
     { name: displayName, isLeader: true },
     { name: 'xVortex', isLeader: false },
   ]);
+
+  // Keep self-entry in party synced with auth displayName
+  useEffect(() => {
+    setPartyMembers(prev => {
+      const selfIdx = prev.findIndex(m => m.isLeader && (m.name !== displayName));
+      if (selfIdx === -1) return prev;
+      const next = [...prev];
+      next[selfIdx] = { ...next[selfIdx], name: displayName };
+      return next;
+    });
+  }, [displayName]);
 
   const transferLeader = (name: string) => {
     setPartyMembers(prev => prev.map(m => ({

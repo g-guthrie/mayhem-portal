@@ -59,13 +59,14 @@ const PauseMenu: React.FC = () => {
               { label: 'SFX Volume', width: 'w-1/2' },
               { label: 'Mouse Sensitivity', width: 'w-2/3' },
             ].map(({ label, width }) => (
-              <div key={label} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/20">
+              <div key={label} className="flex items-center justify-between px-3 py-2.5 rounded-lg bg-muted/20 opacity-50">
                 <span className="font-rajdhani font-semibold text-xs text-foreground">{label}</span>
                 <div className="w-20 h-1.5 rounded-full bg-muted/40 relative">
                   <div className={`absolute left-0 top-0 h-full ${width} rounded-full bg-primary`} />
                 </div>
               </div>
             ))}
+            <span className="font-orbitron text-[8px] text-muted-foreground tracking-wider text-center">COMING SOON</span>
           </div>
         </div>
       </div>

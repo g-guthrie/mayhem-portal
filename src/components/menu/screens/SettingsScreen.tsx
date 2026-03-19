@@ -26,11 +26,17 @@ const SettingsScreen: React.FC = () => {
         {items.map(item => (
           <button
             key={item.id}
-            className="glass-card p-4 flex items-center gap-3 cursor-pointer group text-left w-full"
-            onClick={item.action}
+            className={`glass-card p-4 flex items-center gap-3 text-left w-full ${item.disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer group'}`}
+            onClick={item.disabled ? undefined : item.action}
+            disabled={item.disabled}
           >
-            <span className="text-primary group-hover:scale-110 transition-transform">{item.icon}</span>
-            <span className="font-orbitron text-xs font-bold tracking-wider text-foreground">{item.label}</span>
+            <span className={`${item.disabled ? 'text-muted-foreground' : 'text-primary'} group-hover:scale-110 transition-transform`}>{item.icon}</span>
+            <div className="flex flex-col">
+              <span className="font-orbitron text-xs font-bold tracking-wider text-foreground">{item.label}</span>
+              {'sublabel' in item && item.sublabel && (
+                <span className="font-orbitron text-[8px] text-muted-foreground tracking-wider">{item.sublabel}</span>
+              )}
+            </div>
           </button>
         ))}
       </div>

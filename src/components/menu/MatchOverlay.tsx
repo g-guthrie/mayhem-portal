@@ -134,10 +134,11 @@ const MatchOverlay: React.FC = () => {
           )}
           {isCreator && (
             <button
-              className={`launch-btn flex-1 !py-2.5 !text-[10px] !rounded-xl ${!allReady ? 'opacity-60' : ''}`}
+              className={`launch-btn flex-1 !py-2.5 !text-[10px] !rounded-xl ${!allReady ? 'opacity-70 !bg-destructive/80 hover:!bg-destructive/90 border-destructive/50' : ''}`}
               onClick={startMatch}
+              title={!allReady ? 'Not all players are ready — this will force start the match' : 'All players ready'}
             >
-              {allReady ? 'START NOW' : 'FORCE START'}
+              {allReady ? 'START NOW' : '⚠ FORCE START'}
             </button>
           )}
           <button

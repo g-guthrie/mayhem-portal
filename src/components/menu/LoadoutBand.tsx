@@ -202,7 +202,7 @@ const LoadoutBand: React.FC = () => {
                       className={`slot-btn flex-1 ${throwableCategory === cat.id ? 'active' : ''}`}
                       data-cat-id={cat.id}
                       style={throwableCategory === cat.id ? { background: 'hsl(var(--loadout-tactical))', color: 'white', boxShadow: '0 0 15px hsl(var(--loadout-tactical) / 0.3)' } : {}}
-                      onClick={() => setThrowableCategory(cat.id)}
+                      onClick={() => handleThrowableCategoryChange(cat.id)}
                     >
                       {cat.label}
                     </button>

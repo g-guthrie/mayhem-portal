@@ -21,9 +21,12 @@ const SocialHero: React.FC = () => {
   const [confirmingFriend, setConfirmingFriend] = useState<string | null>(null);
 
   const removeFriend = (name: string) => {
-    setFriends(prev => prev.filter(f => f.name !== name));
+    setFriends(prev => {
+      const next = prev.filter(f => f.name !== name);
+      if (next.length === 0) setRemoveMode(false);
+      return next;
+    });
     setConfirmingFriend(null);
-    if (friends.length <= 1) setRemoveMode(false);
   };
 
   return (

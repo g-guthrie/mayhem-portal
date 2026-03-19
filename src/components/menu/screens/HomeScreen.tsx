@@ -905,18 +905,20 @@ const HomeScreen: React.FC = () => {
             <input
               className="glass-input !py-1 !px-2 !text-[10px] flex-1 min-w-0"
               placeholder="Friend ID"
+              maxLength={32}
               value={quickFriendId}
               onChange={e => setQuickFriendId(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleQuickJoinFriend(); }}
             />
-            <button className="pill-btn !px-1.5 !py-1" title="Invite to party" onClick={() => {
-              if (!quickFriendId.trim()) return;
-              toast({ title: 'Invite sent', description: `Invited ${quickFriendId}` });
+            <button className={`pill-btn !px-1.5 !py-1 ${!quickFriendId.trim() ? 'opacity-50' : ''}`} title="Invite to party" onClick={() => {
+              const val = quickFriendId.trim();
+              if (!val || val.length < 2 || val.length > 32) return;
+              toast({ title: 'Invite sent', description: `Invited ${val}` });
               setQuickFriendId('');
             }}>
               <UserPlus className="w-2.5 h-2.5" />
             </button>
-            <button className="pill-btn !px-1.5 !py-1" title="Join friend" onClick={handleQuickJoinFriend}>
+            <button className={`pill-btn !px-1.5 !py-1 ${!quickFriendId.trim() ? 'opacity-50' : ''}`} title="Join friend" onClick={handleQuickJoinFriend}>
               <ArrowRight className="w-2.5 h-2.5" />
             </button>
           </div>
@@ -924,11 +926,12 @@ const HomeScreen: React.FC = () => {
             <input
               className="glass-input !py-1 !px-2 !text-[10px] flex-1 min-w-0"
               placeholder="Room Code"
+              maxLength={8}
               value={quickRoomCode}
-              onChange={e => setQuickRoomCode(e.target.value)}
+              onChange={e => setQuickRoomCode(e.target.value.toUpperCase())}
               onKeyDown={e => { if (e.key === 'Enter') handleQuickJoinRoom(); }}
             />
-            <button className="pill-btn !px-1.5 !py-1" title="Join room" onClick={handleQuickJoinRoom}>
+            <button className={`pill-btn !px-1.5 !py-1 ${quickRoomCode.trim().length < 4 ? 'opacity-50' : ''}`} title="Join room" onClick={handleQuickJoinRoom}>
               <Globe className="w-2.5 h-2.5" />
             </button>
           </div>

@@ -67,7 +67,7 @@ const ManualScreen: React.FC = () => {
           <div className="flex flex-col gap-2">
             <h3 className="font-orbitron text-sm font-bold text-primary">THROWABLES</h3>
             {['Frag Grenade', 'Plasma Grenade', 'Molotov', 'Knife'].map(t => (
-              <div key={t} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/20 cursor-pointer transition-colors">
+              <div key={t} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/20 transition-colors">
                 <Bomb className="w-4 h-4 text-primary" />
                 <span className="font-rajdhani font-semibold text-sm">{t}</span>
               </div>

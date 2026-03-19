@@ -48,10 +48,32 @@ const SocialHero: React.FC = () => {
               value={friendId}
               onChange={e => setFriendId(e.target.value)}
             />
-            <button id="invite-friend-btn" className="pill-btn active !rounded-xl !px-3" title="Invite">
+            <button
+              id="invite-friend-btn"
+              className={`pill-btn active !rounded-xl !px-3 ${!friendId.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title="Invite"
+              onClick={() => {
+                const val = friendId.trim();
+                if (!val || val.length < 2 || val.length > 32) return;
+                // TODO: wire to real invite
+                setFriendId('');
+              }}
+              disabled={!friendId.trim()}
+            >
               <UserPlus className="w-4 h-4" />
             </button>
-            <button id="join-friend-btn" className="pill-btn !rounded-xl !px-3" title="Join">
+            <button
+              id="join-friend-btn"
+              className={`pill-btn !rounded-xl !px-3 ${!friendId.trim() ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title="Join"
+              onClick={() => {
+                const val = friendId.trim();
+                if (!val || val.length < 2 || val.length > 32) return;
+                // TODO: wire to real join
+                setFriendId('');
+              }}
+              disabled={!friendId.trim()}
+            >
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
@@ -75,9 +97,20 @@ const SocialHero: React.FC = () => {
               className="glass-input flex-1"
               placeholder="Room Code"
               value={roomCode}
-              onChange={e => setRoomCode(e.target.value)}
+              onChange={e => setRoomCode(e.target.value.toUpperCase().slice(0, 8))}
             />
-            <button id="join-room-btn" className="pill-btn !rounded-xl !px-3" title="Join Room">
+            <button
+              id="join-room-btn"
+              className={`pill-btn !rounded-xl !px-3 ${roomCode.trim().length < 4 ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title="Join Room"
+              onClick={() => {
+                const val = roomCode.trim();
+                if (val.length < 4) return;
+                // TODO: wire to real room join
+                setRoomCode('');
+              }}
+              disabled={roomCode.trim().length < 4}
+            >
               <Globe className="w-4 h-4" />
             </button>
           </div>

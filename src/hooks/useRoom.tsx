@@ -522,6 +522,8 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const acceptInvite = useCallback((code: string) => {
     setPendingInvites(prev => prev.filter(i => i.roomCode !== code));
+    // Use a stable identity — callers should pass proper name/id via a wrapper
+    // For now, use a timestamp-based fallback; real integration will use auth context
     joinRoom(code, 'You', 'self_' + Date.now().toString(36));
   }, [joinRoom]);
 

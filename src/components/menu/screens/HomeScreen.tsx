@@ -860,8 +860,8 @@ const HomeScreen: React.FC = () => {
             </div>
           </div>
 
-          {/* Friends panel */}
-          <div className="flex flex-col gap-1.5 min-h-0">
+          {/* Friends panel — logged in only */}
+          {isLoggedIn && <div className="flex flex-col gap-1.5 min-h-0">
             <div className="flex items-center justify-between">
               <span className="section-label flex items-center gap-1 !mb-0 !text-[9px]">
                 <Users className="w-3 h-3 text-primary" /> FRIENDS

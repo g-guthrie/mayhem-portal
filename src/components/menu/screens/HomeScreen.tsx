@@ -122,6 +122,21 @@ const HomeScreen: React.FC = () => {
     });
   }, [displayName]);
 
+  // Logout cleanup: leave room and reset party to solo
+  const prevLoggedIn = useRef(isLoggedIn);
+  useEffect(() => {
+    if (prevLoggedIn.current && !isLoggedIn) {
+      // User just logged out
+      if (room.isInRoom) room.leaveRoom();
+      setPartyMembers([{ name: displayName, isLeader: true }]);
+      setRemoveMode(false);
+      setConfirmingFriend(null);
+      setAddFriendOpen(false);
+      setFriends(INITIAL_FRIENDS);
+    }
+    prevLoggedIn.current = isLoggedIn;
+  }, [isLoggedIn, displayName, room]);
+
   const transferLeader = (name: string) => {
     setPartyMembers(prev => prev.map(m => ({
       ...m,

@@ -597,181 +597,121 @@ const HomeScreen: React.FC = () => {
         )}
       </div>
 
-      {/* 2-column: Players + Party */}
-      <div className={`grid gap-2.5 ${!isSolo ? 'grid-cols-1 sm:grid-cols-[1fr,200px]' : ''}`}>
-        {/* Left: Player roster */}
-        <div className="flex flex-col gap-2 min-w-0">
-          {room.selectedPlayer && (
-            <div className="text-[9px] font-orbitron text-primary tracking-wider text-center animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
-              TAP A TEAM TO ASSIGN {room.selectedPlayer.name.toUpperCase()}
-            </div>
-          )}
+      {/* Player roster — full width */}
+      <div className="flex flex-col gap-2 min-w-0">
+        {room.selectedPlayer && (
+          <div className="text-[9px] font-orbitron text-primary tracking-wider text-center animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
+            TAP A TEAM TO ASSIGN {room.selectedPlayer.name.toUpperCase()}
+          </div>
+        )}
 
-          {room.mode !== 'ffa' ? (
-            <div className="rounded-xl border border-border/20 bg-muted/5 p-2 max-h-[300px] overflow-y-auto">
-              <span className="section-label flex items-center gap-1 !mb-1.5">
-                <Users className="w-3 h-3 text-primary" /> TEAMS
-              </span>
-              <div className={`grid gap-2 pr-1 ${
-                room.teamCount === 1 ? 'grid-cols-1' :
-                room.teamCount === 2 ? 'grid-cols-2' :
-                room.teamCount === 3 ? 'grid-cols-3' :
-                'grid-cols-2'
-              }`}>
-                {Array.from({ length: room.teamCount }).map((_, tIdx) => {
-                  const isDropTarget = dragOverTeam === tIdx;
-                  const isAssignTarget = room.selectedPlayer != null;
-                  const teamMembers = room.teams[tIdx] || [];
-                  const ts = TEAM_STYLES[tIdx];
+        {room.mode !== 'ffa' ? (
+          <div className="rounded-xl border border-border/20 bg-muted/5 p-2 max-h-[300px] overflow-y-auto">
+            <span className="section-label flex items-center gap-1 !mb-1.5">
+              <Users className="w-3 h-3 text-primary" /> TEAMS
+            </span>
+            <div className={`grid gap-2 pr-1 ${
+              room.teamCount === 1 ? 'grid-cols-1' :
+              room.teamCount === 2 ? 'grid-cols-2' :
+              room.teamCount === 3 ? 'grid-cols-3' :
+              'grid-cols-2'
+            }`}>
+              {Array.from({ length: room.teamCount }).map((_, tIdx) => {
+                const isDropTarget = dragOverTeam === tIdx;
+                const isAssignTarget = room.selectedPlayer != null;
+                const teamMembers = room.teams[tIdx] || [];
+                const ts = TEAM_STYLES[tIdx];
 
-                  const activeStyle = (isDropTarget || isAssignTarget) ? {
-                    borderColor: ts.borderColor,
-                    backgroundColor: ts.bgColor,
-                  } : {};
+                const activeStyle = (isDropTarget || isAssignTarget) ? {
+                  borderColor: ts.borderColor,
+                  backgroundColor: ts.bgColor,
+                } : {};
 
-                  return (
-                    <div
-                      key={tIdx}
-                      className={`rounded-xl border-2 border-dashed p-2.5 min-h-[70px] flex flex-col transition-all duration-200 ${
-                        isDropTarget ? 'scale-[1.03] shadow-lg' :
-                        isAssignTarget ? 'hover:scale-[1.01] cursor-pointer' :
-                        'border-border/30 bg-muted/5 hover:bg-muted/10'
-                      }`}
-                      style={activeStyle}
-                      onDragOver={e => { e.preventDefault(); handleDragOver(e, tIdx); }}
-                      onDragLeave={handleDragLeave}
-                      onDrop={() => handleDrop(tIdx)}
-                      onClick={() => handleTeamClick(tIdx)}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-orbitron text-[9px] font-bold tracking-wider" style={{ color: ts.color }}>
-                          TEAM {tIdx + 1}
-                        </span>
-                        <span className="font-rajdhani text-[9px] text-muted-foreground font-semibold">
-                          {teamMembers.length}
+                return (
+                  <div
+                    key={tIdx}
+                    className={`rounded-xl border-2 border-dashed p-2.5 min-h-[70px] flex flex-col transition-all duration-200 ${
+                      isDropTarget ? 'scale-[1.03] shadow-lg' :
+                      isAssignTarget ? 'hover:scale-[1.01] cursor-pointer' :
+                      'border-border/30 bg-muted/5 hover:bg-muted/10'
+                    }`}
+                    style={activeStyle}
+                    onDragOver={e => { e.preventDefault(); handleDragOver(e, tIdx); }}
+                    onDragLeave={handleDragLeave}
+                    onDrop={() => handleDrop(tIdx)}
+                    onClick={() => handleTeamClick(tIdx)}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-orbitron text-[9px] font-bold tracking-wider" style={{ color: ts.color }}>
+                        TEAM {tIdx + 1}
+                      </span>
+                      <span className="font-rajdhani text-[9px] text-muted-foreground font-semibold">
+                        {teamMembers.length}
+                      </span>
+                    </div>
+
+                    {teamMembers.length === 0 ? (
+                      <div
+                        className="flex items-center justify-center py-6 rounded-lg border border-dashed transition-colors"
+                        style={{ borderColor: isDropTarget ? ts.borderColor : undefined }}
+                      >
+                        <span className="font-orbitron text-[8px] text-muted-foreground/50 tracking-wider">
+                          {isDropTarget ? 'DROP HERE' : 'DRAG PLAYER'}
                         </span>
                       </div>
+                    ) : (
+                      <div className="flex flex-col gap-1">
+                        {teamMembers.map(member => {
+                          const isSelected = room.selectedPlayer?.id === member.id;
+                          const isBeingDragged = dragItem?.playerId === member.id;
 
-                      {teamMembers.length === 0 ? (
-                        <div
-                          className="flex items-center justify-center py-6 rounded-lg border border-dashed transition-colors"
-                          style={{ borderColor: isDropTarget ? ts.borderColor : undefined }}
-                        >
-                          <span className="font-orbitron text-[8px] text-muted-foreground/50 tracking-wider">
-                            {isDropTarget ? 'DROP HERE' : 'DRAG PLAYER'}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col gap-1">
-                          {teamMembers.map(member => {
-                            const isSelected = room.selectedPlayer?.id === member.id;
-                            const isBeingDragged = dragItem?.playerId === member.id;
-
-                            return (
-                              <div
-                                key={member.id}
-                                draggable
-                                onDragStart={() => handleDragStart(member.id, tIdx)}
-                                onDragEnd={() => { setDragItem(null); setDragOverTeam(null); }}
-                                onClick={e => { e.stopPropagation(); handlePlayerClick(member); }}
-                                className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-150 group ${
-                                  isBeingDragged
-                                    ? 'opacity-40 scale-95'
-                                    : isSelected
-                                      ? 'bg-primary/20 border border-primary/40 ring-1 ring-primary/20 shadow-sm'
-                                      : 'bg-muted/20 cursor-grab active:cursor-grabbing hover:bg-primary/10 border border-transparent hover:border-primary/20'
-                                }`}
-                              >
-                                <GripVertical className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary/60 transition-colors shrink-0" />
-                                <span className="font-rajdhani font-semibold text-[11px] text-foreground flex-1 truncate">{member.name}</span>
-                                {member.isCreator && <Shield className="w-2.5 h-2.5 text-primary shrink-0" />}
-                                {room.readyPlayers.has(member.id) && (
-                                  <Check className="w-2.5 h-2.5 text-green-500 shrink-0" />
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            /* FFA player list */
-            <div className="rounded-xl border border-border/20 bg-muted/5 p-2 max-h-[300px] overflow-y-auto">
-              <span className="section-label flex items-center gap-1 !mb-1.5">
-                <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
-              </span>
-              <div className="flex flex-col gap-0.5 pr-1">
-                {room.players.map(p => (
-                  <div key={p.id} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                      <span className="font-rajdhani font-semibold text-xs text-foreground">{p.name}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      {p.isCreator && <Shield className="w-2.5 h-2.5 text-primary" />}
-                      {room.readyPlayers.has(p.id) && <Check className="w-2.5 h-2.5 text-green-500" />}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right: Party panel inside room */}
-        {!isSolo && (
-          <div className="rounded-xl border border-border/20 bg-muted/5 p-2 flex flex-col gap-1.5">
-            <div className="flex items-center justify-between">
-              <span className="section-label flex items-center gap-1 !mb-0 !text-[9px]">
-                <Users className="w-3 h-3 text-primary" /> PARTY
-              </span>
-              <button
-                className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
-                onClick={() => { setPartyMembers([{ name: displayName, isLeader: true }]); toast({ title: 'Left party' }); }}
-              >
-                <LogOut className="w-2.5 h-2.5" />
-              </button>
-            </div>
-            <div className="flex flex-col gap-1 max-h-[250px] overflow-y-auto">
-              {partyMembers.map(m => (
-                <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
-                    <span className="font-rajdhani font-semibold text-[11px] text-foreground truncate">{m.name}</span>
-                    {m.isLeader && <span className="text-[7px] font-orbitron text-primary tracking-wider shrink-0">LEADER</span>}
-                  </div>
-                  <div className="flex items-center gap-0.5 shrink-0">
-                    {!m.isLeader && isPartyLeader && (
-                      <button
-                        className="pill-btn !px-1 !py-0.5 text-[8px]"
-                        title="Make Leader"
-                        onClick={() => { transferLeader(m.name); toast({ title: `${m.name} is now party leader` }); }}
-                      >
-                        <Crown className="w-2.5 h-2.5 text-primary" />
-                      </button>
+                          return (
+                            <div
+                              key={member.id}
+                              draggable
+                              onDragStart={() => handleDragStart(member.id, tIdx)}
+                              onDragEnd={() => { setDragItem(null); setDragOverTeam(null); }}
+                              onClick={e => { e.stopPropagation(); handlePlayerClick(member); }}
+                              className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-150 group ${
+                                isBeingDragged
+                                  ? 'opacity-40 scale-95'
+                                  : isSelected
+                                    ? 'bg-primary/20 border border-primary/40 ring-1 ring-primary/20 shadow-sm'
+                                    : 'bg-muted/20 cursor-grab active:cursor-grabbing hover:bg-primary/10 border border-transparent hover:border-primary/20'
+                              }`}
+                            >
+                              <GripVertical className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary/60 transition-colors shrink-0" />
+                              <span className="font-rajdhani font-semibold text-[11px] text-foreground flex-1 truncate">{member.name}</span>
+                              {member.isCreator && <Shield className="w-2.5 h-2.5 text-primary shrink-0" />}
+                              {room.readyPlayers.has(member.id) && (
+                                <Check className="w-2.5 h-2.5 text-green-500 shrink-0" />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
                     )}
-                    {!m.isLeader && (
-                      <>
-                        <button
-                          className="pill-btn !px-1 !py-0.5 text-[8px] border-green-500/30 hover:bg-green-500/10"
-                          title="Invite to room"
-                          onClick={() => { room.invitePlayer(m.name); toast({ title: `Invited ${m.name} to room` }); }}
-                        >
-                          <UserPlus className="w-2.5 h-2.5 text-green-500" />
-                        </button>
-                        <button
-                          className="pill-btn !px-1 !py-0.5 text-[8px] text-destructive border-destructive/30 hover:bg-destructive/10"
-                          title="Remove from party"
-                          onClick={() => { setPartyMembers(prev => prev.filter(p => p.name !== m.name)); toast({ title: `Kicked ${m.name}` }); }}
-                        >
-                          <UserMinus className="w-2.5 h-2.5" />
-                        </button>
-                      </>
-                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          /* FFA player list */
+          <div className="rounded-xl border border-border/20 bg-muted/5 p-2 max-h-[300px] overflow-y-auto">
+            <span className="section-label flex items-center gap-1 !mb-1.5">
+              <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
+            </span>
+            <div className="flex flex-col gap-0.5 pr-1">
+              {room.players.map(p => (
+                <div key={p.id} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                    <span className="font-rajdhani font-semibold text-xs text-foreground">{p.name}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {p.isCreator && <Shield className="w-2.5 h-2.5 text-primary" />}
+                    {room.readyPlayers.has(p.id) && <Check className="w-2.5 h-2.5 text-green-500" />}
                   </div>
                 </div>
               ))}
@@ -820,9 +760,211 @@ const HomeScreen: React.FC = () => {
             }
           }}
         >
-          <Play className="w-3 h-3" /> {room.isCreator ? 'START MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
+        <Play className="w-3 h-3" /> {room.isCreator ? 'START MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
         </button>
       </div>
+
+      {/* ─── Inline Party + Friends sub-panels ─── */}
+      {isLoggedIn && (
+        <div ref={socialPanelRef} className="grid grid-cols-2 gap-2.5 mt-1">
+          {/* Party panel */}
+          <div className="flex flex-col gap-1.5 min-h-0">
+            <div className="flex items-center justify-between">
+              <span className="section-label flex items-center gap-1 !mb-0 !text-[9px]">
+                <Users className="w-3 h-3 text-primary" /> PARTY ({partyMembers.length})
+              </span>
+              {!isSolo && (
+                <button
+                  className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
+                  onClick={() => { setPartyMembers([{ name: displayName, isLeader: true }]); toast({ title: 'Left party' }); }}
+                >
+                  <LogOut className="w-2.5 h-2.5" />
+                  <span className="hidden sm:inline">LEAVE</span>
+                </button>
+              )}
+            </div>
+            <div className="flex flex-col gap-0.5 max-h-[160px] overflow-y-auto">
+              {partyMembers.map(m => {
+                const isInFriendsList = friends.some(f => f.name === m.name);
+                const isInRoom = room.players.some(p => p.name === m.name);
+                return (
+                  <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
+                      <span className="font-rajdhani font-semibold text-[11px] text-foreground truncate">{m.name}</span>
+                      {m.isLeader && <span className="text-[7px] font-orbitron text-primary tracking-wider shrink-0">LEADER</span>}
+                    </div>
+                    {!m.isLeader && (
+                      <div className="flex items-center gap-0.5 shrink-0">
+                        {isPartyLeader && (
+                          <button
+                            className="pill-btn !px-1 !py-0.5 text-[8px]"
+                            title="Make Leader"
+                            onClick={() => { transferLeader(m.name); toast({ title: `${m.name} is now party leader` }); }}
+                          >
+                            <Crown className="w-2.5 h-2.5 text-primary" />
+                          </button>
+                        )}
+                        {!isInFriendsList && (
+                          <button
+                            className="pill-btn !px-1 !py-0.5 text-[8px]"
+                            title="Add as friend"
+                            onClick={() => {
+                              setFriends(prev => [...prev, { name: m.name, status: 'online', inGame: false }]);
+                              toast({ title: `Added ${m.name} as friend` });
+                            }}
+                          >
+                            <UserPlus className="w-2.5 h-2.5" />
+                          </button>
+                        )}
+                        {!isInRoom && (
+                          <button
+                            className="pill-btn !px-1 !py-0.5 text-[8px] border-green-500/30 hover:bg-green-500/10"
+                            title="Invite to room"
+                            onClick={() => { room.invitePlayer(m.name); toast({ title: `Invited ${m.name} to room` }); }}
+                          >
+                            <UserPlus className="w-2.5 h-2.5 text-green-500" />
+                          </button>
+                        )}
+                        <button
+                          className="pill-btn !px-1 !py-0.5 text-[8px] text-destructive border-destructive/30 hover:bg-destructive/10"
+                          title="Remove from party"
+                          onClick={() => { setPartyMembers(prev => prev.filter(p => p.name !== m.name)); toast({ title: `Kicked ${m.name}` }); }}
+                        >
+                          <UserMinus className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Friends panel */}
+          <div className="flex flex-col gap-1.5 min-h-0">
+            <div className="flex items-center justify-between">
+              <span className="section-label flex items-center gap-1 !mb-0 !text-[9px]">
+                <Users className="w-3 h-3 text-primary" /> FRIENDS
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
+                  onClick={() => setAddFriendOpen(!addFriendOpen)}
+                  title="Add Friend"
+                >
+                  <UserPlus className="w-2.5 h-2.5" />
+                  <span className="hidden sm:inline">ADD</span>
+                </button>
+                <button
+                  className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 ${removeMode ? 'active' : ''}`}
+                  onClick={() => { setRemoveMode(!removeMode); setConfirmingFriend(null); }}
+                  title="Remove Friend"
+                >
+                  <UserMinus className="w-2.5 h-2.5" />
+                  <span className="hidden sm:inline">REMOVE</span>
+                </button>
+              </div>
+            </div>
+
+            {addFriendOpen && (
+              <div className="flex gap-1.5 animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
+                <input
+                  className="glass-input flex-1 !py-1 !px-2 !text-xs"
+                  placeholder="Enter player ID..."
+                  value={addFriendId}
+                  onChange={e => setAddFriendId(e.target.value)}
+                  autoFocus
+                />
+                <button
+                  className="pill-btn active !px-2 !py-1 !text-[9px]"
+                  onClick={() => {
+                    if (!addFriendId.trim()) return;
+                    toast({ title: 'Friend request sent', description: `Sent to ${addFriendId}` });
+                    setAddFriendId('');
+                    setAddFriendOpen(false);
+                  }}
+                >
+                  SEND
+                </button>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-0.5 max-h-[160px] overflow-y-auto">
+              {friends.length === 0 && (
+                <div className="text-center py-4 text-muted-foreground font-orbitron text-[9px] tracking-wider">
+                  NO FRIENDS YET — ADD SOMEONE!
+                </div>
+              )}
+              {friends.map(f => (
+                <div
+                  key={f.name}
+                  className={`flex items-center px-2 py-1.5 rounded-lg transition-colors cursor-pointer group ${
+                    removeMode ? 'hover:bg-destructive/10 border border-transparent hover:border-destructive/20' : 'hover:bg-muted/30'
+                  } ${confirmingFriend === f.name ? 'bg-destructive/10 border border-destructive/20' : ''}`}
+                  onClick={() => {
+                    if (removeMode) {
+                      setConfirmingFriend(confirmingFriend === f.name ? null : f.name);
+                    }
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className={`w-1.5 h-1.5 rounded-full ${
+                      f.status === 'online' ? 'bg-green-400' :
+                      f.status === 'away' ? 'bg-yellow-500' : 'bg-muted-foreground/40'
+                    }`} />
+                    <span className="font-rajdhani font-semibold text-xs text-foreground">{f.name}</span>
+                    {confirmingFriend === f.name ? (
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[8px] font-orbitron text-destructive tracking-wider">REMOVE?</span>
+                        <button
+                          className="pill-btn !px-1.5 !py-0.5 text-[8px] text-destructive border-destructive/30 bg-destructive/10 hover:bg-destructive/20"
+                          onClick={(e) => { e.stopPropagation(); removeFriend(f.name); }}
+                        >
+                          YES
+                        </button>
+                        <button
+                          className="pill-btn !px-1.5 !py-0.5 text-[8px]"
+                          onClick={(e) => { e.stopPropagation(); setConfirmingFriend(null); }}
+                        >
+                          NO
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider ml-1">IN GAME</span>}
+                        {!removeMode && (
+                          <button
+                            className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity ml-1"
+                            title="Invite to party"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPartyMembers(prev => {
+                                if (prev.find(m => m.name === f.name)) {
+                                  toast({ title: `${f.name} is already in your party` });
+                                  return prev;
+                                }
+                                if (prev.length >= MAX_PLAYERS) {
+                                  toast({ title: 'Party full', variant: 'destructive' });
+                                  return prev;
+                                }
+                                toast({ title: `${f.name} joined your party` });
+                                return [...prev, { name: f.name, isLeader: false }];
+                              });
+                            }}
+                          >
+                            <UserPlus className="w-2.5 h-2.5" />
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   ) : (
     <div className="glass-card p-3 flex flex-col items-center justify-center gap-2">
@@ -1045,8 +1187,8 @@ const HomeScreen: React.FC = () => {
         )}
       </div>
 
-      {/* Social panel below if applicable */}
-      {showSocialPanel && (
+      {/* Social panel below — only when NOT in a room */}
+      {showSocialPanel && !room.isInRoom && (
         <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
           <div className="sm:col-span-1">
             {SocialPanel}

@@ -78,7 +78,7 @@ const LoadoutBand: React.FC = () => {
   const getAbilityName = (id: string) => ABILITIES.find(a => a.id === id)?.name ?? id;
 
   return (
-    <footer id="menu-loadout-band" <footer id="menu-loadout-band">>
+    <footer id="menu-loadout-band">
       <div className="px-4 sm:px-6 py-3">
         {/* Collapse / Summary row */}
         <div className="flex items-center justify-between mb-2">

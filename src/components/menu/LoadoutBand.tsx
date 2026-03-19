@@ -112,14 +112,15 @@ const LoadoutBand: React.FC = () => {
             <div id="loadout-row" className="loadout-grid grid grid-cols-1 sm:grid-cols-3 gap-3">
 
               {/* Weapons */}
-              <div id="weapon-slot-panel" className="glass-card p-3 flex flex-col gap-3">
+              <div id="weapon-slot-panel" className="glass-card p-3 flex flex-col gap-3" style={{ '--panel-accent': 'var(--loadout-arsenal)' } as React.CSSProperties}>
                 <span className="section-label flex items-center gap-1.5">
-                  <Crosshair className="w-3 h-3 text-primary" /> ARSENAL
+                  <Crosshair className="w-3 h-3" style={{ color: 'hsl(var(--loadout-arsenal))' }} /> ARSENAL
                 </span>
                 <div className="slot-row flex gap-2">
                   <button
                     id="weapon-slot-primary"
                     className={`slot-btn flex-1 ${weaponSlot === 0 ? 'active' : ''}`}
+                    style={weaponSlot === 0 ? { background: 'hsl(var(--loadout-arsenal))', color: 'white', boxShadow: '0 0 15px hsl(var(--loadout-arsenal) / 0.3)' } : {}}
                     onClick={() => setWeaponSlot(0)}
                   >
                     SLOT 1
@@ -127,6 +128,7 @@ const LoadoutBand: React.FC = () => {
                   <button
                     id="weapon-slot-secondary"
                     className={`slot-btn flex-1 ${weaponSlot === 1 ? 'active' : ''}`}
+                    style={weaponSlot === 1 ? { background: 'hsl(var(--loadout-arsenal))', color: 'white', boxShadow: '0 0 15px hsl(var(--loadout-arsenal) / 0.3)' } : {}}
                     onClick={() => setWeaponSlot(1)}
                   >
                     SLOT 2
@@ -138,6 +140,7 @@ const LoadoutBand: React.FC = () => {
                       key={w.id}
                       className={`weapon-choice-btn item-grid-btn ${selectedWeapons[weaponSlot] === w.id ? 'selected' : ''}`}
                       data-weapon-id={w.id}
+                      style={selectedWeapons[weaponSlot] === w.id ? { background: 'hsl(var(--loadout-arsenal) / 0.15)', borderColor: 'hsl(var(--loadout-arsenal) / 0.5)', boxShadow: '0 0 10px hsl(var(--loadout-arsenal) / 0.2)' } : {}}
                       onClick={() => handleWeaponSelect(w.id)}
                     >
                       {w.icon}

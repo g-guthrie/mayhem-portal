@@ -118,20 +118,6 @@ const HomeScreen: React.FC = () => {
     { name: 'xVortex', isLeader: false },
   ]);
 
-  // DEV: Auto-populate room with players for testing
-  const devPopulated = useRef(false);
-  useEffect(() => {
-    if (devPopulated.current || room.isInRoom) return;
-    devPopulated.current = true;
-    room.createRoom(displayName || 'Player1', actorId || 'dev-self');
-    // After creation, add mock players and switch to TDM
-    setTimeout(() => {
-      room.setMode('tdm');
-      ['xVortex', 'NightOwl', 'BlazeFury', 'ShadowKnight', 'IronWolf', 'NovaByte', 'PixelRush', 'CrimsonFox', 'EchoStrike', 'FrostByte', 'TurboWolf', 'GhostLeaf', 'OrbitDash', 'Quartz', 'Hexa'].forEach((name, i) => {
-        setTimeout(() => room.invitePlayer(name), (i + 1) * 100);
-      });
-    }, 50);
-  }, []);
 
 
   useEffect(() => {

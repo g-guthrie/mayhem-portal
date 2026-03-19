@@ -28,14 +28,6 @@ const SocialHero: React.FC = () => {
 
   return (
     <div id="menu-social-hero" className="glass-card p-6 flex flex-col gap-5 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
-      {/* Invite banner (hidden by default) */}
-      <div id="social-direct-invite-banner" className="hidden">
-        <div id="social-direct-invite-copy" />
-        <div id="social-direct-invite-actions" className="flex gap-2">
-          <button id="social-direct-invite-accept-btn" className="pill-btn active">Accept</button>
-          <button id="social-direct-invite-dismiss-btn" className="pill-btn">Dismiss</button>
-        </div>
-      </div>
 
       <div id="menu-social-layout" className="flex flex-col gap-4">
         <div id="menu-social-actions-pane" className="flex flex-col gap-3">

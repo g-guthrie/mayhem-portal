@@ -547,11 +547,6 @@ const HomeScreen: React.FC = () => {
         </div>
         <div className="flex items-center gap-1.5">
           {room.isCreator && (
-            <button className="pill-btn !py-1 !px-2 !text-[9px] gap-1 whitespace-nowrap" onClick={room.inviteParty}>
-              <Users className="w-2.5 h-2.5" /> INVITE PARTY
-            </button>
-          )}
-          {room.isCreator && (
             <span className="font-orbitron text-[7px] text-primary tracking-wider px-1.5 py-0.5 rounded-md bg-primary/10 border border-primary/20">
               <Shield className="w-2 h-2 inline mr-0.5" />HOST
             </span>
@@ -586,11 +581,18 @@ const HomeScreen: React.FC = () => {
 
         {room.mode !== 'ffa' ? (
           <div className="rounded-xl border border-border/20 bg-muted/5 p-2 flex-1 min-h-0 overflow-y-auto">
-            <span className="section-label flex items-center gap-1 !mb-1.5">
+            <span className="section-label flex items-center gap-1 !mb-1.5 w-full">
               <Users className="w-3 h-3 text-primary" /> TEAMS
               {room.isCreator && (
                 <button className="pill-btn !px-1.5 !py-0.5 ml-1" onClick={room.randomizeTeams} title="Randomize Teams">
                   <Shuffle className="w-2.5 h-2.5" />
+                </button>
+              )}
+              <span className="flex-1" />
+              {room.isCreator && (
+                <button className="pill-btn !px-1.5 !py-0.5 gap-1" onClick={room.inviteParty} title="Invite Party to Game">
+                  <Users className="w-2.5 h-2.5" />
+                  <span className="font-orbitron text-[8px] font-bold tracking-wider">INVITE PARTY TO GAME</span>
                 </button>
               )}
             </span>
@@ -696,8 +698,15 @@ const HomeScreen: React.FC = () => {
         ) : (
           /* FFA player list */
           <div className="rounded-xl border border-border/20 bg-muted/5 p-2 flex-1 min-h-0 overflow-y-auto">
-            <span className="section-label flex items-center gap-1 !mb-1.5">
+            <span className="section-label flex items-center gap-1 !mb-1.5 w-full">
               <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
+              <span className="flex-1" />
+              {room.isCreator && (
+                <button className="pill-btn !px-1.5 !py-0.5 gap-1" onClick={room.inviteParty} title="Invite Party to Game">
+                  <Users className="w-2.5 h-2.5" />
+                  <span className="font-orbitron text-[8px] font-bold tracking-wider">INVITE PARTY TO GAME</span>
+                </button>
+              )}
             </span>
             <div className="flex flex-col gap-0.5 pr-1">
               {room.players.map(p => (

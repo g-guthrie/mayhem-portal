@@ -48,7 +48,7 @@ const ScreenRouter: React.FC = () => {
   const ScreenComponent = screens[displayed];
 
   return (
-    <div className={`h-full ${animClass}`}>
+    <div className={animClass}>
       <ScreenComponent />
     </div>
   );

@@ -58,7 +58,7 @@ const OverlayShell: React.FC = () => {
                   id="menu-body"
                   className="flex-1 overflow-y-auto px-4 sm:px-5 py-4 min-h-0"
                 >
-                  <div id="menu-screen-mode" className="menu-screen h-full" data-screen="main">
+                  <div id="menu-screen-mode" className="menu-screen" data-screen="main">
                     <ScreenRouter />
                   </div>
                 </section>

@@ -471,7 +471,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Room Panel (inline in third column) ─── */
   const RoomCardContent = room.isInRoom ? (
-    <div className="glass-card p-3 flex flex-col gap-2.5">
+    <div className="glass-card p-3 flex flex-col gap-2.5 flex-1 min-h-0">
       {/* Room header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -591,7 +591,7 @@ const HomeScreen: React.FC = () => {
 
 
       {/* Player roster — full width */}
-      <div className="flex flex-col gap-2 min-w-0">
+      <div className="flex flex-col gap-2 min-w-0 flex-1 min-h-0">
         {room.selectedPlayer && (
           <div className="text-[9px] font-orbitron text-primary tracking-wider text-center animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
             TAP A TEAM TO ASSIGN {room.selectedPlayer.name.toUpperCase()}
@@ -599,7 +599,7 @@ const HomeScreen: React.FC = () => {
         )}
 
         {room.mode !== 'ffa' ? (
-          <div className="rounded-xl border border-border/20 bg-muted/5 p-2 max-h-[300px] overflow-y-auto">
+          <div className="rounded-xl border border-border/20 bg-muted/5 p-2 flex-1 min-h-0 overflow-y-auto">
             <span className="section-label flex items-center gap-1 !mb-1.5">
               <Users className="w-3 h-3 text-primary" /> TEAMS
               {room.isCreator && (
@@ -709,7 +709,7 @@ const HomeScreen: React.FC = () => {
           </div>
         ) : (
           /* FFA player list */
-          <div className="rounded-xl border border-border/20 bg-muted/5 p-2 max-h-[300px] overflow-y-auto">
+          <div className="rounded-xl border border-border/20 bg-muted/5 p-2 flex-1 min-h-0 overflow-y-auto">
             <span className="section-label flex items-center gap-1 !mb-1.5">
               <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
             </span>
@@ -1196,10 +1196,10 @@ const HomeScreen: React.FC = () => {
      ═══════════════════════════════════════════ */
 
   return (
-    <div className="flex flex-col gap-3 min-h-full">
+    <div className="flex flex-col gap-3 min-h-full flex-1">
       {InviteBanner}
       {/* Main content area */}
-      <div className={room.isInRoom ? '' : 'grid gap-3 grid-cols-1 sm:grid-cols-3'}>
+      <div className={room.isInRoom ? 'flex flex-col flex-1 min-h-0' : 'grid gap-3 grid-cols-1 sm:grid-cols-3'}>
         {room.isInRoom ? (
           RoomCardContent
         ) : (

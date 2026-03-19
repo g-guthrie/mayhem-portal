@@ -565,19 +565,6 @@ const HomeScreen: React.FC = () => {
               <Users className="w-2.5 h-2.5" /> INVITE PARTY
             </button>
           )}
-          <button
-            className="launch-btn !py-1 !px-2 !text-[9px] gap-1 whitespace-nowrap"
-            onClick={() => {
-              if (room.isCreator) {
-                room.startMatch();
-              } else {
-                room.toggleReady(actorId);
-                toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
-              }
-            }}
-          >
-            <Play className="w-2.5 h-2.5" /> {room.isCreator ? 'START MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
-          </button>
           {room.isCreator && (
             <span className="font-orbitron text-[7px] text-primary tracking-wider px-1.5 py-0.5 rounded-md bg-primary/10 border border-primary/20">
               <Shield className="w-2 h-2 inline mr-0.5" />HOST
@@ -706,6 +693,19 @@ const HomeScreen: React.FC = () => {
                 );
               })}
             </div>
+            <button
+              className="launch-btn w-full !py-1.5 !text-[9px] gap-1 mt-2"
+              onClick={() => {
+                if (room.isCreator) {
+                  room.startMatch();
+                } else {
+                  room.toggleReady(actorId);
+                  toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
+                }
+              }}
+            >
+              <Play className="w-2.5 h-2.5" /> {room.isCreator ? 'START MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
+            </button>
           </div>
         ) : (
           /* FFA player list */
@@ -727,6 +727,19 @@ const HomeScreen: React.FC = () => {
                 </div>
               ))}
             </div>
+            <button
+              className="launch-btn w-full !py-1.5 !text-[9px] gap-1 mt-2"
+              onClick={() => {
+                if (room.isCreator) {
+                  room.startMatch();
+                } else {
+                  room.toggleReady(actorId);
+                  toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
+                }
+              }}
+            >
+              <Play className="w-2.5 h-2.5" /> {room.isCreator ? 'START MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
+            </button>
           </div>
         )}
       </div>

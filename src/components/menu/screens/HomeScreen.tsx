@@ -572,7 +572,7 @@ const HomeScreen: React.FC = () => {
               <Users className="w-3 h-3 text-primary" /> TEAMS
             </span>
             <div
-              className={`grid flex-1 min-h-0 gap-2 overflow-y-auto pr-1 ${
+              className={`grid flex-1 min-h-0 auto-rows-fr gap-2 overflow-hidden pr-1 ${
                 room.teamCount === 1 ? 'grid-cols-1' :
                 room.teamCount === 2 ? 'grid-cols-2' :
                 room.teamCount === 3 ? 'grid-cols-3' :
@@ -593,7 +593,7 @@ const HomeScreen: React.FC = () => {
                 return (
                   <div
                     key={tIdx}
-                    className={`rounded-xl border-2 border-dashed p-2.5 min-h-[70px] transition-all duration-200 ${
+                    className={`rounded-xl border-2 border-dashed p-2.5 min-h-0 overflow-hidden flex flex-col transition-all duration-200 ${
                       isDropTarget ? 'scale-[1.03] shadow-lg' :
                       isAssignTarget ? 'hover:scale-[1.01] cursor-pointer' :
                       'border-border/30 bg-muted/5 hover:bg-muted/10'
@@ -604,7 +604,7 @@ const HomeScreen: React.FC = () => {
                     onDrop={() => handleDrop(tIdx)}
                     onClick={() => handleTeamClick(tIdx)}
                   >
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between mb-2 shrink-0">
                       <span className="font-orbitron text-[9px] font-bold tracking-wider" style={{ color: ts.color }}>
                         TEAM {tIdx + 1}
                       </span>
@@ -613,47 +613,47 @@ const HomeScreen: React.FC = () => {
                       </span>
                     </div>
 
-                    {teamMembers.length === 0 && (
+                    {teamMembers.length === 0 ? (
                       <div
-                        className="flex items-center justify-center py-3 rounded-lg border border-dashed transition-colors"
+                        className="flex flex-1 items-center justify-center rounded-lg border border-dashed transition-colors"
                         style={{ borderColor: isDropTarget ? ts.borderColor : undefined }}
                       >
                         <span className="font-orbitron text-[8px] text-muted-foreground/50 tracking-wider">
                           {isDropTarget ? 'DROP HERE' : 'DRAG PLAYER'}
                         </span>
                       </div>
+                    ) : (
+                      <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1">
+                        {teamMembers.map(member => {
+                          const isSelected = room.selectedPlayer?.id === member.id;
+                          const isBeingDragged = dragItem?.playerId === member.id;
+
+                          return (
+                            <div
+                              key={member.id}
+                              draggable
+                              onDragStart={() => handleDragStart(member.id, tIdx)}
+                              onDragEnd={() => { setDragItem(null); setDragOverTeam(null); }}
+                              onClick={e => { e.stopPropagation(); handlePlayerClick(member); }}
+                              className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-150 group shrink-0 ${
+                                isBeingDragged
+                                  ? 'opacity-40 scale-95'
+                                  : isSelected
+                                    ? 'bg-primary/20 border border-primary/40 ring-1 ring-primary/20 shadow-sm'
+                                    : 'bg-muted/20 cursor-grab active:cursor-grabbing hover:bg-primary/10 border border-transparent hover:border-primary/20'
+                              }`}
+                            >
+                              <GripVertical className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary/60 transition-colors shrink-0" />
+                              <span className="font-rajdhani font-semibold text-[11px] text-foreground flex-1 truncate">{member.name}</span>
+                              {member.isCreator && <Shield className="w-2.5 h-2.5 text-primary shrink-0" />}
+                              {room.readyPlayers.has(member.id) && (
+                                <Check className="w-2.5 h-2.5 text-green-500 shrink-0" />
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
                     )}
-
-                    <div className="flex flex-col gap-1">
-                      {teamMembers.map(member => {
-                        const isSelected = room.selectedPlayer?.id === member.id;
-                        const isBeingDragged = dragItem?.playerId === member.id;
-
-                        return (
-                          <div
-                            key={member.id}
-                            draggable
-                            onDragStart={() => handleDragStart(member.id, tIdx)}
-                            onDragEnd={() => { setDragItem(null); setDragOverTeam(null); }}
-                            onClick={e => { e.stopPropagation(); handlePlayerClick(member); }}
-                            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-150 group ${
-                              isBeingDragged
-                                ? 'opacity-40 scale-95'
-                                : isSelected
-                                  ? 'bg-primary/20 border border-primary/40 ring-1 ring-primary/20 shadow-sm'
-                                  : 'bg-muted/20 cursor-grab active:cursor-grabbing hover:bg-primary/10 border border-transparent hover:border-primary/20'
-                            }`}
-                          >
-                            <GripVertical className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary/60 transition-colors shrink-0" />
-                            <span className="font-rajdhani font-semibold text-[11px] text-foreground flex-1 truncate">{member.name}</span>
-                            {member.isCreator && <Shield className="w-2.5 h-2.5 text-primary shrink-0" />}
-                            {room.readyPlayers.has(member.id) && (
-                              <Check className="w-2.5 h-2.5 text-green-500 shrink-0" />
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
                   </div>
                 );
               })}

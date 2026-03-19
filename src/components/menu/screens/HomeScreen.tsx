@@ -727,6 +727,19 @@ const HomeScreen: React.FC = () => {
                 </div>
               ))}
             </div>
+            <button
+              className="launch-btn w-full !py-1.5 !text-[9px] gap-1 mt-2"
+              onClick={() => {
+                if (room.isCreator) {
+                  room.startMatch();
+                } else {
+                  room.toggleReady(actorId);
+                  toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
+                }
+              }}
+            >
+              <Play className="w-2.5 h-2.5" /> {room.isCreator ? 'START MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
+            </button>
           </div>
         )}
       </div>

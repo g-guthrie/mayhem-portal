@@ -589,7 +589,7 @@ const HomeScreen: React.FC = () => {
           )}
           {room.isCreator ? (
             <button
-              className={`pill-btn !px-1.5 !py-1 ${room.isLocked ? 'text-primary border-primary/30 bg-primary/10' : ''}`}
+              className={`pill-btn !px-1.5 !py-1 ${room.isLocked ? 'text-destructive border-destructive/30 bg-destructive/10' : 'text-green-400 border-green-400/30 bg-green-400/10'}`}
               onClick={room.toggleLock}
               title={room.isLocked ? 'Unlock Room' : 'Lock Room'}
             >

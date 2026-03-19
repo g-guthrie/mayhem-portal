@@ -153,7 +153,7 @@ const LoadoutBand: React.FC = () => {
               {/* Throwables */}
               <div id="throwable-slot-panel" className="glass-card p-3 flex flex-col gap-3">
                 <span className="section-label flex items-center gap-1.5">
-                  <Bomb className="w-3 h-3 text-primary" /> TACTICAL
+                  <Bomb className="w-3 h-3" style={{ color: 'hsl(var(--loadout-tactical))' }} /> TACTICAL
                 </span>
                 <div id="throwable-category-tabs" className="slot-row flex gap-2">
                   {THROWABLE_CATEGORIES.map(cat => (
@@ -161,6 +161,7 @@ const LoadoutBand: React.FC = () => {
                       key={cat.id}
                       className={`slot-btn flex-1 ${throwableCategory === cat.id ? 'active' : ''}`}
                       data-cat-id={cat.id}
+                      style={throwableCategory === cat.id ? { background: 'hsl(var(--loadout-tactical))', color: 'white', boxShadow: '0 0 15px hsl(var(--loadout-tactical) / 0.3)' } : {}}
                       onClick={() => setThrowableCategory(cat.id)}
                     >
                       {cat.label}
@@ -174,6 +175,7 @@ const LoadoutBand: React.FC = () => {
                       className={`throwable-choice-btn item-grid-btn ${selectedThrowable === t.id ? 'selected' : ''}`}
                       data-throwable-id={t.id}
                       data-category-id={throwableCategory}
+                      style={selectedThrowable === t.id ? { background: 'hsl(var(--loadout-tactical) / 0.15)', borderColor: 'hsl(var(--loadout-tactical) / 0.5)', boxShadow: '0 0 10px hsl(var(--loadout-tactical) / 0.2)' } : {}}
                       onClick={() => setSelectedThrowable(t.id)}
                     >
                       {t.icon}

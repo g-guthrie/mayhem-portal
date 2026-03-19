@@ -1,5 +1,4 @@
 import React from 'react';
-import menuBg from '@/assets/menu-bg.jpg';
 import { MenuNavProvider } from '@/hooks/useMenuNav';
 import { AuthProvider } from '@/hooks/useAuth';
 import { RoomProvider } from '@/hooks/useRoom';
@@ -7,22 +6,21 @@ import MenuHeader from '@/components/menu/MenuHeader';
 import ScreenRouter from '@/components/menu/ScreenRouter';
 import LoadoutBand from '@/components/menu/LoadoutBand';
 import MatchOverlay from '@/components/menu/MatchOverlay';
+import { GameBridgeSync } from '@/components/menu/GameBridgeSync';
 
 const Index: React.FC = () => {
   return (
     <AuthProvider>
     <RoomProvider>
     <MenuNavProvider>
+      {/* Game Bridge: syncs React state → vanilla JS runtime */}
+      <GameBridgeSync />
+
       <div
         id="overlay"
-        className="grid place-items-center w-screen h-screen p-3 sm:p-5"
-        style={{
-          backgroundImage: `url(${menuBg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
+        className="fixed inset-0 z-40 grid place-items-center p-3 sm:p-5 pointer-events-auto"
       >
-        {/* Dim overlay for game visibility behind */}
+        {/* Dim overlay — sits between canvas (z-0) and menu (z-40) */}
         <div className="fixed inset-0 bg-background/60 backdrop-blur-sm pointer-events-none" />
 
         <div id="menu-stage" className="w-full h-full flex items-center justify-center relative z-10">

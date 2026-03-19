@@ -52,6 +52,12 @@
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --tempo: 300ms;
 
+    /* Loadout panel accents */
+    --loadout-arsenal: 142 70% 45%;
+    --loadout-tactical: 25 95% 53%;
+    --loadout-abilities: 270 70% 60%;
+    --tempo: 300ms;
+
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;

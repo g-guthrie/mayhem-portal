@@ -188,12 +188,13 @@ const LoadoutBand: React.FC = () => {
               {/* Abilities */}
               <div id="ability-slot-panel" className="glass-card p-3 flex flex-col gap-3">
                 <span className="section-label flex items-center gap-1.5">
-                  <Zap className="w-3 h-3 text-primary" /> ABILITIES
+                  <Zap className="w-3 h-3" style={{ color: 'hsl(var(--loadout-abilities))' }} /> ABILITIES
                 </span>
                 <div className="slot-row flex gap-2">
                   <button
                     id="ability-slot-primary"
                     className={`slot-btn flex-1 ${abilitySlot === 0 ? 'active' : ''}`}
+                    style={abilitySlot === 0 ? { background: 'hsl(var(--loadout-abilities))', color: 'white', boxShadow: '0 0 15px hsl(var(--loadout-abilities) / 0.3)' } : {}}
                     onClick={() => setAbilitySlot(0)}
                   >
                     ABILITY 1
@@ -201,6 +202,7 @@ const LoadoutBand: React.FC = () => {
                   <button
                     id="ability-slot-secondary"
                     className={`slot-btn flex-1 ${abilitySlot === 1 ? 'active' : ''}`}
+                    style={abilitySlot === 1 ? { background: 'hsl(var(--loadout-abilities))', color: 'white', boxShadow: '0 0 15px hsl(var(--loadout-abilities) / 0.3)' } : {}}
                     onClick={() => setAbilitySlot(1)}
                   >
                     ABILITY 2
@@ -212,6 +214,7 @@ const LoadoutBand: React.FC = () => {
                       key={a.id}
                       className={`ability-choice-btn item-grid-btn ${selectedAbilities[abilitySlot] === a.id ? 'selected' : ''}`}
                       data-ability-id={a.id}
+                      style={selectedAbilities[abilitySlot] === a.id ? { background: 'hsl(var(--loadout-abilities) / 0.15)', borderColor: 'hsl(var(--loadout-abilities) / 0.5)', boxShadow: '0 0 10px hsl(var(--loadout-abilities) / 0.2)' } : {}}
                       onClick={() => handleAbilitySelect(a.id)}
                     >
                       {a.icon}

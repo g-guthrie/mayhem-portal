@@ -49,13 +49,15 @@ const LoadoutBand: React.FC = () => {
   const [abilitySlot, setAbilitySlot] = useState<0 | 1>(0);
   const [selectedAbilities, setSelectedAbilities] = useState<[string, string]>(['choke', 'missile']);
   const [collapsed, setCollapsed] = useState(false);
-  const [manuallyCollapsed, setManuallyClosed] = useState(false);
+  const [manualOverride, setManualOverride] = useState(false);
 
-  // Auto-collapse on room create, but re-expand when leaving room
   useEffect(() => {
-    const collapseHandler = () => setCollapsed(true);
+    const collapseHandler = () => {
+      setCollapsed(true);
+      setManualOverride(false); // reset manual state on room create
+    };
     const expandHandler = () => {
-      if (!manuallyCollapsed) setCollapsed(false);
+      if (!manualOverride) setCollapsed(false);
     };
     window.addEventListener('loadout:collapse', collapseHandler);
     window.addEventListener('loadout:expand', expandHandler);
@@ -63,12 +65,12 @@ const LoadoutBand: React.FC = () => {
       window.removeEventListener('loadout:collapse', collapseHandler);
       window.removeEventListener('loadout:expand', expandHandler);
     };
-  }, [manuallyCollapsed]);
+  }, [manualOverride]);
 
   const toggleCollapsed = () => {
     const next = !collapsed;
     setCollapsed(next);
-    setManuallyClosed(next);
+    setManualOverride(true); // user manually toggled, respect it
   };
 
   const handleWeaponSelect = (id: string) => {

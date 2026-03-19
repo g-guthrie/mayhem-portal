@@ -475,10 +475,7 @@ const HomeScreen: React.FC = () => {
       {/* Room header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="section-label !mb-0">PRIVATE ROOM</span>
-          <div className="flex items-center gap-1">
-            <span className="font-orbitron text-[9px] text-muted-foreground tracking-wider">ID:</span>
-            <span className="font-orbitron text-xs font-bold text-primary tracking-wider">{room.roomCode}</span>
+          <span className="section-label !mb-0">PRIVATE ROOM <span className="text-muted-foreground">ID:</span> <span className="text-primary">{room.roomCode}</span></span>
             <button
               className="pill-btn !px-1 !py-0.5"
               title="Copy"

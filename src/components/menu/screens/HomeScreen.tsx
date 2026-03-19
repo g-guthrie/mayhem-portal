@@ -25,7 +25,7 @@ const ROOM_MODES = [
   { id: 'tdm' as const, label: 'TDM', icon: <Swords className="w-3 h-3" /> },
   { id: 'lms' as const, label: 'LMS', icon: <Target className="w-3 h-3" /> },
 ];
-const TEAM_COUNTS = [2, 3, 4];
+const TEAM_COUNTS = [1, 2, 3, 4];
 
 interface FakeFriend {
   name: string;

@@ -741,8 +741,7 @@ const HomeScreen: React.FC = () => {
 
 
       {/* ─── Inline Party + Friends sub-panels ─── */}
-      {true && (
-        <div ref={socialPanelRef} className={`grid gap-2.5 mt-1 ${isLoggedIn ? 'grid-cols-2' : 'grid-cols-1'}`}>
+      <div ref={socialPanelRef} className={`grid gap-2.5 mt-1 ${isLoggedIn ? 'grid-cols-2' : 'grid-cols-1'}`}>
           {/* Party panel */}
           <div className="flex flex-col gap-1.5 min-h-0">
             <div className="flex items-center justify-between">

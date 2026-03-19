@@ -451,7 +451,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Room Panel (inline in third column) ─── */
   const RoomCardContent = room.isInRoom ? (
-    <div className="glass-card p-3 flex h-full min-h-0 flex-col gap-2.5 overflow-hidden">
+    <div className="glass-card p-3 flex flex-col gap-2.5">
       {/* Room header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -487,200 +487,195 @@ const HomeScreen: React.FC = () => {
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-2.5">
-      {/* Scrollable room content */}
-      <div className="flex flex-1 min-h-0 flex-col gap-2.5 pr-1">
-        {/* Mode selector — creator only */}
-        {room.isCreator && (
-          <>
+      {/* Mode selector — creator only */}
+      {room.isCreator && (
+        <>
+          <div className="flex gap-1.5">
+            {ROOM_MODES.map(mode => (
+              <button
+                key={mode.id}
+                id={`private-room-mode-${mode.id}-btn`}
+                className={`pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.mode === mode.id ? 'active' : ''}`}
+                onClick={() => room.setMode(mode.id)}
+              >
+                {mode.icon} {mode.label}
+              </button>
+            ))}
+          </div>
+
+          {room.mode !== 'ffa' && (
             <div className="flex gap-1.5">
-              {ROOM_MODES.map(mode => (
+              {TEAM_COUNTS.map(n => (
                 <button
-                  key={mode.id}
-                  id={`private-room-mode-${mode.id}-btn`}
-                  className={`pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.mode === mode.id ? 'active' : ''}`}
-                  onClick={() => room.setMode(mode.id)}
+                  key={n}
+                  className={`pill-btn flex-1 justify-center !text-[9px] !px-2 !py-1.5 ${room.teamCount === n ? 'active' : ''}`}
+                  onClick={() => room.setTeamCount(n)}
                 >
-                  {mode.icon} {mode.label}
+                  {n} TEAMS
                 </button>
               ))}
             </div>
-
-            {room.mode !== 'ffa' && (
-              <div className="flex gap-1.5">
-                {TEAM_COUNTS.map(n => (
-                  <button
-                    key={n}
-                    className={`pill-btn flex-1 justify-center !text-[9px] !px-2 !py-1.5 ${room.teamCount === n ? 'active' : ''}`}
-                    onClick={() => room.setTeamCount(n)}
-                  >
-                    {n} TEAMS
-                  </button>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Non-creator mode display */}
-        {!room.isCreator && (
-          <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-muted/10">
-            <span className="font-orbitron text-[9px] text-muted-foreground tracking-wider">MODE</span>
-            <span className="font-orbitron text-[9px] font-bold text-foreground tracking-wider">
-              {ROOM_MODES.find(m => m.id === room.mode)?.label || room.mode.toUpperCase()}
-            </span>
-            {room.mode !== 'ffa' && (
-              <span className="font-orbitron text-[9px] text-muted-foreground tracking-wider ml-2">{room.teamCount} TEAMS</span>
-            )}
-          </div>
-        )}
-
-        {/* Lock + Randomize — creator controls */}
-        <div className="flex gap-1.5">
-          {room.isCreator && (
-            <button
-              className={`pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.isLocked ? 'active' : ''}`}
-              onClick={room.toggleLock}
-            >
-              {room.isLocked ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
-              {room.isLocked ? 'LOCKED' : 'OPEN'}
-            </button>
           )}
-          {!room.isCreator && room.isLocked && (
-            <div className="pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 opacity-60 cursor-default">
-              <Lock className="w-2.5 h-2.5" /> ROOM LOCKED
-            </div>
-          )}
-          {room.isCreator && room.mode !== 'ffa' && (
-            <button className="pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5" onClick={room.randomizeTeams}>
-              <Shuffle className="w-2.5 h-2.5" /> RANDOMIZE
-            </button>
+        </>
+      )}
+
+      {/* Non-creator mode display */}
+      {!room.isCreator && (
+        <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-muted/10">
+          <span className="font-orbitron text-[9px] text-muted-foreground tracking-wider">MODE</span>
+          <span className="font-orbitron text-[9px] font-bold text-foreground tracking-wider">
+            {ROOM_MODES.find(m => m.id === room.mode)?.label || room.mode.toUpperCase()}
+          </span>
+          {room.mode !== 'ffa' && (
+            <span className="font-orbitron text-[9px] text-muted-foreground tracking-wider ml-2">{room.teamCount} TEAMS</span>
           )}
         </div>
+      )}
 
-        {/* Player roster with hint */}
-        {room.selectedPlayer && (
-          <div className="text-[9px] font-orbitron text-primary tracking-wider text-center animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
-            TAP A TEAM TO ASSIGN {room.selectedPlayer.name.toUpperCase()}
+      {/* Lock + Randomize — creator controls */}
+      <div className="flex gap-1.5">
+        {room.isCreator && (
+          <button
+            className={`pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.isLocked ? 'active' : ''}`}
+            onClick={room.toggleLock}
+          >
+            {room.isLocked ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
+            {room.isLocked ? 'LOCKED' : 'OPEN'}
+          </button>
+        )}
+        {!room.isCreator && room.isLocked && (
+          <div className="pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 opacity-60 cursor-default">
+            <Lock className="w-2.5 h-2.5" /> ROOM LOCKED
           </div>
         )}
+        {room.isCreator && room.mode !== 'ffa' && (
+          <button className="pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5" onClick={room.randomizeTeams}>
+            <Shuffle className="w-2.5 h-2.5" /> RANDOMIZE
+          </button>
+        )}
+      </div>
 
-        {/* Team Roster — Hybrid: click + drag */}
-        {room.mode !== 'ffa' ? (
-          <div className="min-h-0 flex flex-1 flex-col overflow-hidden">
-            <span className="section-label flex items-center gap-1 !mb-1.5">
-              <Users className="w-3 h-3 text-primary" /> TEAMS
-            </span>
-            <div
-              className={`grid flex-1 min-h-0 auto-rows-fr gap-2 overflow-hidden pr-1 ${
-                room.teamCount === 1 ? 'grid-cols-1' :
-                room.teamCount === 2 ? 'grid-cols-2' :
-                room.teamCount === 3 ? 'grid-cols-3' :
-                'grid-cols-2'
-              }`}
-            >
-              {Array.from({ length: room.teamCount }).map((_, tIdx) => {
-                const isDropTarget = dragOverTeam === tIdx;
-                const isAssignTarget = room.selectedPlayer != null;
-                const teamMembers = room.teams[tIdx] || [];
-                const ts = TEAM_STYLES[tIdx];
+      {/* Player roster with hint */}
+      {room.selectedPlayer && (
+        <div className="text-[9px] font-orbitron text-primary tracking-wider text-center animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
+          TAP A TEAM TO ASSIGN {room.selectedPlayer.name.toUpperCase()}
+        </div>
+      )}
 
-                const activeStyle = (isDropTarget || isAssignTarget) ? {
-                  borderColor: ts.borderColor,
-                  backgroundColor: ts.bgColor,
-                } : {};
+      {/* Team Roster — Hybrid: click + drag */}
+      {room.mode !== 'ffa' ? (
+        <div className="flex flex-col gap-1.5">
+          <span className="section-label flex items-center gap-1 !mb-1.5">
+            <Users className="w-3 h-3 text-primary" /> TEAMS
+          </span>
+          <div className={`grid gap-2 pr-1 ${
+            room.teamCount === 1 ? 'grid-cols-1' :
+            room.teamCount === 2 ? 'grid-cols-2' :
+            room.teamCount === 3 ? 'grid-cols-3' :
+            'grid-cols-2'
+          }`}>
+            {Array.from({ length: room.teamCount }).map((_, tIdx) => {
+              const isDropTarget = dragOverTeam === tIdx;
+              const isAssignTarget = room.selectedPlayer != null;
+              const teamMembers = room.teams[tIdx] || [];
+              const ts = TEAM_STYLES[tIdx];
 
-                return (
-                  <div
-                    key={tIdx}
-                    className={`rounded-xl border-2 border-dashed p-2.5 min-h-0 overflow-hidden flex flex-col transition-all duration-200 ${
-                      isDropTarget ? 'scale-[1.03] shadow-lg' :
-                      isAssignTarget ? 'hover:scale-[1.01] cursor-pointer' :
-                      'border-border/30 bg-muted/5 hover:bg-muted/10'
-                    }`}
-                    style={activeStyle}
-                    onDragOver={e => { e.preventDefault(); handleDragOver(e, tIdx); }}
-                    onDragLeave={handleDragLeave}
-                    onDrop={() => handleDrop(tIdx)}
-                    onClick={() => handleTeamClick(tIdx)}
-                  >
-                    <div className="flex items-center justify-between mb-2 shrink-0">
-                      <span className="font-orbitron text-[9px] font-bold tracking-wider" style={{ color: ts.color }}>
-                        TEAM {tIdx + 1}
-                      </span>
-                      <span className="font-rajdhani text-[9px] text-muted-foreground font-semibold">
-                        {teamMembers.length}
+              const activeStyle = (isDropTarget || isAssignTarget) ? {
+                borderColor: ts.borderColor,
+                backgroundColor: ts.bgColor,
+              } : {};
+
+              return (
+                <div
+                  key={tIdx}
+                  className={`rounded-xl border-2 border-dashed p-2.5 min-h-[70px] flex flex-col transition-all duration-200 ${
+                    isDropTarget ? 'scale-[1.03] shadow-lg' :
+                    isAssignTarget ? 'hover:scale-[1.01] cursor-pointer' :
+                    'border-border/30 bg-muted/5 hover:bg-muted/10'
+                  }`}
+                  style={activeStyle}
+                  onDragOver={e => { e.preventDefault(); handleDragOver(e, tIdx); }}
+                  onDragLeave={handleDragLeave}
+                  onDrop={() => handleDrop(tIdx)}
+                  onClick={() => handleTeamClick(tIdx)}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-orbitron text-[9px] font-bold tracking-wider" style={{ color: ts.color }}>
+                      TEAM {tIdx + 1}
+                    </span>
+                    <span className="font-rajdhani text-[9px] text-muted-foreground font-semibold">
+                      {teamMembers.length}
+                    </span>
+                  </div>
+
+                  {teamMembers.length === 0 ? (
+                    <div
+                      className="flex items-center justify-center py-6 rounded-lg border border-dashed transition-colors"
+                      style={{ borderColor: isDropTarget ? ts.borderColor : undefined }}
+                    >
+                      <span className="font-orbitron text-[8px] text-muted-foreground/50 tracking-wider">
+                        {isDropTarget ? 'DROP HERE' : 'DRAG PLAYER'}
                       </span>
                     </div>
+                  ) : (
+                    <div className="flex flex-col gap-1">
+                      {teamMembers.map(member => {
+                        const isSelected = room.selectedPlayer?.id === member.id;
+                        const isBeingDragged = dragItem?.playerId === member.id;
 
-                    {teamMembers.length === 0 ? (
-                      <div
-                        className="flex flex-1 items-center justify-center rounded-lg border border-dashed transition-colors"
-                        style={{ borderColor: isDropTarget ? ts.borderColor : undefined }}
-                      >
-                        <span className="font-orbitron text-[8px] text-muted-foreground/50 tracking-wider">
-                          {isDropTarget ? 'DROP HERE' : 'DRAG PLAYER'}
-                        </span>
-                      </div>
-                    ) : (
-                      <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto pr-1">
-                        {teamMembers.map(member => {
-                          const isSelected = room.selectedPlayer?.id === member.id;
-                          const isBeingDragged = dragItem?.playerId === member.id;
-
-                          return (
-                            <div
-                              key={member.id}
-                              draggable
-                              onDragStart={() => handleDragStart(member.id, tIdx)}
-                              onDragEnd={() => { setDragItem(null); setDragOverTeam(null); }}
-                              onClick={e => { e.stopPropagation(); handlePlayerClick(member); }}
-                              className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-150 group shrink-0 ${
-                                isBeingDragged
-                                  ? 'opacity-40 scale-95'
-                                  : isSelected
-                                    ? 'bg-primary/20 border border-primary/40 ring-1 ring-primary/20 shadow-sm'
-                                    : 'bg-muted/20 cursor-grab active:cursor-grabbing hover:bg-primary/10 border border-transparent hover:border-primary/20'
-                              }`}
-                            >
-                              <GripVertical className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary/60 transition-colors shrink-0" />
-                              <span className="font-rajdhani font-semibold text-[11px] text-foreground flex-1 truncate">{member.name}</span>
-                              {member.isCreator && <Shield className="w-2.5 h-2.5 text-primary shrink-0" />}
-                              {room.readyPlayers.has(member.id) && (
-                                <Check className="w-2.5 h-2.5 text-green-500 shrink-0" />
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ) : (
-          /* FFA player list */
-          <div className="min-h-0 flex flex-1 flex-col overflow-hidden">
-            <span className="section-label flex items-center gap-1 !mb-1.5">
-              <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
-            </span>
-            <div className="flex flex-1 min-h-0 flex-col gap-0.5 overflow-y-auto pr-1">
-              {room.players.map(p => (
-                <div key={p.id} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
-                    <span className="font-rajdhani font-semibold text-xs text-foreground">{p.name}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    {p.isCreator && <Shield className="w-2.5 h-2.5 text-primary" />}
-                    {room.readyPlayers.has(p.id) && <Check className="w-2.5 h-2.5 text-green-500" />}
-                  </div>
+                        return (
+                          <div
+                            key={member.id}
+                            draggable
+                            onDragStart={() => handleDragStart(member.id, tIdx)}
+                            onDragEnd={() => { setDragItem(null); setDragOverTeam(null); }}
+                            onClick={e => { e.stopPropagation(); handlePlayerClick(member); }}
+                            className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-150 group ${
+                              isBeingDragged
+                                ? 'opacity-40 scale-95'
+                                : isSelected
+                                  ? 'bg-primary/20 border border-primary/40 ring-1 ring-primary/20 shadow-sm'
+                                  : 'bg-muted/20 cursor-grab active:cursor-grabbing hover:bg-primary/10 border border-transparent hover:border-primary/20'
+                            }`}
+                          >
+                            <GripVertical className="w-3 h-3 text-muted-foreground/40 group-hover:text-primary/60 transition-colors shrink-0" />
+                            <span className="font-rajdhani font-semibold text-[11px] text-foreground flex-1 truncate">{member.name}</span>
+                            {member.isCreator && <Shield className="w-2.5 h-2.5 text-primary shrink-0" />}
+                            {room.readyPlayers.has(member.id) && (
+                              <Check className="w-2.5 h-2.5 text-green-500 shrink-0" />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        )}
+        </div>
+      ) : (
+        /* FFA player list */
+        <div className="flex flex-col gap-1.5">
+          <span className="section-label flex items-center gap-1 !mb-1.5">
+            <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
+          </span>
+          <div className="flex flex-col gap-0.5 pr-1">
+            {room.players.map(p => (
+              <div key={p.id} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                  <span className="font-rajdhani font-semibold text-xs text-foreground">{p.name}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  {p.isCreator && <Shield className="w-2.5 h-2.5 text-primary" />}
+                  {room.readyPlayers.has(p.id) && <Check className="w-2.5 h-2.5 text-green-500" />}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       </div>
 
       {/* Invite controls */}

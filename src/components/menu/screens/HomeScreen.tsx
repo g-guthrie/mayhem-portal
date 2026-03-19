@@ -650,18 +650,6 @@ const HomeScreen: React.FC = () => {
                             <Crown className="w-2.5 h-2.5 text-primary" />
                           </button>
                         )}
-                        {!isInFriendsList && (
-                          <button
-                            className="pill-btn !px-1 !py-0.5 text-[8px]"
-                            title="Add as friend"
-                            onClick={() => {
-                              setFriends(prev => [...prev, { name: m.name, status: 'online', inGame: false }]);
-                              toast({ title: `Added ${m.name} as friend` });
-                            }}
-                          >
-                            <UserPlus className="w-2.5 h-2.5" />
-                          </button>
-                        )}
                         {!isInRoom && (
                           <button
                             className="pill-btn !px-1 !py-0.5 text-[8px] border-green-500/30 hover:bg-green-500/10"

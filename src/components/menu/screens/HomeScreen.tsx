@@ -476,21 +476,20 @@ const HomeScreen: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="section-label !mb-0">PRIVATE ROOM <span className="text-muted-foreground">ID:</span> <span className="text-primary">{room.roomCode}</span></span>
-            <button
-              className="pill-btn !px-1 !py-0.5"
-              title="Copy"
-              onClick={() => {
-                try {
-                  navigator.clipboard.writeText(room.roomCode);
-                  toast({ title: 'Copied room code', description: room.roomCode });
-                } catch {
-                  toast({ title: 'Failed to copy', variant: 'destructive' });
-                }
-              }}
-            >
-              <Copy className="w-2.5 h-2.5" />
-            </button>
-          </div>
+          <button
+            className="pill-btn !px-1 !py-0.5"
+            title="Copy"
+            onClick={() => {
+              try {
+                navigator.clipboard.writeText(room.roomCode);
+                toast({ title: 'Copied room code', description: room.roomCode });
+              } catch {
+                toast({ title: 'Failed to copy', variant: 'destructive' });
+              }
+            }}
+          >
+            <Copy className="w-2.5 h-2.5" />
+          </button>
           {/* Inline mode pill */}
           {room.isCreator ? (
             <div className="relative" ref={modeDropdownRef}>

@@ -451,7 +451,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Room Panel (inline in third column) ─── */
   const RoomCardContent = room.isInRoom ? (
-    <div className="glass-card p-3 flex flex-col gap-2.5 overflow-y-auto max-h-[400px]">
+    <div className="glass-card p-3 flex h-full min-h-0 flex-col gap-2.5 overflow-hidden">
       {/* Room header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -487,6 +487,7 @@ const HomeScreen: React.FC = () => {
         </div>
       </div>
 
+      <div className="flex-1 min-h-0 overflow-y-auto pr-1 space-y-2.5">
       {/* Mode selector — creator only */}
       {room.isCreator && (
         <>
@@ -700,6 +701,7 @@ const HomeScreen: React.FC = () => {
           </button>
         </div>
       )}
+      </div>
 
       {/* Room Actions */}
       <div className="flex gap-2 pt-1">
@@ -940,10 +942,10 @@ const HomeScreen: React.FC = () => {
     <div className="flex flex-col gap-3 h-full min-h-0">
       {InviteBanner}
       {/* Top row: 3-col default, 2-col when room is open */}
-      <div className={`grid gap-3 ${room.isInRoom ? 'grid-cols-1 sm:grid-cols-[minmax(250px,1fr)_2fr]' : 'grid-cols-1 sm:grid-cols-3'}`}>
+      <div className={`grid gap-3 min-h-0 ${room.isInRoom ? 'flex-1 grid-cols-1 sm:grid-cols-[minmax(250px,1fr)_2fr]' : 'grid-cols-1 sm:grid-cols-3'}`}>
         {room.isInRoom ? (
           <>
-            <div className="flex flex-col justify-between h-full gap-3">
+            <div className="flex flex-col justify-between h-full min-h-0 gap-3">
               {PlayCard}
               {QuickJoinCard}
             </div>

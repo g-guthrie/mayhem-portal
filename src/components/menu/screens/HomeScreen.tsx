@@ -126,9 +126,20 @@ const HomeScreen: React.FC = () => {
     });
   }, [displayName]);
 
-  // Logout cleanup: leave room and reset party to solo
+  // Login: populate demo party; Logout: reset to solo
   const prevLoggedIn = useRef(isLoggedIn);
   useEffect(() => {
+    if (!prevLoggedIn.current && isLoggedIn) {
+      // User just logged in — seed a demo party
+      setPartyMembers([
+        { name: displayName, isLeader: true },
+        { name: 'xVortex', isLeader: false },
+        { name: 'NightOwl', isLeader: false },
+        { name: 'BlazeFury', isLeader: false },
+        { name: 'GhostRaven', isLeader: false },
+        { name: 'IronWolf', isLeader: false },
+      ]);
+    }
     if (prevLoggedIn.current && !isLoggedIn) {
       // User just logged out
       if (room.isInRoom) room.leaveRoom();

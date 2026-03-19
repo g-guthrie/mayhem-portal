@@ -109,31 +109,33 @@ const LoadoutBand: React.FC = () => {
   return (
     <footer id="menu-loadout-band">
       <div className="px-4 sm:px-6 py-3">
-        {/* Collapse / Summary row */}
-        <div className="flex items-center justify-between mb-2">
-          {collapsed ? (
-            <div id="loadout-collapsed-row" className="flex gap-3">
-              <button id="weapon-slot-summary" className="pill-btn !py-1.5 text-[10px]" onClick={() => setCollapsed(false)}>
-                <Crosshair className="w-3 h-3" /> {getWeaponName(selectedWeapons[0])} / {getWeaponName(selectedWeapons[1])}
-              </button>
-              <button id="throwable-slot-summary" className="pill-btn !py-1.5 text-[10px]" onClick={() => setCollapsed(false)}>
-                <Bomb className="w-3 h-3" /> {selectedThrowable.toUpperCase()}
-              </button>
-              <button id="ability-slot-summary" className="pill-btn !py-1.5 text-[10px]" onClick={() => setCollapsed(false)}>
-                <Zap className="w-3 h-3" /> {getAbilityName(selectedAbilities[0])} / {getAbilityName(selectedAbilities[1])}
-              </button>
-            </div>
-          ) : (
-            <div />
-          )}
-          <button
-            id="loadout-collapse-btn"
-            className="pill-btn !py-1.5 !px-3 text-[10px] ml-auto"
-            onClick={toggleCollapsed}
-          >
-            {collapsed ? '▲ EXPAND LOADOUT' : '▼ COLLAPSE LOADOUT'}
-          </button>
-        </div>
+        {/* Collapse / Summary row — only show when there's content competing for space */}
+        {needsCollapse && (
+          <div className="flex items-center justify-between mb-2">
+            {collapsed ? (
+              <div id="loadout-collapsed-row" className="flex gap-3">
+                <button id="weapon-slot-summary" className="pill-btn !py-1.5 text-[10px]" onClick={() => setCollapsed(false)}>
+                  <Crosshair className="w-3 h-3" /> {getWeaponName(selectedWeapons[0])} / {getWeaponName(selectedWeapons[1])}
+                </button>
+                <button id="throwable-slot-summary" className="pill-btn !py-1.5 text-[10px]" onClick={() => setCollapsed(false)}>
+                  <Bomb className="w-3 h-3" /> {selectedThrowable.toUpperCase()}
+                </button>
+                <button id="ability-slot-summary" className="pill-btn !py-1.5 text-[10px]" onClick={() => setCollapsed(false)}>
+                  <Zap className="w-3 h-3" /> {getAbilityName(selectedAbilities[0])} / {getAbilityName(selectedAbilities[1])}
+                </button>
+              </div>
+            ) : (
+              <div />
+            )}
+            <button
+              id="loadout-collapse-btn"
+              className="pill-btn !py-1.5 !px-3 text-[10px] ml-auto"
+              onClick={toggleCollapsed}
+            >
+              {collapsed ? '▲ EXPAND LOADOUT' : '▼ COLLAPSE LOADOUT'}
+            </button>
+          </div>
+        )}
 
         {/* Expanded loadout */}
         {!collapsed && (

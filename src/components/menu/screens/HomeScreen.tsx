@@ -92,6 +92,7 @@ const HomeScreen: React.FC = () => {
 
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
+  const [invitePartyOpen, setInvitePartyOpen] = useState(false);
 
   /* Room mode dropdown */
   const [roomModeDropdownOpen, setRoomModeDropdownOpen] = useState(false);

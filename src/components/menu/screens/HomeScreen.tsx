@@ -103,6 +103,9 @@ const HomeScreen: React.FC = () => {
       if (modeDropdownRef.current && !modeDropdownRef.current.contains(e.target as Node)) {
         setRoomModeDropdownOpen(false);
       }
+      if (teamDropdownRef.current && !teamDropdownRef.current.contains(e.target as Node)) {
+        setTeamCountDropdownOpen(false);
+      }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);

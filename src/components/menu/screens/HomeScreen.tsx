@@ -587,34 +587,33 @@ const HomeScreen: React.FC = () => {
               <Shield className="w-2 h-2 inline mr-0.5" />HOST
             </span>
           )}
+          {room.isCreator ? (
+            <button
+              className={`pill-btn !px-1.5 !py-1 ${room.isLocked ? 'text-primary border-primary/30 bg-primary/10' : ''}`}
+              onClick={room.toggleLock}
+              title={room.isLocked ? 'Unlock Room' : 'Lock Room'}
+            >
+              {room.isLocked ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
+            </button>
+          ) : room.isLocked ? (
+            <span className="pill-btn !px-1.5 !py-1 opacity-60 cursor-default" title="Room Locked">
+              <Lock className="w-2.5 h-2.5" />
+            </span>
+          ) : null}
           <button className="pill-btn !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={room.leaveRoom} title="Leave Room">
             <LogOut className="w-2.5 h-2.5" />
           </button>
         </div>
       </div>
 
-      {/* Lock + Randomize — creator controls */}
-      <div className="flex gap-1.5">
-        {room.isCreator && (
-          <button
-            className={`pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.isLocked ? 'active' : ''}`}
-            onClick={room.toggleLock}
-          >
-            {room.isLocked ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
-            {room.isLocked ? 'LOCKED' : 'OPEN'}
-          </button>
-        )}
-        {!room.isCreator && room.isLocked && (
-          <div className="pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 opacity-60 cursor-default">
-            <Lock className="w-2.5 h-2.5" /> ROOM LOCKED
-          </div>
-        )}
-        {room.isCreator && room.mode !== 'ffa' && (
+      {/* Randomize — creator control */}
+      {room.isCreator && room.mode !== 'ffa' && (
+        <div className="flex gap-1.5">
           <button className="pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5" onClick={room.randomizeTeams}>
             <Shuffle className="w-2.5 h-2.5" /> RANDOMIZE
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Player roster — full width */}
       <div className="flex flex-col gap-2 min-w-0">

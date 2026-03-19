@@ -111,7 +111,22 @@ const HomeScreen: React.FC = () => {
     { name: 'xVortex', isLeader: false },
   ]);
 
-  // Keep self-entry in party synced with auth displayName
+  // DEV: Auto-populate room with players for testing
+  const devPopulated = useRef(false);
+  useEffect(() => {
+    if (devPopulated.current || room.isInRoom) return;
+    devPopulated.current = true;
+    room.createRoom(displayName || 'Player1', actorId || 'dev-self');
+    // After creation, add mock players and switch to TDM
+    setTimeout(() => {
+      room.setMode('tdm');
+      ['xVortex', 'NightOwl', 'BlazeFury', 'ShadowKnight', 'IronWolf'].forEach((name, i) => {
+        setTimeout(() => room.invitePlayer(name), (i + 1) * 100);
+      });
+    }, 50);
+  }, []);
+
+
   useEffect(() => {
     setPartyMembers(prev => {
       const selfIdx = prev.findIndex(m => m.isLeader && (m.name !== displayName));

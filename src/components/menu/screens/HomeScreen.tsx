@@ -108,7 +108,7 @@ const HomeScreen: React.FC = () => {
     // After creation, add mock players and switch to TDM
     setTimeout(() => {
       room.setMode('tdm');
-      ['xVortex', 'NightOwl', 'BlazeFury', 'ShadowKnight', 'IronWolf'].forEach((name, i) => {
+      ['xVortex', 'NightOwl', 'BlazeFury', 'ShadowKnight', 'IronWolf', 'NovaByte', 'PixelRush', 'CrimsonFox', 'EchoStrike', 'FrostByte', 'TurboWolf', 'GhostLeaf', 'OrbitDash', 'Quartz', 'Hexa'].forEach((name, i) => {
         setTimeout(() => room.invitePlayer(name), (i + 1) * 100);
       });
     }, 50);

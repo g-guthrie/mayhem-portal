@@ -701,6 +701,7 @@ const HomeScreen: React.FC = () => {
           </button>
         </div>
       )}
+      </div>
 
       {/* Room Actions */}
       <div className="flex gap-2 pt-1">

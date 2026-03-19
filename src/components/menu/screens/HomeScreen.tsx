@@ -952,8 +952,10 @@ const HomeScreen: React.FC = () => {
 
       {/* Social panel below if applicable */}
       {showSocialPanel && (
-        <div className="grid grid-cols-1 gap-3">
-          {SocialPanel}
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
+          <div className="sm:col-span-1">
+            {SocialPanel}
+          </div>
         </div>
       )}
     </div>

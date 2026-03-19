@@ -587,6 +587,19 @@ const HomeScreen: React.FC = () => {
               <Shield className="w-2 h-2 inline mr-0.5" />HOST
             </span>
           )}
+          {room.isCreator ? (
+            <button
+              className={`pill-btn !px-1.5 !py-1 ${room.isLocked ? 'text-primary border-primary/30 bg-primary/10' : ''}`}
+              onClick={room.toggleLock}
+              title={room.isLocked ? 'Unlock Room' : 'Lock Room'}
+            >
+              {room.isLocked ? <Lock className="w-2.5 h-2.5" /> : <Unlock className="w-2.5 h-2.5" />}
+            </button>
+          ) : room.isLocked ? (
+            <span className="pill-btn !px-1.5 !py-1 opacity-60 cursor-default" title="Room Locked">
+              <Lock className="w-2.5 h-2.5" />
+            </span>
+          ) : null}
           <button className="pill-btn !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={room.leaveRoom} title="Leave Room">
             <LogOut className="w-2.5 h-2.5" />
           </button>

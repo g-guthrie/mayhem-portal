@@ -91,6 +91,15 @@ const LoadoutBand: React.FC = () => {
     });
   };
 
+  // Reset throwable selection when switching to a category that doesn't contain the current selection
+  const handleThrowableCategoryChange = (cat: ThrowableCategory) => {
+    setThrowableCategory(cat);
+    const items = THROWABLES[cat];
+    if (!items.find(t => t.id === selectedThrowable)) {
+      setSelectedThrowable(items[0]?.id ?? '');
+    }
+  };
+
   const handleAbilitySelect = (id: string) => {
     setSelectedAbilities(prev => {
       const next: [string, string] = [...prev] as [string, string];

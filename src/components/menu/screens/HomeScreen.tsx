@@ -606,14 +606,6 @@ const HomeScreen: React.FC = () => {
         </div>
       </div>
 
-      {/* Randomize — creator control */}
-      {room.isCreator && room.mode !== 'ffa' && (
-        <div className="flex gap-1.5">
-          <button className="pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5" onClick={room.randomizeTeams}>
-            <Shuffle className="w-2.5 h-2.5" /> RANDOMIZE
-          </button>
-        </div>
-      )}
 
       {/* Player roster — full width */}
       <div className="flex flex-col gap-2 min-w-0">

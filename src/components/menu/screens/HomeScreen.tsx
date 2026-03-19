@@ -617,16 +617,14 @@ const HomeScreen: React.FC = () => {
 
         {room.mode !== 'ffa' ? (
           <div className="rounded-xl border border-border/20 bg-muted/5 p-2 max-h-[300px] overflow-y-auto">
-            <div className="flex items-center justify-between !mb-1.5">
-              <span className="section-label flex items-center gap-1 !mb-0">
-                <Users className="w-3 h-3 text-primary" /> TEAMS
-              </span>
+            <span className="section-label flex items-center gap-1 !mb-1.5">
+              <Users className="w-3 h-3 text-primary" /> TEAMS
               {room.isCreator && (
-                <button className="pill-btn !px-1.5 !py-0.5" onClick={room.randomizeTeams} title="Randomize Teams">
+                <button className="pill-btn !px-1.5 !py-0.5 ml-1" onClick={room.randomizeTeams} title="Randomize Teams">
                   <Shuffle className="w-2.5 h-2.5" />
                 </button>
               )}
-            </div>
+            </span>
             <div className={`grid gap-2 pr-1 ${
               room.teamCount === 1 ? 'grid-cols-1' :
               room.teamCount === 2 ? 'grid-cols-2' :

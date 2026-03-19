@@ -80,7 +80,7 @@ const MenuHeader: React.FC = () => {
               }}
             >
               <span id="menu-party-id-label" className="text-muted-foreground group-hover:text-foreground transition-colors text-[10px]">
-                {isLoggedIn ? displayName : 'PLAYER ID'}
+                {isLoggedIn ? displayName : 'GUEST ID'}
               </span>
               <span id="menu-party-id-value" className="text-primary font-bold text-[10px] font-mono">{actorId?.slice(0, 12)}</span>
               <button
@@ -99,6 +99,17 @@ const MenuHeader: React.FC = () => {
                 <Copy className="w-2.5 h-2.5 text-muted-foreground hover:text-foreground" />
               </button>
             </div>
+          )}
+          {/* Login button — guest only, next to ID pill */}
+          {!isLoggedIn && current === 'home' && (
+            <button
+              id="menu-login-btn"
+              className="pill-btn active gap-1"
+              onClick={() => push('auth')}
+            >
+              <LogIn className="w-3 h-3" />
+              <span className="text-[10px]">LOGIN</span>
+            </button>
           )}
         </div>
         <div id="menu-header-actions" className="flex items-center gap-2">
@@ -146,17 +157,6 @@ const MenuHeader: React.FC = () => {
                 <Globe className="w-2.5 h-2.5" />
               </button>
             </div>
-          )}
-          {/* Login button — guest only, visible on home */}
-          {!isLoggedIn && current === 'home' && (
-            <button
-              id="menu-login-btn"
-              className="pill-btn active gap-1.5"
-              onClick={() => push('auth')}
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span className="text-[10px]">LOGIN</span>
-            </button>
           )}
           {current !== 'settings' && (
             <button

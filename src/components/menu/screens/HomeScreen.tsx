@@ -981,7 +981,7 @@ const HomeScreen: React.FC = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div>}
         </div>
       )}
     </div>

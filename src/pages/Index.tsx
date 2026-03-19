@@ -32,6 +32,16 @@ const OverlayShell: React.FC = () => {
     <>
       <GameBridgeSync />
 
+      {/* Simulated game canvas background */}
+      <div
+        className="fixed inset-0 z-0"
+        style={{
+          backgroundImage: 'url(/game-bg.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+
       <div
         id="overlay"
         className="fixed inset-0 z-40 grid place-items-center p-3 sm:p-5"

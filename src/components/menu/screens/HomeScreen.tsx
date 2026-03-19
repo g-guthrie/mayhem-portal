@@ -624,7 +624,18 @@ const HomeScreen: React.FC = () => {
                 return (
                   <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
                     <div className="flex items-center gap-1.5 min-w-0">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
+                      {!isInFriendsList && !m.isLeader ? (
+                        <button
+                          className="shrink-0 text-green-500 hover:text-green-400 transition-colors"
+                          title="Add as friend"
+                          onClick={() => {
+                            setFriends(prev => [...prev, { name: m.name, status: 'online', inGame: false }]);
+                            toast({ title: `Added ${m.name} as friend` });
+                          }}
+                        >
+                          <UserPlus className="w-3 h-3" />
+                        </button>
+                      ) : null}
                       <span className="font-rajdhani font-semibold text-[11px] text-foreground truncate">{m.name}</span>
                       {m.isLeader && <span className="text-[7px] font-orbitron text-primary tracking-wider shrink-0">LEADER</span>}
                     </div>
@@ -637,18 +648,6 @@ const HomeScreen: React.FC = () => {
                             onClick={() => { transferLeader(m.name); toast({ title: `${m.name} is now party leader` }); }}
                           >
                             <Crown className="w-2.5 h-2.5 text-primary" />
-                          </button>
-                        )}
-                        {!isInFriendsList && (
-                          <button
-                            className="pill-btn !px-1 !py-0.5 text-[8px]"
-                            title="Add as friend"
-                            onClick={() => {
-                              setFriends(prev => [...prev, { name: m.name, status: 'online', inGame: false }]);
-                              toast({ title: `Added ${m.name} as friend` });
-                            }}
-                          >
-                            <UserPlus className="w-2.5 h-2.5" />
                           </button>
                         )}
                         {!isInRoom && (
@@ -837,7 +836,18 @@ const HomeScreen: React.FC = () => {
             {partyMembers.map(m => (
               <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                  {!friends.some(f => f.name === m.name) && !m.isLeader ? (
+                    <button
+                      className="shrink-0 text-green-500 hover:text-green-400 transition-colors"
+                      title="Add as friend"
+                      onClick={() => {
+                        setFriends(prev => [...prev, { name: m.name, status: 'online', inGame: false }]);
+                        toast({ title: `Added ${m.name} as friend` });
+                      }}
+                    >
+                      <UserPlus className="w-3 h-3" />
+                    </button>
+                  ) : null}
                   <span className="font-rajdhani font-semibold text-xs text-foreground">{m.name}</span>
                   {m.isLeader && <span className="text-[8px] font-orbitron text-primary tracking-wider">LEADER</span>}
                 </div>

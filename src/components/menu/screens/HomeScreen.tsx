@@ -557,7 +557,7 @@ const HomeScreen: React.FC = () => {
       </div>
 
       {/* 2-column: Players + Party */}
-      <div className={`grid gap-2.5 ${!isSolo ? 'grid-cols-1 sm:grid-cols-[1fr,200px]' : ''}`}>
+      <div className={`grid gap-2.5 ${!isSolo ? 'grid-cols-1 sm:grid-cols-[200px,1fr]' : ''}`}>
         {/* Left: Player roster */}
         <div className="flex flex-col gap-2 min-w-0">
           {room.selectedPlayer && (

@@ -77,6 +77,16 @@ const MenuHeader: React.FC<MenuHeaderProps> = () => {
               </button>
             </div>
           )}
+          {current === 'home' && (
+            <button
+              id="menu-loadout-btn"
+              className="pill-btn gap-1.5 ml-1 !border-destructive/50 !bg-destructive/10 hover:!bg-destructive/20 text-destructive"
+              onClick={() => push('loadout')}
+            >
+              <Crosshair className="w-3 h-3" />
+              <span className="text-[10px] font-orbitron font-bold">LOADOUT</span>
+            </button>
+          )}
         </div>
         <div id="menu-header-actions" className="flex items-center gap-2">
           {/* Login button — guest only, visible on home */}

@@ -62,7 +62,7 @@ const OverlayShell: React.FC = () => {
                     <ScreenRouter />
                   </div>
                 </section>
-                <LoadoutBand />
+                
               </div>
             </main>
           </div>

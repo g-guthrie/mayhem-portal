@@ -19,6 +19,13 @@ export const GameBridgeSync: React.FC = () => {
     prevMatchState.current = matchState;
 
     if (prev !== matchState) {
+      // If leaving mid-match (e.g. player quits), emit match-end first
+      if (prev === 'in-match' && matchState === 'idle') {
+        gameBridge.emit('match-end');
+        gameBridge.emit('return-to-lobby');
+        return;
+      }
+
       switch (matchState) {
         case 'countdown':
           gameBridge.emit('countdown', { value: countdownValue });
@@ -33,7 +40,7 @@ export const GameBridgeSync: React.FC = () => {
           gameBridge.emit('match-end');
           break;
         case 'idle':
-          if (prev === 'post-match' || prev === 'in-match') {
+          if (prev === 'post-match') {
             gameBridge.emit('return-to-lobby');
           }
           break;

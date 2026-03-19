@@ -810,10 +810,9 @@ const HomeScreen: React.FC = () => {
       </div>
     </div>
   ) : (
-    <div className="flex flex-col gap-3">
-      {/* Game Mode + Quick Join inline */}
+    <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+      {/* Game Mode card */}
       <div className="glass-card p-3 flex flex-col gap-3">
-        {/* Game Mode selector */}
         <div className="flex flex-col gap-2">
           <span className="section-label !mb-0">GAME MODE</span>
           <div className="flex items-center gap-2">
@@ -857,10 +856,20 @@ const HomeScreen: React.FC = () => {
             </div>
           )}
         </div>
+        {/* Create Private Room */}
+        <button
+          className="pill-btn w-full !py-2.5 !text-[10px] gap-1.5 justify-center"
+          onClick={handleCreateRoom}
+        >
+          <DoorOpen className="w-3.5 h-3.5" /> CREATE PRIVATE ROOM
+        </button>
+      </div>
 
-        {/* Quick Join row */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1 flex-1 min-w-[140px]">
+      {/* Quick Join card */}
+      <div className="glass-card p-3 flex flex-col gap-3">
+        <span className="section-label !mb-0">QUICK JOIN</span>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-1">
             <input
               className="glass-input !py-1 !px-2 !text-[10px] flex-1 min-w-0"
               placeholder="Friend ID"
@@ -879,8 +888,7 @@ const HomeScreen: React.FC = () => {
               <ArrowRight className="w-2.5 h-2.5" />
             </button>
           </div>
-          <div className="w-px h-5 bg-border/30 hidden sm:block" />
-          <div className="flex items-center gap-1 flex-1 min-w-[140px]">
+          <div className="flex items-center gap-1">
             <input
               className="glass-input !py-1 !px-2 !text-[10px] flex-1 min-w-0"
               placeholder="Room Code"
@@ -893,14 +901,6 @@ const HomeScreen: React.FC = () => {
             </button>
           </div>
         </div>
-
-        {/* Create Private Room */}
-        <button
-          className="pill-btn w-full !py-2.5 !text-[10px] gap-1.5 justify-center"
-          onClick={handleCreateRoom}
-        >
-          <DoorOpen className="w-3.5 h-3.5" /> CREATE PRIVATE ROOM
-        </button>
       </div>
     </div>
   );
@@ -1107,32 +1107,15 @@ const HomeScreen: React.FC = () => {
     <div className="flex flex-col gap-3 min-h-full flex-1">
       {InviteBanner}
       {/* Main content area */}
-      <div className={
-        room.isInRoom
-          ? 'flex flex-col flex-1 min-h-0'
-          : showSocialPanel
-            ? 'grid gap-3 grid-cols-1 sm:grid-cols-2'
-            : 'flex justify-center'
-      }>
-        {room.isInRoom ? (
-          RoomCardContent
-        ) : (
-          <>
-            <div className={showSocialPanel ? '' : 'w-full max-w-md'}>
-              {RoomCardContent}
-            </div>
-            {showSocialPanel && SocialPanel}
-          </>
-        )}
-      </div>
-
-      {/* Social panel below — only when NOT in a room and not already shown in grid */}
-      {showSocialPanel && !room.isInRoom && false && (
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
-          <div className="sm:col-span-1">
-            {SocialPanel}
-          </div>
+      {room.isInRoom ? (
+        <div className="flex flex-col flex-1 min-h-0">
+          {RoomCardContent}
         </div>
+      ) : (
+        <>
+          {RoomCardContent}
+          {showSocialPanel && SocialPanel}
+        </>
       )}
     </div>
   );

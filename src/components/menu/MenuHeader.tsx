@@ -24,7 +24,7 @@ const MenuHeader: React.FC<MenuHeaderProps> = () => {
   const canGoBack = history.length > 1;
 
   return (
-    <header id="menu-header" className="px-4 sm:px-5 py-3 border-b border-border/30 flex-shrink-0">
+    <header id="menu-header" className="px-4 sm:px-5 py-3 flex-shrink-0">
       <div id="menu-header-main" className="flex items-center justify-between">
         <div id="menu-header-leading" className="flex items-center gap-2.5">
           {canGoBack && (

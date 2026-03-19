@@ -451,7 +451,7 @@ const HomeScreen: React.FC = () => {
 
   /* ─── Room Panel (inline in third column) ─── */
   const RoomCardContent = room.isInRoom ? (
-    <div className="glass-card p-3 flex flex-col gap-2.5 overflow-y-auto max-h-[400px]">
+    <div className="glass-card p-3 flex h-full min-h-0 flex-col gap-2.5 overflow-hidden">
       {/* Room header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

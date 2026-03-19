@@ -787,58 +787,98 @@ const HomeScreen: React.FC = () => {
       </div>
     </div>
   ) : (
-    <div className="glass-card p-3 flex flex-col gap-3">
-      {/* Game Mode selector */}
-      <div className="flex flex-col gap-2">
-        <span className="section-label !mb-0">GAME MODE</span>
-        <div className="flex items-center gap-2">
-          <button
-            id="primary-launch-btn"
-            className="launch-btn flex-1 !py-2 !text-[10px] animate-pulse-glow"
-            onClick={() => {
-              if (room.isInRoom) {
-                toast({ title: 'Already in a room', description: 'Leave your current room or start the match from the room panel.', variant: 'destructive' });
-                return;
-              }
-              toast({ title: `Searching for ${currentMode.label}...`, description: 'Finding the best match for you.' });
-            }}
-          >
-            <Play className="w-3.5 h-3.5" /> START MATCH
-          </button>
-          <button
-            id="game-modes-toggle-btn"
-            className={`pill-btn !px-2 !py-2 gap-1.5 min-w-0 transition-transform ${modesOpen ? 'active' : ''}`}
-            onClick={() => setModesOpen(!modesOpen)}
-          >
-            {currentMode.icon}
-            <span className="font-orbitron text-[9px] font-bold tracking-wider truncate max-w-[100px]">{currentMode.label}</span>
-            <ChevronDown className={`w-3 h-3 shrink-0 transition-transform ${modesOpen ? 'rotate-180' : ''}`} />
-          </button>
-        </div>
-        {modesOpen && (
-          <div className="grid grid-cols-2 gap-1.5 max-h-[120px] overflow-y-auto animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
-            {GAME_MODES.map(mode => (
-              <button
-                key={mode.id}
-                className={`item-grid-btn !p-2 text-left !min-h-0 ${selectedMode === mode.id ? 'selected' : ''}`}
-                onClick={() => { setSelectedMode(mode.id); setModesOpen(false); }}
-              >
-                <div className="flex items-center gap-1.5 w-full">
-                  <span className={selectedMode === mode.id ? 'text-primary' : ''}>{mode.icon}</span>
-                  <span className="font-orbitron text-[9px] font-bold tracking-wider">{mode.label}</span>
-                </div>
-              </button>
-            ))}
+    <div className="flex flex-col gap-3">
+      {/* Game Mode + Quick Join inline */}
+      <div className="glass-card p-3 flex flex-col gap-3">
+        {/* Game Mode selector */}
+        <div className="flex flex-col gap-2">
+          <span className="section-label !mb-0">GAME MODE</span>
+          <div className="flex items-center gap-2">
+            <button
+              id="primary-launch-btn"
+              className="launch-btn flex-1 !py-2 !text-[10px] animate-pulse-glow"
+              onClick={() => {
+                if (room.isInRoom) {
+                  toast({ title: 'Already in a room', description: 'Leave your current room or start the match from the room panel.', variant: 'destructive' });
+                  return;
+                }
+                toast({ title: `Searching for ${currentMode.label}...`, description: 'Finding the best match for you.' });
+              }}
+            >
+              <Play className="w-3.5 h-3.5" /> START MATCH
+            </button>
+            <button
+              id="game-modes-toggle-btn"
+              className={`pill-btn !px-2 !py-2 gap-1.5 min-w-0 transition-transform ${modesOpen ? 'active' : ''}`}
+              onClick={() => setModesOpen(!modesOpen)}
+            >
+              {currentMode.icon}
+              <span className="font-orbitron text-[9px] font-bold tracking-wider truncate max-w-[100px]">{currentMode.label}</span>
+              <ChevronDown className={`w-3 h-3 shrink-0 transition-transform ${modesOpen ? 'rotate-180' : ''}`} />
+            </button>
           </div>
-        )}
+          {modesOpen && (
+            <div className="grid grid-cols-2 gap-1.5 max-h-[120px] overflow-y-auto animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
+              {GAME_MODES.map(mode => (
+                <button
+                  key={mode.id}
+                  className={`item-grid-btn !p-2 text-left !min-h-0 ${selectedMode === mode.id ? 'selected' : ''}`}
+                  onClick={() => { setSelectedMode(mode.id); setModesOpen(false); }}
+                >
+                  <div className="flex items-center gap-1.5 w-full">
+                    <span className={selectedMode === mode.id ? 'text-primary' : ''}>{mode.icon}</span>
+                    <span className="font-orbitron text-[9px] font-bold tracking-wider">{mode.label}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Quick Join row */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1 flex-1 min-w-[140px]">
+            <input
+              className="glass-input !py-1 !px-2 !text-[10px] flex-1 min-w-0"
+              placeholder="Friend ID"
+              value={quickFriendId}
+              onChange={e => setQuickFriendId(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleQuickJoinFriend(); }}
+            />
+            <button className="pill-btn !px-1.5 !py-1" title="Invite to party" onClick={() => {
+              if (!quickFriendId.trim()) return;
+              toast({ title: 'Invite sent', description: `Invited ${quickFriendId}` });
+              setQuickFriendId('');
+            }}>
+              <UserPlus className="w-2.5 h-2.5" />
+            </button>
+            <button className="pill-btn !px-1.5 !py-1" title="Join friend" onClick={handleQuickJoinFriend}>
+              <ArrowRight className="w-2.5 h-2.5" />
+            </button>
+          </div>
+          <div className="w-px h-5 bg-border/30 hidden sm:block" />
+          <div className="flex items-center gap-1 flex-1 min-w-[140px]">
+            <input
+              className="glass-input !py-1 !px-2 !text-[10px] flex-1 min-w-0"
+              placeholder="Room Code"
+              value={quickRoomCode}
+              onChange={e => setQuickRoomCode(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleQuickJoinRoom(); }}
+            />
+            <button className="pill-btn !px-1.5 !py-1" title="Join room" onClick={handleQuickJoinRoom}>
+              <Globe className="w-2.5 h-2.5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Create Private Room */}
+        <button
+          className="pill-btn w-full !py-2.5 !text-[10px] gap-1.5 justify-center"
+          onClick={handleCreateRoom}
+        >
+          <DoorOpen className="w-3.5 h-3.5" /> CREATE PRIVATE ROOM
+        </button>
       </div>
-      {/* Create Private Room */}
-      <button
-        className="pill-btn w-full !py-2.5 !text-[10px] gap-1.5 justify-center"
-        onClick={handleCreateRoom}
-      >
-        <DoorOpen className="w-3.5 h-3.5" /> CREATE PRIVATE ROOM
-      </button>
     </div>
   );
 

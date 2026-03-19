@@ -93,6 +93,19 @@ const HomeScreen: React.FC = () => {
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
 
+  /* Room mode dropdown */
+  const [roomModeDropdownOpen, setRoomModeDropdownOpen] = useState(false);
+  const modeDropdownRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (modeDropdownRef.current && !modeDropdownRef.current.contains(e.target as Node)) {
+        setRoomModeDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   /* Party state — sync leader name with displayName */
   const [partyMembers, setPartyMembers] = useState<{ name: string; isLeader: boolean }[]>([
     { name: displayName, isLeader: true },
@@ -462,6 +475,56 @@ const HomeScreen: React.FC = () => {
               <Shield className="w-2 h-2 inline mr-0.5" />HOST
             </span>
           )}
+          {/* Inline mode pill */}
+          {room.isCreator ? (
+            <div className="relative" ref={modeDropdownRef}>
+              <button
+                className="pill-btn gap-1 !text-[9px] !px-2 !py-1"
+                onClick={() => setRoomModeDropdownOpen(!roomModeDropdownOpen)}
+              >
+                {ROOM_MODES.find(m => m.id === room.mode)?.icon}
+                <span className="font-orbitron text-[9px] font-bold tracking-wider">
+                  {ROOM_MODES.find(m => m.id === room.mode)?.label}
+                  {room.mode !== 'ffa' && ` ${room.teamCount}T`}
+                </span>
+                <ChevronDown className={`w-2.5 h-2.5 transition-transform ${roomModeDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {roomModeDropdownOpen && (
+                <div className="absolute top-full left-0 mt-1 z-50 flex flex-col gap-1 bg-card border border-border/30 rounded-xl p-1.5 shadow-lg animate-fade-in-up min-w-[120px]" style={{ animationDuration: '0.15s' }}>
+                  {ROOM_MODES.map(mode => (
+                    <button
+                      key={mode.id}
+                      className={`pill-btn justify-start gap-1.5 !text-[9px] !px-2.5 !py-1.5 w-full ${room.mode === mode.id ? 'active' : ''}`}
+                      onClick={() => { room.setMode(mode.id); setRoomModeDropdownOpen(false); }}
+                    >
+                      {mode.icon} {mode.label}
+                    </button>
+                  ))}
+                  {room.mode !== 'ffa' && (
+                    <div className="flex gap-1 mt-1 border-t border-border/20 pt-1">
+                      {TEAM_COUNTS.map(n => (
+                        <button
+                          key={n}
+                          className={`pill-btn flex-1 justify-center !text-[9px] !px-1.5 !py-1 ${room.teamCount === n ? 'active' : ''}`}
+                          onClick={() => room.setTeamCount(n)}
+                        >
+                          {n}T
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <span className="pill-btn gap-1 !text-[9px] !px-2 !py-1 cursor-default opacity-80">
+              {ROOM_MODES.find(m => m.id === room.mode)?.icon}
+              <span className="font-orbitron text-[9px] font-bold tracking-wider">
+                {ROOM_MODES.find(m => m.id === room.mode)?.label}
+                {room.mode !== 'ffa' && ` ${room.teamCount}T`}
+              </span>
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1.5">
           <div id="room-share-panel" className="flex items-center gap-1.5">
@@ -487,51 +550,6 @@ const HomeScreen: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {/* Mode selector — creator only */}
-      {room.isCreator && (
-        <>
-          <div className="flex gap-1.5">
-            {ROOM_MODES.map(mode => (
-              <button
-                key={mode.id}
-                id={`private-room-mode-${mode.id}-btn`}
-                className={`pill-btn flex-1 justify-center gap-1 !text-[9px] !px-2 !py-1.5 ${room.mode === mode.id ? 'active' : ''}`}
-                onClick={() => room.setMode(mode.id)}
-              >
-                {mode.icon} {mode.label}
-              </button>
-            ))}
-          </div>
-
-          {room.mode !== 'ffa' && (
-            <div className="flex gap-1.5">
-              {TEAM_COUNTS.map(n => (
-                <button
-                  key={n}
-                  className={`pill-btn flex-1 justify-center !text-[9px] !px-2 !py-1.5 ${room.teamCount === n ? 'active' : ''}`}
-                  onClick={() => room.setTeamCount(n)}
-                >
-                  {n} TEAMS
-                </button>
-              ))}
-            </div>
-          )}
-        </>
-      )}
-
-      {/* Non-creator mode display */}
-      {!room.isCreator && (
-        <div className="flex items-center gap-2 px-2 py-1.5 rounded-lg bg-muted/10">
-          <span className="font-orbitron text-[9px] text-muted-foreground tracking-wider">MODE</span>
-          <span className="font-orbitron text-[9px] font-bold text-foreground tracking-wider">
-            {ROOM_MODES.find(m => m.id === room.mode)?.label || room.mode.toUpperCase()}
-          </span>
-          {room.mode !== 'ffa' && (
-            <span className="font-orbitron text-[9px] text-muted-foreground tracking-wider ml-2">{room.teamCount} TEAMS</span>
-          )}
-        </div>
-      )}
 
       {/* Lock + Randomize — creator controls */}
       <div className="flex gap-1.5">

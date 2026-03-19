@@ -39,23 +39,11 @@ const INITIAL_FRIENDS: FakeFriend[] = [
   { name: 'ShadowKnight', status: 'offline', inGame: false },
 ];
 
-const TEAM_COLORS = [
-  'text-cyan-400',
-  'text-rose-400',
-  'text-amber-400',
-  'text-emerald-400',
-];
-const TEAM_BORDER_COLORS = [
-  'border-cyan-400/30',
-  'border-rose-400/30',
-  'border-amber-400/30',
-  'border-emerald-400/30',
-];
-const TEAM_BG_COLORS = [
-  'bg-cyan-400/5',
-  'bg-rose-400/5',
-  'bg-amber-400/5',
-  'bg-emerald-400/5',
+const TEAM_STYLES = [
+  { color: 'rgb(34, 211, 238)', borderColor: 'rgba(34, 211, 238, 0.3)', bgColor: 'rgba(34, 211, 238, 0.05)' },
+  { color: 'rgb(251, 113, 133)', borderColor: 'rgba(251, 113, 133, 0.3)', bgColor: 'rgba(251, 113, 133, 0.05)' },
+  { color: 'rgb(251, 191, 36)', borderColor: 'rgba(251, 191, 36, 0.3)', bgColor: 'rgba(251, 191, 36, 0.05)' },
+  { color: 'rgb(52, 211, 153)', borderColor: 'rgba(52, 211, 153, 0.3)', bgColor: 'rgba(52, 211, 153, 0.05)' },
 ];
 
 const HomeScreen: React.FC = () => {

@@ -13,9 +13,7 @@ const PostMatchScreen: React.FC = () => {
 
   const handleBackToLobby = () => {
     returnToLobby();
-    if (isInRoom) {
-      menuNav.push('room');
-    }
+    menuNav.reset();
   };
 
   const handleMainMenu = () => {

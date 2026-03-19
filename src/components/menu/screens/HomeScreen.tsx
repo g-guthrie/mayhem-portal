@@ -746,7 +746,7 @@ const HomeScreen: React.FC = () => {
       </div>
 
       {/* Party */}
-      {!isSolo && (
+      {!isSolo && !room.isInRoom && (
         <div id="menu-party-hero">
           <div className="flex items-center justify-between mb-1.5">
             <span className="section-label flex items-center gap-1 !mb-0">

@@ -39,23 +39,11 @@ const INITIAL_FRIENDS: FakeFriend[] = [
   { name: 'ShadowKnight', status: 'offline', inGame: false },
 ];
 
-const TEAM_COLORS = [
-  'text-cyan-400',
-  'text-rose-400',
-  'text-amber-400',
-  'text-emerald-400',
-];
-const TEAM_BORDER_COLORS = [
-  'border-cyan-400/30',
-  'border-rose-400/30',
-  'border-amber-400/30',
-  'border-emerald-400/30',
-];
-const TEAM_BG_COLORS = [
-  'bg-cyan-400/5',
-  'bg-rose-400/5',
-  'bg-amber-400/5',
-  'bg-emerald-400/5',
+const TEAM_STYLES = [
+  { color: 'rgb(34, 211, 238)', borderColor: 'rgba(34, 211, 238, 0.3)', bgColor: 'rgba(34, 211, 238, 0.05)' },
+  { color: 'rgb(251, 113, 133)', borderColor: 'rgba(251, 113, 133, 0.3)', bgColor: 'rgba(251, 113, 133, 0.05)' },
+  { color: 'rgb(251, 191, 36)', borderColor: 'rgba(251, 191, 36, 0.3)', bgColor: 'rgba(251, 191, 36, 0.05)' },
+  { color: 'rgb(52, 211, 153)', borderColor: 'rgba(52, 211, 153, 0.3)', bgColor: 'rgba(52, 211, 153, 0.05)' },
 ];
 
 const HomeScreen: React.FC = () => {
@@ -590,24 +578,29 @@ const HomeScreen: React.FC = () => {
               const isDropTarget = dragOverTeam === tIdx;
               const isAssignTarget = room.selectedPlayer != null;
               const teamMembers = room.teams[tIdx] || [];
+              const ts = TEAM_STYLES[tIdx];
+
+              const activeStyle = (isDropTarget || isAssignTarget) ? {
+                borderColor: ts.borderColor,
+                backgroundColor: ts.bgColor,
+              } : {};
 
               return (
                 <div
                   key={tIdx}
                   className={`rounded-xl border-2 border-dashed p-2.5 min-h-[70px] transition-all duration-200 ${
-                    isDropTarget
-                      ? `${TEAM_BORDER_COLORS[tIdx]} ${TEAM_BG_COLORS[tIdx]} scale-[1.03] shadow-lg`
-                      : isAssignTarget
-                        ? `${TEAM_BORDER_COLORS[tIdx]} ${TEAM_BG_COLORS[tIdx]} hover:scale-[1.01] cursor-pointer`
-                        : 'border-border/30 bg-muted/5 hover:bg-muted/10'
+                    isDropTarget ? 'scale-[1.03] shadow-lg' :
+                    isAssignTarget ? 'hover:scale-[1.01] cursor-pointer' :
+                    'border-border/30 bg-muted/5 hover:bg-muted/10'
                   }`}
+                  style={activeStyle}
                   onDragOver={e => { e.preventDefault(); handleDragOver(e, tIdx); }}
                   onDragLeave={handleDragLeave}
                   onDrop={() => handleDrop(tIdx)}
                   onClick={() => handleTeamClick(tIdx)}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`font-orbitron text-[9px] font-bold tracking-wider ${TEAM_COLORS[tIdx]}`}>
+                    <span className="font-orbitron text-[9px] font-bold tracking-wider" style={{ color: ts.color }}>
                       TEAM {tIdx + 1}
                     </span>
                     <span className="font-rajdhani text-[9px] text-muted-foreground font-semibold">
@@ -616,9 +609,10 @@ const HomeScreen: React.FC = () => {
                   </div>
 
                   {teamMembers.length === 0 && (
-                    <div className={`flex items-center justify-center py-3 rounded-lg border border-dashed transition-colors ${
-                      isDropTarget ? `${TEAM_BORDER_COLORS[tIdx]}` : 'border-border/20'
-                    }`}>
+                    <div
+                      className="flex items-center justify-center py-3 rounded-lg border border-dashed transition-colors"
+                      style={{ borderColor: isDropTarget ? ts.borderColor : undefined }}
+                    >
                       <span className="font-orbitron text-[8px] text-muted-foreground/50 tracking-wider">
                         {isDropTarget ? 'DROP HERE' : 'DRAG PLAYER'}
                       </span>

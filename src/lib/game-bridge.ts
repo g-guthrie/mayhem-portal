@@ -4,7 +4,8 @@
    or `import { gameBridge } from '../src/lib/game-bridge'` in vanilla JS.
 */
 
-export type GameEvent =
+/* Events emitted by React → consumed by vanilla JS runtime */
+export type MenuEvent =
   | 'match-start'
   | 'match-end'
   | 'match-cancelled'
@@ -14,6 +15,17 @@ export type GameEvent =
   | 'player-leave'
   | 'countdown'
   | 'return-to-lobby';
+
+/* Events emitted by vanilla JS runtime → consumed by React */
+export type RuntimeEvent =
+  | 'runtime-match-end'      // runtime signals match is over (e.g. server says so)
+  | 'runtime-kill'           // player got a kill
+  | 'runtime-death'          // player died
+  | 'runtime-score-update'   // score/stat update
+  | 'runtime-player-join'    // a player connected in-game
+  | 'runtime-player-leave';  // a player disconnected in-game
+
+export type GameEvent = MenuEvent | RuntimeEvent;
 
 type Callback = (data?: any) => void;
 

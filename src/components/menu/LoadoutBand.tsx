@@ -138,7 +138,7 @@ const LoadoutBand: React.FC = () => {
         )}
 
         {/* Expanded loadout */}
-        {!collapsed && (
+        {(!collapsed || !needsCollapse) && (
           <div id="loadout-expanded-shell">
             <div id="loadout-row" className="loadout-grid grid grid-cols-1 sm:grid-cols-3 gap-3">
 

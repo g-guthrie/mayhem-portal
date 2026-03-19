@@ -551,6 +551,24 @@ const HomeScreen: React.FC = () => {
           )}
         </div>
         <div className="flex items-center gap-1.5">
+          {room.isCreator && (
+            <button className="pill-btn !py-1 !px-2 !text-[9px] gap-1 whitespace-nowrap" onClick={room.inviteParty}>
+              <Users className="w-2.5 h-2.5" /> INVITE PARTY
+            </button>
+          )}
+          <button
+            className="launch-btn !py-1 !px-2 !text-[9px] gap-1 whitespace-nowrap"
+            onClick={() => {
+              if (room.isCreator) {
+                room.startMatch();
+              } else {
+                room.toggleReady(actorId);
+                toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
+              }
+            }}
+          >
+            <Play className="w-2.5 h-2.5" /> {room.isCreator ? 'START MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
+          </button>
           <div id="room-share-panel" className="flex items-center gap-1.5">
             <span id="room-share-code" className="font-orbitron text-xs font-bold text-primary tracking-wider">{room.roomCode}</span>
             <button
@@ -721,27 +739,6 @@ const HomeScreen: React.FC = () => {
         )}
       </div>
 
-      {/* Invite + Room Actions — all inline */}
-      <div className="flex items-center gap-1.5 flex-nowrap">
-        {room.isCreator && (
-          <button className="pill-btn !py-1.5 !px-2 !text-[9px] gap-1 whitespace-nowrap flex-1" onClick={room.inviteParty}>
-            <Users className="w-3 h-3" /> INVITE PARTY
-          </button>
-        )}
-        <button
-          className="launch-btn flex-1 !py-1.5 !text-[9px] gap-1 whitespace-nowrap"
-          onClick={() => {
-            if (room.isCreator) {
-              room.startMatch();
-            } else {
-              room.toggleReady(actorId);
-              toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
-            }
-          }}
-        >
-        <Play className="w-3 h-3" /> {room.isCreator ? 'START MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
-        </button>
-      </div>
 
       {/* ─── Inline Party + Friends sub-panels ─── */}
       {isLoggedIn && (

@@ -394,10 +394,8 @@ const HomeScreen: React.FC = () => {
           <button className="pill-btn !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={room.leaveRoom} title="Leave Room">
             <LogOut className="w-2.5 h-2.5" />
           </button>
-        </div>
-            </div>
-          </div>
-
+      </div>
+    </div>
       {/* Player roster — full width */}
       <div className="flex flex-col gap-2 min-w-0 flex-1 min-h-0">
         {room.selectedPlayer && (

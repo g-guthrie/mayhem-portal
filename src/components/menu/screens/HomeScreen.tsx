@@ -219,13 +219,21 @@ const HomeScreen: React.FC = () => {
   };
 
   const handleQuickJoinFriend = () => {
-    if (!quickFriendId.trim()) return;
-    toast({ title: 'Joining friend...', description: quickFriendId });
+    const val = quickFriendId.trim();
+    if (!val || val.length < 2 || val.length > 32) {
+      if (val.length > 0) toast({ title: 'Invalid Friend ID', description: 'Must be 2–32 characters.', variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Joining friend...', description: val });
     setQuickFriendId('');
   };
 
   const handleQuickJoinRoom = () => {
-    if (quickRoomCode.trim().length < 4) return;
+    const val = quickRoomCode.trim().toUpperCase();
+    if (val.length < 4 || val.length > 8) {
+      if (val.length > 0) toast({ title: 'Invalid Room Code', description: 'Must be 4–8 characters.', variant: 'destructive' });
+      return;
+    }
     if (room.isInRoom) {
       toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
       return;
@@ -234,7 +242,7 @@ const HomeScreen: React.FC = () => {
       toast({ title: 'Match in progress', variant: 'destructive' });
       return;
     }
-    room.joinRoom(quickRoomCode.trim(), displayName, actorId);
+    room.joinRoom(val, displayName, actorId);
     setQuickRoomCode('');
   };
 

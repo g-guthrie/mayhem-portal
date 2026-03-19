@@ -937,7 +937,7 @@ const HomeScreen: React.FC = () => {
      ═══════════════════════════════════════════ */
 
   return (
-    <div className="flex flex-col gap-3 h-full min-h-0">
+    <div className="flex flex-col gap-3 min-h-full">
       {InviteBanner}
       {/* Main content area */}
       <div className={room.isInRoom ? '' : 'grid gap-3 grid-cols-1 sm:grid-cols-3'}>

@@ -21,9 +21,9 @@ const GAME_MODES: GameMode[] = [
 
 /* ─── Room mode config ─── */
 const ROOM_MODES = [
-  { id: 'ffa' as const, label: 'FFA', icon: <Crosshair className="w-3 h-3" /> },
-  { id: 'tdm' as const, label: 'TDM', icon: <Swords className="w-3 h-3" /> },
-  { id: 'lms' as const, label: 'LMS', icon: <Target className="w-3 h-3" /> },
+  { id: 'ffa' as const, label: 'FREE FOR ALL', icon: <Crosshair className="w-3 h-3" /> },
+  { id: 'tdm' as const, label: 'TEAM DEATHMATCH', icon: <Swords className="w-3 h-3" /> },
+  { id: 'lms' as const, label: 'LAST MAN STANDING', icon: <Target className="w-3 h-3" /> },
 ];
 const TEAM_COUNTS = [1, 2, 3, 4];
 

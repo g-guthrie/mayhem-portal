@@ -942,10 +942,10 @@ const HomeScreen: React.FC = () => {
     <div className="flex flex-col gap-3 h-full min-h-0">
       {InviteBanner}
       {/* Top row: 3-col default, 2-col when room is open */}
-      <div className={`grid gap-3 ${room.isInRoom ? 'grid-cols-1 sm:grid-cols-[minmax(250px,1fr)_2fr]' : 'grid-cols-1 sm:grid-cols-3'}`}>
+      <div className={`grid gap-3 min-h-0 ${room.isInRoom ? 'flex-1 grid-cols-1 sm:grid-cols-[minmax(250px,1fr)_2fr]' : 'grid-cols-1 sm:grid-cols-3'}`}>
         {room.isInRoom ? (
           <>
-            <div className="flex flex-col justify-between h-full gap-3">
+            <div className="flex flex-col justify-between h-full min-h-0 gap-3">
               {PlayCard}
               {QuickJoinCard}
             </div>

@@ -56,10 +56,6 @@ const HomeScreen: React.FC = () => {
   const [modesOpen, setModesOpen] = useState(false);
   const currentMode = GAME_MODES.find(m => m.id === selectedMode)!;
 
-  /* Quick join */
-  const [friendId, setFriendId] = useState('');
-  const [roomCodeInput, setRoomCodeInput] = useState('');
-
   /* Add/remove friend */
   const [addFriendOpen, setAddFriendOpen] = useState(false);
   const [addFriendId, setAddFriendId] = useState('');
@@ -86,9 +82,6 @@ const HomeScreen: React.FC = () => {
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
-
-  /* Join confirmation for party members */
-  const [joinConfirm, setJoinConfirm] = useState<'friend' | 'room' | null>(null);
 
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
@@ -208,20 +201,6 @@ const HomeScreen: React.FC = () => {
     window.dispatchEvent(new Event('loadout:collapse'));
   };
 
-  /* ─── Join room by code ─── */
-  const handleJoinRoom = () => {
-    if (roomCodeInput.trim().length < 4) return;
-    if (room.isInRoom) {
-      toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
-      return;
-    }
-    if (isMatchActive) {
-      toast({ title: 'Match in progress', description: 'Wait for the current match to end.', variant: 'destructive' });
-      return;
-    }
-    room.joinRoom(roomCodeInput.trim(), displayName, actorId);
-    setRoomCodeInput('');
-  };
 
   /* ─── Play Card ─── */
   const PlayCard = (
@@ -271,158 +250,6 @@ const HomeScreen: React.FC = () => {
     </div>
   );
 
-  /* ─── Quick Join Card ─── */
-  const QuickJoinCard = (
-    <div className="glass-card p-3 flex flex-col gap-2">
-      <span className="section-label !mb-0">QUICK JOIN</span>
-
-      {/* Friend ID row */}
-      {joinConfirm === 'friend' ? (
-        <div className="flex items-center gap-1.5 animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
-          <span className="text-[9px] font-orbitron text-foreground tracking-wider">
-            {isPartyLeader ? 'BRING PARTY?' : 'LEAVE PARTY & JOIN?'}
-          </span>
-          <button
-            className="pill-btn active !px-2 !py-1.5 !text-[9px]"
-            onClick={() => {
-              if (room.isInRoom) {
-                toast({ title: 'Already in a room', variant: 'destructive' });
-                setJoinConfirm(null);
-                return;
-              }
-              if (!isPartyLeader) {
-                setPartyMembers([{ name: displayName, isLeader: true }]);
-              }
-              toast({ title: isPartyLeader ? 'Joining with party...' : 'Left party, joining friend...' });
-              setJoinConfirm(null);
-              setFriendId('');
-            }}
-          >
-            YES
-          </button>
-          <button
-            className="pill-btn !px-2 !py-1.5 !text-[9px]"
-            onClick={() => setJoinConfirm(null)}
-          >
-            NO
-          </button>
-        </div>
-      ) : (
-        <div id="social-friend-id-stack" className="flex gap-1.5">
-          <input
-            id="party-id-input"
-            className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
-            placeholder="Friend ID"
-            value={friendId}
-            onChange={e => setFriendId(e.target.value)}
-          />
-          <button
-            id="invite-friend-btn"
-            className="pill-btn active !px-2 !py-1.5"
-            title="Invite"
-            onClick={() => {
-              if (!friendId.trim()) return;
-              toast({ title: 'Invite sent', description: `Invited ${friendId} to your party` });
-              setFriendId('');
-            }}
-          >
-            <UserPlus className="w-3 h-3" />
-          </button>
-          <button
-            id="join-friend-btn"
-            className="pill-btn !px-2 !py-1.5"
-            title="Join"
-            onClick={() => {
-              if (!friendId.trim()) return;
-              if (!isSolo) {
-                setJoinConfirm('friend');
-              } else {
-                toast({ title: 'Joining friend...', description: friendId });
-                setFriendId('');
-              }
-            }}
-          >
-            <ArrowRight className="w-3 h-3" />
-          </button>
-        </div>
-      )}
-
-      {/* Room code row */}
-      {joinConfirm === 'room' ? (
-        <div className="flex items-center gap-1.5 animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
-          <span className="text-[9px] font-orbitron text-foreground tracking-wider">
-            {isPartyLeader ? 'BRING PARTY?' : 'LEAVE PARTY & JOIN?'}
-          </span>
-          <button
-            className="pill-btn active !px-2 !py-1.5 !text-[9px]"
-            onClick={() => {
-              if (room.isInRoom) {
-                toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
-                setJoinConfirm(null);
-                return;
-              }
-              if (isMatchActive) {
-                toast({ title: 'Match in progress', variant: 'destructive' });
-                setJoinConfirm(null);
-                return;
-              }
-              if (isPartyLeader) {
-                room.joinRoom(roomCodeInput.trim(), displayName, actorId);
-              } else {
-                setPartyMembers([{ name: displayName, isLeader: true }]);
-                room.joinRoom(roomCodeInput.trim(), displayName, actorId);
-              }
-              toast({ title: isPartyLeader ? 'Joining room with party...' : 'Left party, joining room...' });
-              setJoinConfirm(null);
-              setRoomCodeInput('');
-            }}
-          >
-            YES
-          </button>
-          <button
-            className="pill-btn !px-2 !py-1.5 !text-[9px]"
-            onClick={() => setJoinConfirm(null)}
-          >
-            NO
-          </button>
-        </div>
-      ) : (
-        <div id="social-room-join-stack" className="flex gap-1.5">
-          <input
-            id="room-code-input"
-            className="glass-input flex-1 !py-1.5 !px-2.5 !text-xs"
-            placeholder="Room Code"
-            value={roomCodeInput}
-            onChange={e => setRoomCodeInput(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                if (!isSolo) {
-                  setJoinConfirm('room');
-                } else {
-                  handleJoinRoom();
-                }
-              }
-            }}
-          />
-          <button
-            id="join-room-btn"
-            className="pill-btn !px-2 !py-1.5"
-            title="Join Room"
-            onClick={() => {
-              if (!roomCodeInput.trim()) return;
-              if (!isSolo) {
-                setJoinConfirm('room');
-              } else {
-                handleJoinRoom();
-              }
-            }}
-          >
-            <Globe className="w-3 h-3" />
-          </button>
-        </div>
-      )}
-    </div>
-  );
 
   /* ─── Pending Invites ─── */
   const InviteBanner = room.pendingInvites.length > 0 ? (
@@ -1181,13 +1008,12 @@ const HomeScreen: React.FC = () => {
     <div className="flex flex-col gap-3 min-h-full flex-1">
       {InviteBanner}
       {/* Main content area */}
-      <div className={room.isInRoom ? 'flex flex-col flex-1 min-h-0' : 'grid gap-3 grid-cols-1 sm:grid-cols-3'}>
+      <div className={room.isInRoom ? 'flex flex-col flex-1 min-h-0' : 'grid gap-3 grid-cols-1 sm:grid-cols-2'}>
         {room.isInRoom ? (
           RoomCardContent
         ) : (
           <>
             {PlayCard}
-            {QuickJoinCard}
             {RoomCardContent}
           </>
         )}
@@ -1195,7 +1021,7 @@ const HomeScreen: React.FC = () => {
 
       {/* Social panel below — only when NOT in a room */}
       {showSocialPanel && !room.isInRoom && (
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
+        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
           <div className="sm:col-span-1">
             {SocialPanel}
           </div>

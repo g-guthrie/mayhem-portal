@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useMenuNav } from '@/hooks/useMenuNav';
 import HomeScreen from './screens/HomeScreen';
 import SocialScreen from './screens/SocialScreen';
-import RoomScreen from './screens/RoomScreen';
 import SettingsScreen from './screens/SettingsScreen';
 import AuthScreen from './screens/AuthScreen';
 import ManualScreen from './screens/ManualScreen';
@@ -11,7 +10,6 @@ import ControlsScreen from './screens/ControlsScreen';
 const screens = {
   home: HomeScreen,
   social: SocialScreen,
-  room: RoomScreen,
   settings: SettingsScreen,
   auth: AuthScreen,
   manual: ManualScreen,

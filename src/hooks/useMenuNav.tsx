@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useCallback, useRef } from 
 export type MenuScreen = 
   | 'home' 
   | 'social' 
-  | 'room' 
   | 'settings' 
   | 'auth' 
   | 'manual' 

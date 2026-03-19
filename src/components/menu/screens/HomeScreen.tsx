@@ -981,8 +981,7 @@ const HomeScreen: React.FC = () => {
               ))}
             </div>
           </div>}
-        </div>
-      )}
+      </div>
     </div>
   ) : (
     <div className="glass-card p-3 flex flex-col items-center justify-center gap-2">

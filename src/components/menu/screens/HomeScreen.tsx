@@ -105,11 +105,37 @@ const HomeScreen: React.FC = () => {
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
 
-  /* Party state */
+  /* Party state — sync leader name with displayName */
   const [partyMembers, setPartyMembers] = useState<{ name: string; isLeader: boolean }[]>([
     { name: displayName, isLeader: true },
     { name: 'xVortex', isLeader: false },
   ]);
+
+  // Keep self-entry in party synced with auth displayName
+  useEffect(() => {
+    setPartyMembers(prev => {
+      const selfIdx = prev.findIndex(m => m.isLeader && (m.name !== displayName));
+      if (selfIdx === -1) return prev;
+      const next = [...prev];
+      next[selfIdx] = { ...next[selfIdx], name: displayName };
+      return next;
+    });
+  }, [displayName]);
+
+  // Logout cleanup: leave room and reset party to solo
+  const prevLoggedIn = useRef(isLoggedIn);
+  useEffect(() => {
+    if (prevLoggedIn.current && !isLoggedIn) {
+      // User just logged out
+      if (room.isInRoom) room.leaveRoom();
+      setPartyMembers([{ name: displayName, isLeader: true }]);
+      setRemoveMode(false);
+      setConfirmingFriend(null);
+      setAddFriendOpen(false);
+      setFriends(INITIAL_FRIENDS);
+    }
+    prevLoggedIn.current = isLoggedIn;
+  }, [isLoggedIn, displayName, room]);
 
   const transferLeader = (name: string) => {
     setPartyMembers(prev => prev.map(m => ({
@@ -157,10 +183,17 @@ const HomeScreen: React.FC = () => {
     }
   };
 
+  /* ─── Guards ─── */
+  const isMatchActive = room.matchState !== 'idle';
+
   /* ─── Create room ─── */
   const handleCreateRoom = () => {
     if (room.isInRoom) {
       toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+      return;
+    }
+    if (isMatchActive) {
+      toast({ title: 'Match in progress', description: 'Wait for the current match to end.', variant: 'destructive' });
       return;
     }
     room.createRoom(displayName, actorId);
@@ -171,6 +204,10 @@ const HomeScreen: React.FC = () => {
     if (roomCodeInput.trim().length < 4) return;
     if (room.isInRoom) {
       toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+      return;
+    }
+    if (isMatchActive) {
+      toast({ title: 'Match in progress', description: 'Wait for the current match to end.', variant: 'destructive' });
       return;
     }
     room.joinRoom(roomCodeInput.trim(), displayName, actorId);
@@ -239,6 +276,14 @@ const HomeScreen: React.FC = () => {
           <button
             className="pill-btn active !px-2 !py-1.5 !text-[9px]"
             onClick={() => {
+              if (room.isInRoom) {
+                toast({ title: 'Already in a room', variant: 'destructive' });
+                setJoinConfirm(null);
+                return;
+              }
+              if (!isPartyLeader) {
+                setPartyMembers([{ name: displayName, isLeader: true }]);
+              }
               toast({ title: isPartyLeader ? 'Joining with party...' : 'Left party, joining friend...' });
               setJoinConfirm(null);
               setFriendId('');
@@ -302,9 +347,20 @@ const HomeScreen: React.FC = () => {
           <button
             className="pill-btn active !px-2 !py-1.5 !text-[9px]"
             onClick={() => {
+              if (room.isInRoom) {
+                toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+                setJoinConfirm(null);
+                return;
+              }
+              if (isMatchActive) {
+                toast({ title: 'Match in progress', variant: 'destructive' });
+                setJoinConfirm(null);
+                return;
+              }
               if (isPartyLeader) {
                 room.joinRoom(roomCodeInput.trim(), displayName, actorId);
               } else {
+                setPartyMembers([{ name: displayName, isLeader: true }]);
                 room.joinRoom(roomCodeInput.trim(), displayName, actorId);
               }
               toast({ title: isPartyLeader ? 'Joining room with party...' : 'Left party, joining room...' });

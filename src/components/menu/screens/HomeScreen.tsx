@@ -201,20 +201,6 @@ const HomeScreen: React.FC = () => {
     window.dispatchEvent(new Event('loadout:collapse'));
   };
 
-  /* ─── Join room by code ─── */
-  const handleJoinRoom = () => {
-    if (roomCodeInput.trim().length < 4) return;
-    if (room.isInRoom) {
-      toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
-      return;
-    }
-    if (isMatchActive) {
-      toast({ title: 'Match in progress', description: 'Wait for the current match to end.', variant: 'destructive' });
-      return;
-    }
-    room.joinRoom(roomCodeInput.trim(), displayName, actorId);
-    setRoomCodeInput('');
-  };
 
   /* ─── Play Card ─── */
   const PlayCard = (

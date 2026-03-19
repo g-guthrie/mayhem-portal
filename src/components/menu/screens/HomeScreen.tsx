@@ -25,7 +25,7 @@ const ROOM_MODES = [
   { id: 'tdm' as const, label: 'TEAM DEATHMATCH', icon: <Swords className="w-3 h-3" /> },
   { id: 'lms' as const, label: 'LAST MAN STANDING', icon: <Target className="w-3 h-3" /> },
 ];
-const TEAM_COUNTS = [1, 2, 3, 4];
+const TEAM_COUNTS = [2, 3, 4];
 
 interface FakeFriend {
   name: string;
@@ -95,11 +95,16 @@ const HomeScreen: React.FC = () => {
 
   /* Room mode dropdown */
   const [roomModeDropdownOpen, setRoomModeDropdownOpen] = useState(false);
+  const [teamCountDropdownOpen, setTeamCountDropdownOpen] = useState(false);
   const modeDropdownRef = useRef<HTMLDivElement>(null);
+  const teamDropdownRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (modeDropdownRef.current && !modeDropdownRef.current.contains(e.target as Node)) {
         setRoomModeDropdownOpen(false);
+      }
+      if (teamDropdownRef.current && !teamDropdownRef.current.contains(e.target as Node)) {
+        setTeamCountDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -480,12 +485,11 @@ const HomeScreen: React.FC = () => {
             <div className="relative" ref={modeDropdownRef}>
               <button
                 className="pill-btn active gap-1 !text-[9px] !px-2 !py-1"
-                onClick={() => setRoomModeDropdownOpen(!roomModeDropdownOpen)}
+                onClick={() => { setRoomModeDropdownOpen(!roomModeDropdownOpen); setTeamCountDropdownOpen(false); }}
               >
                 {ROOM_MODES.find(m => m.id === room.mode)?.icon}
                 <span className="font-orbitron text-[9px] font-bold tracking-wider">
                   {ROOM_MODES.find(m => m.id === room.mode)?.label}
-                  {room.mode !== 'ffa' && ` ${room.teamCount}T`}
                 </span>
                 <ChevronDown className={`w-2.5 h-2.5 transition-transform ${roomModeDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -500,19 +504,6 @@ const HomeScreen: React.FC = () => {
                       {mode.icon} {mode.label}
                     </button>
                   ))}
-                  {room.mode !== 'ffa' && (
-                    <div className="flex gap-1 mt-1 border-t border-border/20 pt-1">
-                      {TEAM_COUNTS.map(n => (
-                        <button
-                          key={n}
-                          className={`pill-btn flex-1 justify-center !text-[9px] !px-1.5 !py-1 ${room.teamCount === n ? 'active' : ''}`}
-                          onClick={() => room.setTeamCount(n)}
-                        >
-                          {n}T
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
               )}
             </div>
@@ -521,9 +512,41 @@ const HomeScreen: React.FC = () => {
               {ROOM_MODES.find(m => m.id === room.mode)?.icon}
               <span className="font-orbitron text-[9px] font-bold tracking-wider">
                 {ROOM_MODES.find(m => m.id === room.mode)?.label}
-                {room.mode !== 'ffa' && ` ${room.teamCount}T`}
               </span>
             </span>
+          )}
+          {/* Inline team count pill — only for team modes */}
+          {room.mode !== 'ffa' && (
+            room.isCreator ? (
+              <div className="relative" ref={teamDropdownRef}>
+                <button
+                  className="pill-btn active gap-1 !text-[9px] !px-2 !py-1"
+                  onClick={() => { setTeamCountDropdownOpen(!teamCountDropdownOpen); setRoomModeDropdownOpen(false); }}
+                >
+                  <Users className="w-2.5 h-2.5" />
+                  <span className="font-orbitron text-[9px] font-bold tracking-wider">{room.teamCount} TEAMS</span>
+                  <ChevronDown className={`w-2.5 h-2.5 transition-transform ${teamCountDropdownOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {teamCountDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-1 z-50 flex flex-col gap-1 bg-card border border-border/30 rounded-xl p-1.5 shadow-lg animate-fade-in-up min-w-[90px]" style={{ animationDuration: '0.15s' }}>
+                    {TEAM_COUNTS.map(n => (
+                      <button
+                        key={n}
+                        className={`pill-btn justify-start gap-1.5 !text-[9px] !px-2.5 !py-1.5 w-full ${room.teamCount === n ? 'active' : ''}`}
+                        onClick={() => { room.setTeamCount(n); setTeamCountDropdownOpen(false); }}
+                      >
+                        {n} TEAMS
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <span className="pill-btn gap-1 !text-[9px] !px-2 !py-1 cursor-default opacity-80">
+                <Users className="w-2.5 h-2.5" />
+                <span className="font-orbitron text-[9px] font-bold tracking-wider">{room.teamCount} TEAMS</span>
+              </span>
+            )
           )}
         </div>
         <div className="flex items-center gap-1.5">

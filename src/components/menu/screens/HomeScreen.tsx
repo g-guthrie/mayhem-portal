@@ -635,10 +635,11 @@ const HomeScreen: React.FC = () => {
                       }}
                     />
                     <button
-                      className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 shrink-0"
+                      className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 shrink-0 ${!inviteInput.trim() || inviteInput.trim().length < 2 ? 'opacity-50' : ''}`}
                       onClick={() => {
-                        if (!inviteInput.trim()) return;
-                        room.invitePlayer(inviteInput.trim());
+                        const val = inviteInput.trim();
+                        if (!val || val.length < 2) return;
+                        room.invitePlayer(val);
                         setInviteInput('');
                       }}
                       title="Invite to Party"

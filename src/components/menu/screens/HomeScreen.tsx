@@ -965,6 +965,7 @@ const HomeScreen: React.FC = () => {
                 <span className="hidden sm:inline">REMOVE</span>
               </button>
             </div>
+          </div>
 
           <div id="social-friends-list" className="flex flex-col gap-0.5 max-h-[200px] overflow-y-auto">
           {friends.length === 0 && (

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Crosshair, ChevronDown, Swords, Target, Dumbbell,
   UserPlus, ArrowRight, Globe, Users, UserMinus,
@@ -8,7 +8,10 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useMenuNav } from '@/hooks/useMenuNav';
 import { useRoom, type RoomPlayer, MAX_PLAYERS } from '@/hooks/useRoom';
+import { useSocial, isValidId } from '@/hooks/useSocial';
 import { toast } from '@/hooks/use-toast';
+import ConfirmRemove from '@/components/menu/ConfirmRemove';
+import InlineError from '@/components/menu/InlineError';
 
 /* ─── Game Modes ─── */
 interface GameMode { id: string; label: string; icon: React.ReactNode }
@@ -27,18 +30,6 @@ const ROOM_MODES = [
 ];
 const TEAM_COUNTS = [2, 3, 4];
 
-interface FakeFriend {
-  name: string;
-  status: 'online' | 'away' | 'offline';
-  inGame: boolean;
-}
-const INITIAL_FRIENDS: FakeFriend[] = [
-  { name: 'xVortex', status: 'online', inGame: true },
-  { name: 'NightOwl', status: 'online', inGame: false },
-  { name: 'BlazeFury', status: 'away', inGame: false },
-  { name: 'ShadowKnight', status: 'offline', inGame: false },
-];
-
 const TEAM_STYLES = [
   { color: 'rgb(34, 211, 238)', borderColor: 'rgba(34, 211, 238, 0.3)', bgColor: 'rgba(34, 211, 238, 0.05)' },
   { color: 'rgb(251, 113, 133)', borderColor: 'rgba(251, 113, 133, 0.3)', bgColor: 'rgba(251, 113, 133, 0.05)' },
@@ -50,47 +41,16 @@ const HomeScreen: React.FC = () => {
   const { isLoggedIn, displayName, actorId } = useAuth();
   const { push } = useMenuNav();
   const room = useRoom();
+  const social = useSocial();
 
   /* Play state */
   const [selectedMode, setSelectedMode] = useState('ffa');
   const [modesOpen, setModesOpen] = useState(false);
   const currentMode = GAME_MODES.find(m => m.id === selectedMode)!;
 
-  /* Add/remove friend */
-  const [addFriendOpen, setAddFriendOpen] = useState(false);
-  const [addFriendId, setAddFriendId] = useState('');
-  const [friends, setFriends] = useState<FakeFriend[]>(INITIAL_FRIENDS);
-  const [removeMode, setRemoveMode] = useState(false);
-  const [confirmingFriend, setConfirmingFriend] = useState<string | null>(null);
-
-  const removeFriend = (name: string) => {
-    setFriends(prev => {
-      const next = prev.filter(f => f.name !== name);
-      if (next.length === 0) setRemoveMode(false);
-      return next;
-    });
-    setConfirmingFriend(null);
-  };
-
-  /* Click outside to close add/remove */
-  const socialPanelRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (socialPanelRef.current && !socialPanelRef.current.contains(e.target as Node)) {
-        setAddFriendOpen(false);
-        setRemoveMode(false);
-        setConfirmingFriend(null);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  /* Invite player input */
+  /* Local input state */
   const [inviteInput, setInviteInput] = useState('');
-  const [invitePartyOpen, setInvitePartyOpen] = useState(false);
-
-  /* Quick join state */
+  const [addFriendId, setAddFriendId] = useState('');
   const [quickFriendId, setQuickFriendId] = useState('');
   const [quickRoomCode, setQuickRoomCode] = useState('');
 
@@ -112,63 +72,11 @@ const HomeScreen: React.FC = () => {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  /* Party state — sync leader name with displayName */
-  const [partyMembers, setPartyMembers] = useState<{ name: string; isLeader: boolean }[]>([
-    { name: displayName, isLeader: true },
-  ]);
-
-
-
-  useEffect(() => {
-    setPartyMembers(prev => {
-      const selfIdx = prev.findIndex(m => m.isLeader && (m.name !== displayName));
-      if (selfIdx === -1) return prev;
-      const next = [...prev];
-      next[selfIdx] = { ...next[selfIdx], name: displayName };
-      return next;
-    });
-  }, [displayName]);
-
-  // Login: populate demo party; Logout: reset to solo
-  const prevLoggedIn = useRef(isLoggedIn);
-  useEffect(() => {
-    if (!prevLoggedIn.current && isLoggedIn) {
-      // User just logged in — seed a demo party
-      setPartyMembers([
-        { name: displayName, isLeader: true },
-        { name: 'xVortex', isLeader: false },
-        { name: 'NightOwl', isLeader: false },
-        { name: 'BlazeFury', isLeader: false },
-        { name: 'GhostRaven', isLeader: false },
-        { name: 'IronWolf', isLeader: false },
-      ]);
-    }
-    if (prevLoggedIn.current && !isLoggedIn) {
-      // User just logged out
-      if (room.isInRoom) room.leaveRoom();
-      setPartyMembers([{ name: displayName, isLeader: true }]);
-      setRemoveMode(false);
-      setConfirmingFriend(null);
-      setAddFriendOpen(false);
-      setFriends(INITIAL_FRIENDS);
-    }
-    prevLoggedIn.current = isLoggedIn;
-  }, [isLoggedIn, displayName, room]);
-
-  const transferLeader = (name: string) => {
-    setPartyMembers(prev => prev.map(m => ({
-      ...m,
-      isLeader: m.name === name,
-    })));
-  };
-
   /* Drag state for desktop */
   const [dragItem, setDragItem] = useState<{ playerId: string; fromTeam: number } | null>(null);
   const [dragOverTeam, setDragOverTeam] = useState<number | null>(null);
 
-  const isSolo = partyMembers.length <= 1;
-  const isPartyLeader = partyMembers.find(m => m.isLeader)?.name === displayName;
-  const showSocialPanel = isLoggedIn || !isSolo;
+  const showSocialPanel = isLoggedIn || !social.isSolo;
 
   /* ─── Drag & Drop handlers ─── */
   const handleDragStart = (playerId: string, fromTeam: number) => {
@@ -218,9 +126,19 @@ const HomeScreen: React.FC = () => {
     window.dispatchEvent(new Event('loadout:collapse'));
   };
 
+  /* ─── Shared start/ready handler ─── */
+  const handleStartOrReady = () => {
+    if (room.isCreator) {
+      room.startMatch();
+    } else {
+      room.toggleReady(actorId);
+      toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
+    }
+  };
+
   const handleQuickJoinFriend = () => {
     const val = quickFriendId.trim();
-    if (!val || val.length < 2 || val.length > 32) {
+    if (!isValidId(val)) {
       if (val.length > 0) toast({ title: 'Invalid Friend ID', description: 'Must be 2–32 characters.', variant: 'destructive' });
       return;
     }
@@ -246,56 +164,221 @@ const HomeScreen: React.FC = () => {
     setQuickRoomCode('');
   };
 
+  const handleLeaveRoom = () => {
+    room.leaveRoom();
+    setInviteInput('');
+    setRoomModeDropdownOpen(false);
+    setTeamCountDropdownOpen(false);
+  };
 
-  const PlayCard = (
-    <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2">
-      <span className="section-label !mb-0">GAME MODE</span>
-      <div id="play-mode-toolbar" className="flex items-center gap-2">
-        <button
-          id="primary-launch-btn"
-          className="launch-btn flex-1 !py-2 !text-[10px] animate-pulse-glow"
-          onClick={() => {
-            if (room.isInRoom) {
-              toast({ title: 'Already in a room', description: 'Leave your current room or start the match from the room panel.', variant: 'destructive' });
-              return;
-            }
-            toast({ title: `Searching for ${currentMode.label}...`, description: 'Finding the best match for you.' });
-          }}
-        >
-          <Play className="w-3.5 h-3.5" /> START MATCH
-        </button>
-        <button
-          id="game-modes-toggle-btn"
-          className={`pill-btn !px-2 !py-2 gap-1.5 min-w-0 transition-transform ${modesOpen ? 'active' : ''}`}
-          onClick={() => setModesOpen(!modesOpen)}
-        >
-          {currentMode.icon}
-          <span className="font-orbitron text-[9px] font-bold tracking-wider truncate max-w-[100px]">{currentMode.label}</span>
-          <ChevronDown className={`w-3 h-3 shrink-0 transition-transform ${modesOpen ? 'rotate-180' : ''}`} />
-        </button>
-      </div>
-      {modesOpen && (
-        <div id="play-mode-options" className="grid grid-cols-2 gap-1.5 max-h-[120px] overflow-y-auto animate-fade-in-up" style={{ animationDuration: '0.2s' }}>
-          {GAME_MODES.map(mode => (
+  const handleInviteToRoom = (val: string) => {
+    const trimmed = val.trim();
+    if (!isValidId(trimmed)) return;
+    room.invitePlayer(trimmed);
+    setInviteInput('');
+  };
+
+  /* ═══════════════════════════════════════════
+     PARTY MEMBER ROW — shared between in-room and out-of-room
+     ═══════════════════════════════════════════ */
+  const PartyMemberRow: React.FC<{ m: typeof social.partyMembers[0]; compact?: boolean }> = ({ m, compact }) => {
+    const isInFriendsList = social.friends.some(f => f.name === m.name);
+    const isInRoom = room.players.some(p => p.name === m.name);
+    return (
+      <div className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
+        <div className="flex items-center gap-1.5 min-w-0">
+          {!isInFriendsList && !m.isLeader && (
             <button
-              key={mode.id}
-              id={mode.id === 'practice' ? 'practice-mode-btn' : `play-mode-${mode.id}-btn`}
-              className={`item-grid-btn !p-2 text-left !min-h-0 ${selectedMode === mode.id ? 'selected' : ''}`}
-              onClick={() => { setSelectedMode(mode.id); setModesOpen(false); }}
+              className="shrink-0 text-green-500 hover:text-green-400 transition-colors"
+              title="Add as friend"
+              onClick={() => social.addFriendDirect(m.name)}
             >
-              <div className="flex items-center gap-1.5 w-full">
-                <span className={selectedMode === mode.id ? 'text-primary' : ''}>{mode.icon}</span>
-                <span className="font-orbitron text-[9px] font-bold tracking-wider">{mode.label}</span>
-              </div>
+              <UserPlus className="w-3 h-3" />
             </button>
-          ))}
+          )}
+          <span className={`font-rajdhani font-semibold ${compact ? 'text-[11px]' : 'text-xs'} text-foreground truncate`}>{m.name}</span>
+          {m.isLeader && <span className={`font-orbitron text-primary tracking-wider shrink-0 ${compact ? 'text-[7px]' : 'text-[8px]'}`}>LEADER</span>}
         </div>
-      )}
+        {!m.isLeader && (
+          <div className="flex items-center gap-0.5 shrink-0">
+            {social.isPartyLeader && (
+              <button
+                className="pill-btn !px-1 !py-0.5 text-[8px]"
+                title="Make Leader"
+                onClick={() => social.transferLeader(m.name)}
+              >
+                <Crown className="w-2.5 h-2.5 text-primary" />
+              </button>
+            )}
+            {room.isInRoom && !isInRoom && (
+              <button
+                className={`pill-btn !px-1 !py-0.5 text-[8px] border-green-500/30 hover:bg-green-500/10 ${!social.canInviteToRoom ? 'opacity-50 cursor-not-allowed' : ''}`}
+                title={social.canInviteToRoom ? 'Invite to room' : 'Room is locked'}
+                onClick={() => { if (social.canInviteToRoom) { room.invitePlayer(m.name); toast({ title: `Invited ${m.name} to room` }); } }}
+                disabled={!social.canInviteToRoom}
+              >
+                <UserPlus className="w-2.5 h-2.5 text-green-500" />
+              </button>
+            )}
+            <button
+              className="pill-btn !px-1 !py-0.5 text-[8px] text-destructive border-destructive/30 hover:bg-destructive/10"
+              title="Remove from party"
+              onClick={() => social.kickFromParty(m.name)}
+            >
+              <UserMinus className="w-2.5 h-2.5" />
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /* ═══════════════════════════════════════════
+     FRIEND ROW — shared between in-room and out-of-room
+     ═══════════════════════════════════════════ */
+  const FriendRow: React.FC<{ f: typeof social.friends[0] }> = ({ f }) => (
+    <div
+      className={`flex items-center px-2 py-1.5 rounded-lg transition-colors cursor-pointer group ${
+        social.removeMode ? 'hover:bg-destructive/10 border border-transparent hover:border-destructive/20' : 'hover:bg-muted/30'
+      } ${social.confirmingFriend === f.name ? 'bg-destructive/10 border border-destructive/20' : ''}`}
+      onClick={() => { if (social.removeMode) social.startConfirm(f.name); }}
+    >
+      <div className="flex items-center gap-2">
+        <div className={`w-1.5 h-1.5 rounded-full ${
+          f.status === 'online' ? 'bg-green-400' :
+          f.status === 'away' ? 'bg-yellow-500' : 'bg-muted-foreground/40'
+        }`} />
+        <span className="font-rajdhani font-semibold text-xs text-foreground">{f.name}</span>
+        {social.confirmingFriend === f.name ? (
+          <ConfirmRemove
+            onConfirm={() => social.removeFriend(f.name)}
+            onCancel={social.cancelConfirm}
+          />
+        ) : (
+          <>
+            {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider ml-1">IN GAME</span>}
+            {!social.removeMode && (
+              <button
+                className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity ml-1"
+                title="Invite to party"
+                onClick={(e) => { e.stopPropagation(); social.inviteToParty(f.name); }}
+              >
+                <UserPlus className="w-2.5 h-2.5" />
+              </button>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 
+  /* ═══════════════════════════════════════════
+     PARTY PANEL — used in-room and out-of-room
+     ═══════════════════════════════════════════ */
+  const PartyPanel: React.FC<{ compact?: boolean; maxH?: string }> = ({ compact, maxH = '160px' }) => (
+    <div className="flex flex-col gap-1.5 min-h-0">
+      <div className="flex items-center justify-between gap-1.5">
+        <span className={`section-label flex items-center gap-1 !mb-0 ${compact ? '!text-[9px]' : ''} shrink-0`}>
+          <Users className="w-3 h-3 text-primary" /> {compact ? `PARTY (${social.partyMembers.length})` : 'YOUR PARTY'}
+        </span>
+        <div className="flex items-center gap-1 flex-1 min-w-0 justify-end">
+          {social.canInviteToRoom && compact && (
+            <div className="flex items-center gap-1 min-w-0">
+              <input
+                className="glass-input !py-0.5 !px-2 !text-[10px] min-w-0 w-24"
+                placeholder="Enter ID..."
+                maxLength={32}
+                value={inviteInput}
+                onChange={e => setInviteInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleInviteToRoom(inviteInput); }}
+              />
+              <button
+                className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 shrink-0 ${social.isInviteDisabled(inviteInput) ? 'opacity-50' : ''}`}
+                onClick={() => handleInviteToRoom(inviteInput)}
+                disabled={social.isInviteDisabled(inviteInput)}
+                title="Invite to Party"
+              >
+                <UserPlus className="w-2.5 h-2.5" />
+                <span className="hidden sm:inline">INVITE</span>
+              </button>
+            </div>
+          )}
+          {!social.isSolo && (
+            <button
+              className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 shrink-0"
+              onClick={social.leaveParty}
+            >
+              <LogOut className="w-2.5 h-2.5" />
+              <span className="hidden sm:inline">LEAVE</span>
+            </button>
+          )}
+        </div>
+      </div>
+      <InlineError message={social.inlineError?.key === 'party-invite' ? social.inlineError.message : null} onDismiss={social.clearError} />
+      <div className={`flex flex-col gap-0.5 overflow-y-auto`} style={{ maxHeight: maxH }}>
+        {social.partyMembers.map(m => (
+          <PartyMemberRow key={m.name} m={m} compact={compact} />
+        ))}
+      </div>
+    </div>
+  );
 
-  /* ─── Pending Invites ─── */
+  /* ═══════════════════════════════════════════
+     FRIENDS PANEL — used in-room and out-of-room
+     ═══════════════════════════════════════════ */
+  const FriendsPanel: React.FC<{ maxH?: string }> = ({ maxH = '200px' }) => (
+    <div className="flex flex-col gap-1.5 min-h-0">
+      <div className="flex items-center justify-between">
+        <span className="section-label flex items-center gap-1 !mb-0 !text-[9px]">
+          <Users className="w-3 h-3 text-primary" /> FRIENDS
+        </span>
+        <div className="flex items-center gap-1">
+          <input
+            className="glass-input !py-0.5 !px-2 !text-[10px] w-24 min-w-0"
+            placeholder="Enter ID..."
+            maxLength={32}
+            value={addFriendId}
+            onChange={e => setAddFriendId(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter') {
+                if (social.sendFriendRequest(addFriendId)) setAddFriendId('');
+              }
+            }}
+          />
+          <button
+            className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 ${social.isInviteDisabled(addFriendId) ? 'opacity-50' : ''}`}
+            onClick={() => { if (social.sendFriendRequest(addFriendId)) setAddFriendId(''); }}
+            disabled={social.isInviteDisabled(addFriendId)}
+            title="Add Friend"
+          >
+            <UserPlus className="w-2.5 h-2.5" />
+            <span className="hidden sm:inline">ADD</span>
+          </button>
+          <button
+            className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 ${social.removeMode ? 'active' : ''}`}
+            onClick={social.toggleRemoveMode}
+            title="Remove Friend"
+          >
+            <UserMinus className="w-2.5 h-2.5" />
+            <span className="hidden sm:inline">REMOVE</span>
+          </button>
+        </div>
+      </div>
+      <InlineError message={social.inlineError?.key === 'friend-add' ? social.inlineError.message : null} onDismiss={social.clearError} />
+      <div className="flex flex-col gap-0.5 overflow-y-auto" style={{ maxHeight: maxH }}>
+        {social.friends.length === 0 && (
+          <div className="text-center py-4 text-muted-foreground font-orbitron text-[9px] tracking-wider">
+            NO FRIENDS YET — ADD SOMEONE!
+          </div>
+        )}
+        {social.friends.map(f => <FriendRow key={f.name} f={f} />)}
+      </div>
+    </div>
+  );
+
+  /* ═══════════════════════════════════════════
+     PENDING INVITES
+     ═══════════════════════════════════════════ */
   const InviteBanner = room.pendingInvites.length > 0 ? (
     <div className="glass-card p-3 flex flex-col gap-2 border-primary/20 animate-fade-in-up max-h-[150px] overflow-y-auto" style={{ animationDuration: '0.2s' }}>
       <span className="section-label !mb-0 flex items-center gap-1.5">
@@ -326,7 +409,9 @@ const HomeScreen: React.FC = () => {
     </div>
   ) : null;
 
-  /* ─── Room Panel (inline in third column) ─── */
+  /* ═══════════════════════════════════════════
+     ROOM CARD (in-room) or GAME MODE + QUICK JOIN (not in room)
+     ═══════════════════════════════════════════ */
   const RoomCardContent = room.isInRoom ? (
     <div className="glass-card p-3 flex flex-col gap-2.5 flex-1 min-h-0">
       {/* Room header */}
@@ -435,17 +520,12 @@ const HomeScreen: React.FC = () => {
               <Lock className="w-2.5 h-2.5" />
             </span>
           ) : null}
-          <button className="pill-btn !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => {
-            room.leaveRoom();
-            setInviteInput('');
-            setInvitePartyOpen(false);
-            setRoomModeDropdownOpen(false);
-            setTeamCountDropdownOpen(false);
-          }} title="Leave Room">
+          <button className="pill-btn !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={handleLeaveRoom} title="Leave Room">
             <LogOut className="w-2.5 h-2.5" />
           </button>
+        </div>
       </div>
-    </div>
+
       {/* Player roster — full width */}
       <div className="flex flex-col gap-2 min-w-0 flex-1 min-h-0">
         {room.selectedPlayer && (
@@ -464,7 +544,7 @@ const HomeScreen: React.FC = () => {
                 </button>
               )}
               <span className="flex-1" />
-              {room.isCreator && !isSolo && (
+              {room.isCreator && !social.isSolo && (
                 <button className="pill-btn !px-1.5 !py-0.5 gap-1" onClick={room.inviteParty} title="Invite Party to Game">
                   <Users className="w-2.5 h-2.5" />
                   <span className="font-orbitron text-[8px] font-bold tracking-wider">INVITE PARTY TO GAME</span>
@@ -558,14 +638,7 @@ const HomeScreen: React.FC = () => {
             </div>
             <button
               className="launch-btn w-full !py-1.5 !text-[9px] gap-1 mt-2"
-              onClick={() => {
-                if (room.isCreator) {
-                  room.startMatch();
-                } else {
-                  room.toggleReady(actorId);
-                  toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
-                }
-              }}
+              onClick={handleStartOrReady}
             >
               <Play className="w-2.5 h-2.5" /> {room.isCreator ? 'START MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
             </button>
@@ -576,7 +649,7 @@ const HomeScreen: React.FC = () => {
             <span className="section-label flex items-center gap-1 !mb-1.5 w-full">
               <Users className="w-3 h-3 text-primary" /> PLAYERS ({room.players.length}/{MAX_PLAYERS})
               <span className="flex-1" />
-              {room.isCreator && !isSolo && (
+              {room.isCreator && !social.isSolo && (
                 <button className="pill-btn !px-1.5 !py-0.5 gap-1" onClick={room.inviteParty} title="Invite Party to Game">
                   <Users className="w-2.5 h-2.5" />
                   <span className="font-orbitron text-[8px] font-bold tracking-wider">INVITE PARTY TO GAME</span>
@@ -599,246 +672,18 @@ const HomeScreen: React.FC = () => {
             </div>
             <button
               className="launch-btn w-full !py-1.5 !text-[9px] gap-1 mt-2"
-              onClick={() => {
-                if (room.isCreator) {
-                  room.startMatch();
-                } else {
-                  room.toggleReady(actorId);
-                  toast({ title: room.readyPlayers.has(actorId) ? 'Unreadied' : 'Readied up!' });
-                }
-              }}
+              onClick={handleStartOrReady}
             >
               <Play className="w-2.5 h-2.5" /> {room.isCreator ? 'START MATCH' : (room.readyPlayers.has(actorId) ? 'UNREADY' : 'READY UP')}
             </button>
           </div>
         )}
       </div>
+
       {/* ─── Inline Party + Friends sub-panels ─── */}
-      <div ref={socialPanelRef} className={`grid gap-2.5 mt-1 ${isLoggedIn ? 'grid-cols-2' : 'grid-cols-1'}`}>
-          {/* Party panel */}
-          <div className="flex flex-col gap-1.5 min-h-0">
-            <div className="flex items-center justify-between gap-1.5">
-              <span className="section-label flex items-center gap-1 !mb-0 !text-[9px] shrink-0">
-                <Users className="w-3 h-3 text-primary" /> PARTY ({partyMembers.length})
-              </span>
-              <div className="flex items-center gap-1 flex-1 min-w-0 justify-end">
-                {(!room.isLocked || room.isCreator) && (
-                  <div className="flex items-center gap-1 min-w-0">
-                    
-                    <input
-                      className="glass-input !py-0.5 !px-2 !text-[10px] min-w-0 w-24"
-                      placeholder="Enter ID..."
-                      maxLength={32}
-                      value={inviteInput}
-                      onChange={e => setInviteInput(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          const val = inviteInput.trim();
-                          if (!val || val.length < 2) return;
-                          room.invitePlayer(val);
-                          setInviteInput('');
-                        }
-                      }}
-                    />
-                    <button
-                      className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 shrink-0 ${!inviteInput.trim() || inviteInput.trim().length < 2 ? 'opacity-50' : ''}`}
-                      onClick={() => {
-                        const val = inviteInput.trim();
-                        if (!val || val.length < 2) return;
-                        room.invitePlayer(val);
-                        setInviteInput('');
-                      }}
-                      title="Invite to Party"
-                    >
-                      <UserPlus className="w-2.5 h-2.5" />
-                      <span className="hidden sm:inline">INVITE</span>
-                    </button>
-                  </div>
-                )}
-                {!isSolo && (
-                  <button
-                    className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 shrink-0"
-                    onClick={() => { setPartyMembers([{ name: displayName, isLeader: true }]); toast({ title: 'Left party' }); }}
-                  >
-                    <LogOut className="w-2.5 h-2.5" />
-                    <span className="hidden sm:inline">LEAVE</span>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-0.5 max-h-[160px] overflow-y-auto">
-              {partyMembers.map(m => {
-                const isInFriendsList = friends.some(f => f.name === m.name);
-                const isInRoom = room.players.some(p => p.name === m.name);
-                return (
-                  <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      {!isInFriendsList && !m.isLeader ? (
-                        <button
-                          className="shrink-0 text-green-500 hover:text-green-400 transition-colors"
-                          title="Add as friend"
-                          onClick={() => {
-                            setFriends(prev => [...prev, { name: m.name, status: 'online', inGame: false }]);
-                            toast({ title: `Added ${m.name} as friend` });
-                          }}
-                        >
-                          <UserPlus className="w-3 h-3" />
-                        </button>
-                      ) : null}
-                      <span className="font-rajdhani font-semibold text-[11px] text-foreground truncate">{m.name}</span>
-                      {m.isLeader && <span className="text-[7px] font-orbitron text-primary tracking-wider shrink-0">LEADER</span>}
-                    </div>
-                    {!m.isLeader && (
-                      <div className="flex items-center gap-0.5 shrink-0">
-                        {isPartyLeader && (
-                          <button
-                            className="pill-btn !px-1 !py-0.5 text-[8px]"
-                            title="Make Leader"
-                            onClick={() => { transferLeader(m.name); toast({ title: `${m.name} is now party leader` }); }}
-                          >
-                            <Crown className="w-2.5 h-2.5 text-primary" />
-                          </button>
-                        )}
-                        {!isInRoom && (
-                          <button
-                            className="pill-btn !px-1 !py-0.5 text-[8px] border-green-500/30 hover:bg-green-500/10"
-                            title="Invite to room"
-                            onClick={() => { room.invitePlayer(m.name); toast({ title: `Invited ${m.name} to room` }); }}
-                          >
-                            <UserPlus className="w-2.5 h-2.5 text-green-500" />
-                          </button>
-                        )}
-                        <button
-                          className="pill-btn !px-1 !py-0.5 text-[8px] text-destructive border-destructive/30 hover:bg-destructive/10"
-                          title="Remove from party"
-                          onClick={() => { setPartyMembers(prev => prev.filter(p => p.name !== m.name)); toast({ title: `Kicked ${m.name}` }); }}
-                        >
-                          <UserMinus className="w-2.5 h-2.5" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Friends panel — logged in only */}
-          {isLoggedIn && <div className="flex flex-col gap-1.5 min-h-0">
-            <div className="flex items-center justify-between">
-              <span className="section-label flex items-center gap-1 !mb-0 !text-[9px]">
-                <Users className="w-3 h-3 text-primary" /> FRIENDS
-              </span>
-              <div className="flex items-center gap-1">
-                <input
-                  className="glass-input !py-0.5 !px-2 !text-[10px] w-24 min-w-0"
-                  placeholder="Enter ID..."
-                  value={addFriendId}
-                  onChange={e => setAddFriendId(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' && addFriendId.trim()) {
-                      toast({ title: 'Friend request sent', description: `Sent to ${addFriendId}` });
-                      setAddFriendId('');
-                    }
-                  }}
-                />
-                <button
-                  className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
-                  onClick={() => {
-                    if (!addFriendId.trim()) return;
-                    toast({ title: 'Friend request sent', description: `Sent to ${addFriendId}` });
-                    setAddFriendId('');
-                  }}
-                  title="Add Friend"
-                >
-                  <UserPlus className="w-2.5 h-2.5" />
-                  <span className="hidden sm:inline">ADD</span>
-                </button>
-                <button
-                  className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 ${removeMode ? 'active' : ''}`}
-                  onClick={() => { setRemoveMode(!removeMode); setConfirmingFriend(null); }}
-                  title="Remove Friend"
-                >
-                  <UserMinus className="w-2.5 h-2.5" />
-                  <span className="hidden sm:inline">REMOVE</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-0.5 max-h-[160px] overflow-y-auto">
-              {friends.length === 0 && (
-                <div className="text-center py-4 text-muted-foreground font-orbitron text-[9px] tracking-wider">
-                  NO FRIENDS YET — ADD SOMEONE!
-                </div>
-              )}
-              {friends.map(f => (
-                <div
-                  key={f.name}
-                  className={`flex items-center px-2 py-1.5 rounded-lg transition-colors cursor-pointer group ${
-                    removeMode ? 'hover:bg-destructive/10 border border-transparent hover:border-destructive/20' : 'hover:bg-muted/30'
-                  } ${confirmingFriend === f.name ? 'bg-destructive/10 border border-destructive/20' : ''}`}
-                  onClick={() => {
-                    if (removeMode) {
-                      setConfirmingFriend(confirmingFriend === f.name ? null : f.name);
-                    }
-                  }}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className={`w-1.5 h-1.5 rounded-full ${
-                      f.status === 'online' ? 'bg-green-400' :
-                      f.status === 'away' ? 'bg-yellow-500' : 'bg-muted-foreground/40'
-                    }`} />
-                    <span className="font-rajdhani font-semibold text-xs text-foreground">{f.name}</span>
-                    {confirmingFriend === f.name ? (
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[8px] font-orbitron text-destructive tracking-wider">REMOVE?</span>
-                        <button
-                          className="pill-btn !px-1.5 !py-0.5 text-[8px] text-destructive border-destructive/30 bg-destructive/10 hover:bg-destructive/20"
-                          onClick={(e) => { e.stopPropagation(); removeFriend(f.name); }}
-                        >
-                          YES
-                        </button>
-                        <button
-                          className="pill-btn !px-1.5 !py-0.5 text-[8px]"
-                          onClick={(e) => { e.stopPropagation(); setConfirmingFriend(null); }}
-                        >
-                          NO
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider ml-1">IN GAME</span>}
-                        {!removeMode && (
-                          <button
-                            className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity ml-1"
-                            title="Invite to party"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPartyMembers(prev => {
-                                if (prev.find(m => m.name === f.name)) {
-                                  toast({ title: `${f.name} is already in your party` });
-                                  return prev;
-                                }
-                                if (prev.length >= MAX_PLAYERS) {
-                                  toast({ title: 'Party full', variant: 'destructive' });
-                                  return prev;
-                                }
-                                toast({ title: `${f.name} joined your party` });
-                                return [...prev, { name: f.name, isLeader: false }];
-                              });
-                            }}
-                          >
-                            <UserPlus className="w-2.5 h-2.5" />
-                          </button>
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>}
+      <div ref={social.socialPanelRef} className={`grid gap-2.5 mt-1 ${isLoggedIn ? 'grid-cols-2' : 'grid-cols-1'}`}>
+        <PartyPanel compact maxH="160px" />
+        {isLoggedIn && <FriendsPanel maxH="160px" />}
       </div>
     </div>
   ) : (
@@ -910,15 +755,15 @@ const HomeScreen: React.FC = () => {
               onChange={e => setQuickFriendId(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleQuickJoinFriend(); }}
             />
-            <button className={`pill-btn !px-1.5 !py-1 ${!quickFriendId.trim() ? 'opacity-50' : ''}`} title="Invite to party" onClick={() => {
+            <button className={`pill-btn !px-1.5 !py-1 ${!isValidId(quickFriendId) ? 'opacity-50' : ''}`} title="Invite to party" onClick={() => {
               const val = quickFriendId.trim();
-              if (!val || val.length < 2 || val.length > 32) return;
+              if (!isValidId(val)) return;
               toast({ title: 'Invite sent', description: `Invited ${val}` });
               setQuickFriendId('');
-            }}>
+            }} disabled={!isValidId(quickFriendId)}>
               <UserPlus className="w-2.5 h-2.5" />
             </button>
-            <button className={`pill-btn !px-1.5 !py-1 ${!quickFriendId.trim() ? 'opacity-50' : ''}`} title="Join friend" onClick={handleQuickJoinFriend}>
+            <button className={`pill-btn !px-1.5 !py-1 ${!isValidId(quickFriendId) ? 'opacity-50' : ''}`} title="Join friend" onClick={handleQuickJoinFriend} disabled={!isValidId(quickFriendId)}>
               <ArrowRight className="w-2.5 h-2.5" />
             </button>
           </div>
@@ -931,7 +776,7 @@ const HomeScreen: React.FC = () => {
               onChange={e => setQuickRoomCode(e.target.value.toUpperCase())}
               onKeyDown={e => { if (e.key === 'Enter') handleQuickJoinRoom(); }}
             />
-            <button className={`pill-btn !px-1.5 !py-1 ${quickRoomCode.trim().length < 4 ? 'opacity-50' : ''}`} title="Join room" onClick={handleQuickJoinRoom}>
+            <button className={`pill-btn !px-1.5 !py-1 ${quickRoomCode.trim().length < 4 ? 'opacity-50' : ''}`} title="Join room" onClick={handleQuickJoinRoom} disabled={quickRoomCode.trim().length < 4}>
               <Globe className="w-2.5 h-2.5" />
             </button>
           </div>
@@ -940,208 +785,20 @@ const HomeScreen: React.FC = () => {
     </div>
   );
 
-  /* ─── Social Panel ─── */
+  /* ─── Social Panel (out-of-room) ─── */
   const SocialPanel = (
-    <div ref={socialPanelRef} className="glass-card p-3 sm:p-4 flex flex-col gap-2.5 overflow-y-auto min-h-0">
-
-      {/* Party — only show here when NOT in a room (party moves into room card) */}
-      {!isSolo && !room.isInRoom && (
-        <div id="menu-party-hero">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="section-label flex items-center gap-1 !mb-0">
-              <Users className="w-3 h-3 text-primary" /> YOUR PARTY
-            </span>
-            <button
-              id="party-hero-leave-btn"
-              className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
-              onClick={() => {
-                setPartyMembers([{ name: displayName, isLeader: true }]);
-                toast({ title: 'Left party' });
-              }}
-            >
-              <LogOut className="w-2.5 h-2.5" />
-              <span className="hidden sm:inline">LEAVE</span>
-            </button>
-          </div>
-          <div id="party-hero-members" className="flex flex-col gap-1 max-h-[120px] overflow-y-auto">
-            {partyMembers.map(m => (
-              <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
-                <div className="flex items-center gap-1.5">
-                  {!friends.some(f => f.name === m.name) && !m.isLeader ? (
-                    <button
-                      className="shrink-0 text-green-500 hover:text-green-400 transition-colors"
-                      title="Add as friend"
-                      onClick={() => {
-                        setFriends(prev => [...prev, { name: m.name, status: 'online', inGame: false }]);
-                        toast({ title: `Added ${m.name} as friend` });
-                      }}
-                    >
-                      <UserPlus className="w-3 h-3" />
-                    </button>
-                  ) : null}
-                  <span className="font-rajdhani font-semibold text-xs text-foreground">{m.name}</span>
-                  {m.isLeader && <span className="text-[8px] font-orbitron text-primary tracking-wider">LEADER</span>}
-                </div>
-                <div className="flex items-center gap-1">
-                  {!m.isLeader && partyMembers.find(p => p.isLeader)?.name === displayName && (
-                    <button
-                      className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
-                      title="Make Leader"
-                      onClick={() => {
-                        transferLeader(m.name);
-                        toast({ title: `${m.name} is now party leader` });
-                      }}
-                    >
-                      <Crown className="w-2.5 h-2.5 text-primary" />
-                    </button>
-                  )}
-                  {!m.isLeader && (
-                    <button
-                      className="pill-btn !px-1.5 !py-0.5 text-[8px] text-destructive border-destructive/30 hover:bg-destructive/10"
-                      title="Remove"
-                      onClick={() => {
-                        setPartyMembers(prev => prev.filter(p => p.name !== m.name));
-                        toast({ title: `Kicked ${m.name}`, description: 'Removed from party' });
-                      }}
-                    >
-                      <UserMinus className="w-2.5 h-2.5" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Friends List */}
-      {isLoggedIn && (
-        <div id="menu-social-friends-pane" className="flex-1 min-h-0">
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="section-label flex items-center gap-1 !mb-0">
-              <Users className="w-3 h-3 text-primary" /> FRIENDS
-            </span>
-            <div className="flex items-center gap-1">
-              <input
-                className="glass-input !py-0.5 !px-2 !text-[10px] w-24 min-w-0"
-                placeholder="Enter ID..."
-                value={addFriendId}
-                onChange={e => setAddFriendId(e.target.value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' && addFriendId.trim()) {
-                    toast({ title: 'Friend request sent', description: `Sent to ${addFriendId}` });
-                    setAddFriendId('');
-                  }
-                }}
-              />
-              <button
-                className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
-                onClick={() => {
-                  if (!addFriendId.trim()) return;
-                  toast({ title: 'Friend request sent', description: `Sent to ${addFriendId}` });
-                  setAddFriendId('');
-                }}
-                title="Add Friend"
-              >
-                <UserPlus className="w-2.5 h-2.5" />
-                <span className="hidden sm:inline">ADD</span>
-              </button>
-              <button
-                className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 ${removeMode ? 'active' : ''}`}
-                onClick={() => { setRemoveMode(!removeMode); setConfirmingFriend(null); }}
-                title="Remove Friend"
-              >
-                <UserMinus className="w-2.5 h-2.5" />
-                <span className="hidden sm:inline">REMOVE</span>
-              </button>
-            </div>
-          </div>
-
-          <div id="social-friends-list" className="flex flex-col gap-0.5 max-h-[200px] overflow-y-auto">
-          {friends.length === 0 && (
-            <div className="text-center py-4 text-muted-foreground font-orbitron text-[9px] tracking-wider">
-              NO FRIENDS YET — ADD SOMEONE!
-            </div>
-          )}
-          {friends.map(f => (
-              <div
-                key={f.name}
-                className={`flex items-center px-2 py-1.5 rounded-lg transition-colors cursor-pointer group ${
-                  removeMode ? 'hover:bg-destructive/10 border border-transparent hover:border-destructive/20' : 'hover:bg-muted/30'
-                } ${confirmingFriend === f.name ? 'bg-destructive/10 border border-destructive/20' : ''}`}
-                onClick={() => {
-                  if (removeMode) {
-                    setConfirmingFriend(confirmingFriend === f.name ? null : f.name);
-                  }
-                }}
-              >
-                <div className="flex items-center gap-2">
-                  <div className={`w-1.5 h-1.5 rounded-full ${
-                    f.status === 'online' ? 'bg-green-400' :
-                    f.status === 'away' ? 'bg-yellow-500' : 'bg-muted-foreground/40'
-                  }`} />
-                  <span className="font-rajdhani font-semibold text-xs text-foreground">{f.name}</span>
-                  {confirmingFriend === f.name ? (
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[8px] font-orbitron text-destructive tracking-wider">REMOVE?</span>
-                      <button
-                        className="pill-btn !px-1.5 !py-0.5 text-[8px] text-destructive border-destructive/30 bg-destructive/10 hover:bg-destructive/20"
-                        onClick={(e) => { e.stopPropagation(); removeFriend(f.name); }}
-                      >
-                        YES
-                      </button>
-                      <button
-                        className="pill-btn !px-1.5 !py-0.5 text-[8px]"
-                        onClick={(e) => { e.stopPropagation(); setConfirmingFriend(null); }}
-                      >
-                        NO
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      {f.inGame && <span className="text-[8px] font-orbitron text-primary tracking-wider ml-1">IN GAME</span>}
-                      {!removeMode && (
-                        <button
-                          className="pill-btn !px-1.5 !py-0.5 text-[8px] opacity-0 group-hover:opacity-100 transition-opacity ml-1"
-                          title="Invite to party"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPartyMembers(prev => {
-                              if (prev.find(m => m.name === f.name)) {
-                                toast({ title: `${f.name} is already in your party` });
-                                return prev;
-                              }
-                              if (prev.length >= MAX_PLAYERS) {
-                                toast({ title: 'Party full', description: `Maximum ${MAX_PLAYERS} members.`, variant: 'destructive' });
-                                return prev;
-                              }
-                              toast({ title: `${f.name} joined your party` });
-                              return [...prev, { name: f.name, isLeader: false }];
-                            });
-                          }}
-                        >
-                          <UserPlus className="w-2.5 h-2.5" />
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+    <div ref={social.socialPanelRef} className="glass-card p-3 sm:p-4 flex flex-col gap-2.5 overflow-y-auto min-h-0">
+      {!social.isSolo && !room.isInRoom && <PartyPanel maxH="120px" />}
+      {isLoggedIn && <FriendsPanel />}
     </div>
   );
 
   /* ═══════════════════════════════════════════
-     LAYOUT — conditional 2-col when room open
+     LAYOUT
      ═══════════════════════════════════════════ */
-
   return (
     <div className="flex flex-col gap-3 min-h-full flex-1">
       {InviteBanner}
-      {/* Main content area */}
       {room.isInRoom ? (
         <div className="flex flex-col flex-1 min-h-0">
           {RoomCardContent}

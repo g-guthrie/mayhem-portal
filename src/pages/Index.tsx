@@ -39,7 +39,7 @@ const OverlayShell: React.FC = () => {
       >
         {/* Dim overlay — sits between canvas (z-0) and menu (z-40) */}
         {showDimBackdrop && (
-          <div className="fixed inset-0 bg-background/60 backdrop-blur-sm pointer-events-none" />
+          <div className="fixed inset-0 bg-background/40 backdrop-blur-sm pointer-events-none" />
         )}
 
         {showMenuShell && (

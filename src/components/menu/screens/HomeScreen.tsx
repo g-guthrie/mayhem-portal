@@ -93,6 +93,19 @@ const HomeScreen: React.FC = () => {
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
 
+  /* Room mode dropdown */
+  const [roomModeDropdownOpen, setRoomModeDropdownOpen] = useState(false);
+  const modeDropdownRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (modeDropdownRef.current && !modeDropdownRef.current.contains(e.target as Node)) {
+        setRoomModeDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   /* Party state — sync leader name with displayName */
   const [partyMembers, setPartyMembers] = useState<{ name: string; isLeader: boolean }[]>([
     { name: displayName, isLeader: true },

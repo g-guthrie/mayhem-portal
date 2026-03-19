@@ -526,7 +526,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
     }, 300);
-  }, [initTeams]);
+  }, [initTeams, isInRoom, matchState]);
 
   const acceptInvite = useCallback((code: string) => {
     setPendingInvites(prev => prev.filter(i => i.roomCode !== code));

@@ -558,7 +558,64 @@ const HomeScreen: React.FC = () => {
 
       {/* 2-column: Players + Party */}
       <div className={`grid gap-2.5 ${!isSolo ? 'grid-cols-1 sm:grid-cols-[200px,1fr]' : ''}`}>
-        {/* Left: Player roster */}
+        {/* Left: Party panel inside room */}
+        {!isSolo && (
+          <div className="rounded-xl border border-border/20 bg-muted/5 p-2 flex flex-col gap-1.5">
+            <div className="flex items-center justify-between">
+              <span className="section-label flex items-center gap-1 !mb-0 !text-[9px]">
+                <Users className="w-3 h-3 text-primary" /> PARTY
+              </span>
+              <button
+                className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
+                onClick={() => { setPartyMembers([{ name: displayName, isLeader: true }]); toast({ title: 'Left party' }); }}
+              >
+                <LogOut className="w-2.5 h-2.5" />
+              </button>
+            </div>
+            <div className="flex flex-col gap-1 max-h-[250px] overflow-y-auto">
+              {partyMembers.map(m => (
+                <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
+                    <span className="font-rajdhani font-semibold text-[11px] text-foreground truncate">{m.name}</span>
+                    {m.isLeader && <span className="text-[7px] font-orbitron text-primary tracking-wider shrink-0">LEADER</span>}
+                  </div>
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    {!m.isLeader && isPartyLeader && (
+                      <button
+                        className="pill-btn !px-1 !py-0.5 text-[8px]"
+                        title="Make Leader"
+                        onClick={() => { transferLeader(m.name); toast({ title: `${m.name} is now party leader` }); }}
+                      >
+                        <Crown className="w-2.5 h-2.5 text-primary" />
+                      </button>
+                    )}
+                    {!m.isLeader && (
+                      <>
+                        <button
+                          className="pill-btn !px-1 !py-0.5 text-[8px] border-green-500/30 hover:bg-green-500/10"
+                          title="Invite to room"
+                          onClick={() => { room.invitePlayer(m.name); toast({ title: `Invited ${m.name} to room` }); }}
+                        >
+                          <UserPlus className="w-2.5 h-2.5 text-green-500" />
+                        </button>
+                        <button
+                          className="pill-btn !px-1 !py-0.5 text-[8px] text-destructive border-destructive/30 hover:bg-destructive/10"
+                          title="Remove from party"
+                          onClick={() => { setPartyMembers(prev => prev.filter(p => p.name !== m.name)); toast({ title: `Kicked ${m.name}` }); }}
+                        >
+                          <UserMinus className="w-2.5 h-2.5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Right: Player roster */}
         <div className="flex flex-col gap-2 min-w-0">
           {room.selectedPlayer && (
             <div className="text-[9px] font-orbitron text-primary tracking-wider text-center animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
@@ -680,63 +737,6 @@ const HomeScreen: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* Right: Party panel inside room */}
-        {!isSolo && (
-          <div className="rounded-xl border border-border/20 bg-muted/5 p-2 flex flex-col gap-1.5">
-            <div className="flex items-center justify-between">
-              <span className="section-label flex items-center gap-1 !mb-0 !text-[9px]">
-                <Users className="w-3 h-3 text-primary" /> PARTY
-              </span>
-              <button
-                className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
-                onClick={() => { setPartyMembers([{ name: displayName, isLeader: true }]); toast({ title: 'Left party' }); }}
-              >
-                <LogOut className="w-2.5 h-2.5" />
-              </button>
-            </div>
-            <div className="flex flex-col gap-1 max-h-[250px] overflow-y-auto">
-              {partyMembers.map(m => (
-                <div key={m.name} className="flex items-center justify-between px-2 py-1.5 rounded-lg bg-muted/20">
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-400 shrink-0" />
-                    <span className="font-rajdhani font-semibold text-[11px] text-foreground truncate">{m.name}</span>
-                    {m.isLeader && <span className="text-[7px] font-orbitron text-primary tracking-wider shrink-0">LEADER</span>}
-                  </div>
-                  <div className="flex items-center gap-0.5 shrink-0">
-                    {!m.isLeader && isPartyLeader && (
-                      <button
-                        className="pill-btn !px-1 !py-0.5 text-[8px]"
-                        title="Make Leader"
-                        onClick={() => { transferLeader(m.name); toast({ title: `${m.name} is now party leader` }); }}
-                      >
-                        <Crown className="w-2.5 h-2.5 text-primary" />
-                      </button>
-                    )}
-                    {!m.isLeader && (
-                      <>
-                        <button
-                          className="pill-btn !px-1 !py-0.5 text-[8px] border-green-500/30 hover:bg-green-500/10"
-                          title="Invite to room"
-                          onClick={() => { room.invitePlayer(m.name); toast({ title: `Invited ${m.name} to room` }); }}
-                        >
-                          <UserPlus className="w-2.5 h-2.5 text-green-500" />
-                        </button>
-                        <button
-                          className="pill-btn !px-1 !py-0.5 text-[8px] text-destructive border-destructive/30 hover:bg-destructive/10"
-                          title="Remove from party"
-                          onClick={() => { setPartyMembers(prev => prev.filter(p => p.name !== m.name)); toast({ title: `Kicked ${m.name}` }); }}
-                        >
-                          <UserMinus className="w-2.5 h-2.5" />
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Invite + Room Actions — all inline */}

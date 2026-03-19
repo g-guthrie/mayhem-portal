@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings, ChevronLeft, Copy, LogIn, User } from 'lucide-react';
+import { Settings, ChevronLeft, Copy, LogIn, User, Crosshair } from 'lucide-react';
 import { useMenuNav, type MenuScreen } from '@/hooks/useMenuNav';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
@@ -11,6 +11,7 @@ const SCREEN_TITLES: Record<MenuScreen, string> = {
   auth: 'ACCOUNT',
   manual: 'FIELD MANUAL',
   controls: 'CONTROLS',
+  loadout: 'LOADOUT',
 };
 
 interface MenuHeaderProps {

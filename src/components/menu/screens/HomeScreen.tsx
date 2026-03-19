@@ -622,11 +622,14 @@ const HomeScreen: React.FC = () => {
                     <input
                       className="glass-input !py-0.5 !px-2 !text-[10px] min-w-0 w-24"
                       placeholder="Enter ID..."
+                      maxLength={32}
                       value={inviteInput}
                       onChange={e => setInviteInput(e.target.value)}
                       onKeyDown={e => {
-                        if (e.key === 'Enter' && inviteInput.trim()) {
-                          room.invitePlayer(inviteInput.trim());
+                        if (e.key === 'Enter') {
+                          const val = inviteInput.trim();
+                          if (!val || val.length < 2) return;
+                          room.invitePlayer(val);
                           setInviteInput('');
                         }
                       }}

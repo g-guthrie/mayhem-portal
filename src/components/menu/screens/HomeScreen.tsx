@@ -589,7 +589,7 @@ const HomeScreen: React.FC = () => {
                 </button>
               )}
               <span className="flex-1" />
-              {room.isCreator && (
+              {room.isCreator && !isSolo && (
                 <button className="pill-btn !px-1.5 !py-0.5 gap-1" onClick={room.inviteParty} title="Invite Party to Game">
                   <Users className="w-2.5 h-2.5" />
                   <span className="font-orbitron text-[8px] font-bold tracking-wider">INVITE PARTY TO GAME</span>

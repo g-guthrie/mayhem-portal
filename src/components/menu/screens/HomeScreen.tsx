@@ -276,6 +276,14 @@ const HomeScreen: React.FC = () => {
           <button
             className="pill-btn active !px-2 !py-1.5 !text-[9px]"
             onClick={() => {
+              if (room.isInRoom) {
+                toast({ title: 'Already in a room', variant: 'destructive' });
+                setJoinConfirm(null);
+                return;
+              }
+              if (!isPartyLeader) {
+                setPartyMembers([{ name: displayName, isLeader: true }]);
+              }
               toast({ title: isPartyLeader ? 'Joining with party...' : 'Left party, joining friend...' });
               setJoinConfirm(null);
               setFriendId('');

@@ -350,6 +350,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       getRoomAdapter().leaveRoom().catch(() => {});
     }
     resetRoomState();
+    window.dispatchEvent(new Event('loadout:expand'));
   }, [resetRoomState]);
 
   /* ─── Kick Player ─── */

@@ -1107,32 +1107,15 @@ const HomeScreen: React.FC = () => {
     <div className="flex flex-col gap-3 min-h-full flex-1">
       {InviteBanner}
       {/* Main content area */}
-      <div className={
-        room.isInRoom
-          ? 'flex flex-col flex-1 min-h-0'
-          : showSocialPanel
-            ? 'grid gap-3 grid-cols-1 sm:grid-cols-2'
-            : 'flex justify-center'
-      }>
-        {room.isInRoom ? (
-          RoomCardContent
-        ) : (
-          <>
-            <div className={showSocialPanel ? '' : 'w-full max-w-md'}>
-              {RoomCardContent}
-            </div>
-            {showSocialPanel && SocialPanel}
-          </>
-        )}
-      </div>
-
-      {/* Social panel below — only when NOT in a room and not already shown in grid */}
-      {showSocialPanel && !room.isInRoom && false && (
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
-          <div className="sm:col-span-1">
-            {SocialPanel}
-          </div>
+      {room.isInRoom ? (
+        <div className="flex flex-col flex-1 min-h-0">
+          {RoomCardContent}
         </div>
+      ) : (
+        <>
+          {RoomCardContent}
+          {showSocialPanel && SocialPanel}
+        </>
       )}
     </div>
   );

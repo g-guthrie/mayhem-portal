@@ -591,7 +591,7 @@ const HomeScreen: React.FC = () => {
 
 
       {/* Player roster — full width */}
-      <div className="flex flex-col gap-2 min-w-0">
+      <div className="flex flex-col gap-2 min-w-0 flex-1 min-h-0">
         {room.selectedPlayer && (
           <div className="text-[9px] font-orbitron text-primary tracking-wider text-center animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
             TAP A TEAM TO ASSIGN {room.selectedPlayer.name.toUpperCase()}

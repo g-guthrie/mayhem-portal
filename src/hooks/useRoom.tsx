@@ -446,7 +446,10 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (prev <= 1) {
             if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
             countdownIntervalRef.current = null;
-            setTimeout(() => setMatchState('in-match'), 500);
+            countdownTransitionRef.current = setTimeout(() => {
+              countdownTransitionRef.current = null;
+              setMatchState('in-match');
+            }, 500);
             return 0;
           }
           return prev - 1;

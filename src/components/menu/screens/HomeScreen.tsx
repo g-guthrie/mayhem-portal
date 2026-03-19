@@ -95,7 +95,9 @@ const HomeScreen: React.FC = () => {
 
   /* Room mode dropdown */
   const [roomModeDropdownOpen, setRoomModeDropdownOpen] = useState(false);
+  const [teamCountDropdownOpen, setTeamCountDropdownOpen] = useState(false);
   const modeDropdownRef = useRef<HTMLDivElement>(null);
+  const teamDropdownRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (modeDropdownRef.current && !modeDropdownRef.current.contains(e.target as Node)) {

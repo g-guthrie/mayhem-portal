@@ -50,6 +50,12 @@ const LoadoutBand: React.FC = () => {
   const [selectedAbilities, setSelectedAbilities] = useState<[string, string]>(['choke', 'missile']);
   const [collapsed, setCollapsed] = useState(false);
 
+  useEffect(() => {
+    const handler = () => setCollapsed(true);
+    window.addEventListener('loadout:collapse', handler);
+    return () => window.removeEventListener('loadout:collapse', handler);
+  }, []);
+
   const handleWeaponSelect = (id: string) => {
     setSelectedWeapons(prev => {
       const next: [string, string] = [...prev] as [string, string];

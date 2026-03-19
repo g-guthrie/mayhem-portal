@@ -648,7 +648,8 @@ const HomeScreen: React.FC = () => {
                             <span className="font-rajdhani font-semibold text-[11px] text-foreground flex-1 truncate">{member.name}</span>
                             {member.isCreator && <Shield className="w-2.5 h-2.5 text-primary shrink-0" />}
                             {room.readyPlayers.has(member.id) && (
-                              <Check className="w-2.5 h-2.5 text-green-500 shrink-0" />}
+                              <Check className="w-2.5 h-2.5 text-green-500 shrink-0" />
+                            )}
                           </div>
                         );
                       })}

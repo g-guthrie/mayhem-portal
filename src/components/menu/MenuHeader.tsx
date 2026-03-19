@@ -80,7 +80,7 @@ const MenuHeader: React.FC = () => {
               }}
             >
               <span id="menu-party-id-label" className="text-muted-foreground group-hover:text-foreground transition-colors text-[10px]">
-                {isLoggedIn ? displayName : 'PLAYER ID'}
+                {isLoggedIn ? displayName : 'GUEST ID'}
               </span>
               <span id="menu-party-id-value" className="text-primary font-bold text-[10px] font-mono">{actorId?.slice(0, 12)}</span>
               <button

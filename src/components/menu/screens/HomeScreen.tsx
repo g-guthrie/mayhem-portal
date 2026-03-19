@@ -744,7 +744,7 @@ const HomeScreen: React.FC = () => {
         {(!room.isLocked || room.isCreator) && (
           <>
             <input
-              className="glass-input !py-1.5 !px-2 !text-xs min-w-0 w-28"
+              className="glass-input !py-1.5 !px-2 !text-xs min-w-0 flex-1"
               placeholder="Player..."
               value={inviteInput}
               onChange={e => setInviteInput(e.target.value)}
@@ -756,7 +756,7 @@ const HomeScreen: React.FC = () => {
               }}
             />
             <button
-              className="pill-btn !px-2 !py-1.5 !text-[9px] gap-1 whitespace-nowrap shrink-0"
+              className="pill-btn !px-2 !py-1.5 !text-[9px] gap-1 whitespace-nowrap flex-1"
               onClick={() => { if (inviteInput.trim()) { room.invitePlayer(inviteInput.trim()); setInviteInput(''); } }}
             >
               <UserPlus className="w-2.5 h-2.5" /> INVITE
@@ -764,7 +764,7 @@ const HomeScreen: React.FC = () => {
           </>
         )}
         {room.isCreator && (
-          <button className="pill-btn !py-1.5 !px-2 !text-[9px] gap-1 whitespace-nowrap shrink-0" onClick={room.inviteParty}>
+          <button className="pill-btn !py-1.5 !px-2 !text-[9px] gap-1 whitespace-nowrap flex-1" onClick={room.inviteParty}>
             <Users className="w-3 h-3" /> INVITE PARTY
           </button>
         )}

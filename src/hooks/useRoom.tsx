@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import { toast } from '@/hooks/use-toast';
+import { isUsingMocks, getRoomAdapter, type ServerRoomCallbacks } from '@/lib/server-adapter';
 
 /* ─── Constants ─── */
 export const MAX_PLAYERS = 16;
 const DISCONNECT_GRACE_MS = 60_000;
-const MATCH_DURATION_MS = 15_000; // Auto-end after 15s for demo
+const MOCK_MATCH_DURATION_MS = 15_000;
 
 export interface MatchStats {
   kills: number;
@@ -86,6 +87,7 @@ function generateRoomCode(): string {
   return Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
+/* ─── Mock players (dev only) ─── */
 const MOCK_PLAYERS: Omit<RoomPlayer, 'isCreator' | 'isReady'>[] = [
   { id: 'bot1', name: 'xVortex' },
   { id: 'bot2', name: 'NightOwl' },
@@ -108,7 +110,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [matchState, setMatchState] = useState<'idle' | 'ready-check' | 'countdown' | 'in-match' | 'post-match'>('idle');
   const [countdownValue, setCountdownValue] = useState(3);
   const [readyPlayers, setReadyPlayers] = useState<Set<string>>(new Set());
-  const [matchStats] = useState<MatchStats>({ kills: 7, deaths: 3, assists: 4 });
+  const [matchStats, setMatchStats] = useState<MatchStats>({ kills: 0, deaths: 0, assists: 0 });
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
   const [disconnectedPlayers, setDisconnectedPlayers] = useState<Map<string, DisconnectedPlayer>>(new Map());
   const [isPaused, setIsPaused] = useState(false);
@@ -117,17 +119,82 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const countdownTransitionRef = useRef<NodeJS.Timeout | null>(null);
 
-  /* ─── Auto-end match after duration ─── */
+  /* ─── Server adapter callbacks (real mode) ─── */
   useEffect(() => {
+    if (isUsingMocks()) return;
+    const callbacks: ServerRoomCallbacks = {
+      onPlayerJoin: (player) => {
+        setPlayers(prev => {
+          if (prev.find(p => p.id === player.id)) return prev;
+          return [...prev, player];
+        });
+      },
+      onPlayerLeave: (playerId) => {
+        setPlayers(prev => prev.filter(p => p.id !== playerId));
+      },
+      onPlayerReady: (playerId, ready) => {
+        setReadyPlayers(prev => {
+          const next = new Set(prev);
+          if (ready) next.add(playerId);
+          else next.delete(playerId);
+          return next;
+        });
+      },
+      onRoomUpdate: (info) => {
+        if (info.code !== undefined) setRoomCode(info.code);
+        if (info.mode !== undefined) setModeState(info.mode);
+        if (info.teamCount !== undefined) setTeamCountState(info.teamCount);
+        if (info.isLocked !== undefined) setIsLocked(info.isLocked);
+        if (info.isCreator !== undefined) setIsCreator(info.isCreator);
+        if (info.players !== undefined) setPlayers(info.players);
+        if (info.teams !== undefined) setTeams(info.teams);
+      },
+      onMatchStateChange: (state) => setMatchState(state),
+      onCountdown: (value) => setCountdownValue(value),
+      onMatchEnd: (result, stats) => {
+        setMatchResult(result);
+        setMatchStats(stats);
+        setMatchState('post-match');
+        setIsPaused(false);
+      },
+      onPlayerDisconnect: (playerId) => {
+        setPlayers(prev => {
+          const player = prev.find(p => p.id === playerId);
+          if (!player) return prev;
+          setDisconnectedPlayers(dp => {
+            const next = new Map(dp);
+            next.set(playerId, { player, disconnectedAt: Date.now(), remainingMs: DISCONNECT_GRACE_MS });
+            return next;
+          });
+          return prev;
+        });
+      },
+      onPlayerReconnect: (playerId) => {
+        setDisconnectedPlayers(dp => {
+          const next = new Map(dp);
+          next.delete(playerId);
+          return next;
+        });
+      },
+      onError: (msg) => {
+        toast({ title: 'Error', description: msg, variant: 'destructive' });
+      },
+    };
+    getRoomAdapter().registerCallbacks(callbacks);
+  }, []);
+
+  /* ─── Mock: auto-end match after duration ─── */
+  useEffect(() => {
+    if (!isUsingMocks()) return;
     if (matchState === 'in-match') {
       matchTimerRef.current = setTimeout(() => {
-        // Mock result: randomly winner or not
         const totalPlayers = players.length;
         const placement = Math.random() > 0.5 ? 1 : Math.floor(Math.random() * (totalPlayers - 1)) + 2;
         setMatchResult({ isWinner: placement === 1, placement, totalPlayers });
+        setMatchStats({ kills: Math.floor(Math.random() * 12), deaths: Math.floor(Math.random() * 6), assists: Math.floor(Math.random() * 8) });
         setMatchState('post-match');
         setIsPaused(false);
-      }, MATCH_DURATION_MS);
+      }, MOCK_MATCH_DURATION_MS);
       return () => {
         if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
       };
@@ -173,7 +240,46 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTeams(t);
   }, []);
 
+  const clearTimers = useCallback(() => {
+    if (matchTimerRef.current) { clearTimeout(matchTimerRef.current); matchTimerRef.current = null; }
+    if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
+    if (countdownTransitionRef.current) { clearTimeout(countdownTransitionRef.current); countdownTransitionRef.current = null; }
+  }, []);
+
+  const resetRoomState = useCallback(() => {
+    setIsInRoom(false);
+    setRoomCode('');
+    setPlayers([]);
+    setTeams({});
+    setIsCreator(false);
+    setMatchState('idle');
+    setSelectedPlayer(null);
+    setDisconnectedPlayers(new Map());
+    setIsPaused(false);
+    setMatchResult(null);
+    setReadyPlayers(new Set());
+    clearTimers();
+  }, [clearTimers]);
+
+  /* ─── Create Room ─── */
   const createRoom = useCallback((creatorName: string, creatorId: string) => {
+    if (!isUsingMocks()) {
+      getRoomAdapter().createRoom(creatorName, creatorId).then(info => {
+        setRoomCode(info.code);
+        setIsInRoom(true);
+        setIsCreator(info.isCreator);
+        setPlayers(info.players);
+        setTeams(info.teams);
+        setModeState(info.mode);
+        setIsLocked(info.isLocked);
+        setMatchState('idle');
+        setReadyPlayers(new Set());
+        setIsPaused(false);
+        setMatchResult(null);
+      }).catch(err => toast({ title: 'Failed to create room', description: String(err), variant: 'destructive' }));
+      return;
+    }
+    // Mock
     const code = generateRoomCode();
     const creator: RoomPlayer = { id: creatorId, name: creatorName, isCreator: true, isReady: false };
     setRoomCode(code);
@@ -191,29 +297,41 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initTeams([creator], 2);
   }, [initTeams]);
 
+  /* ─── Join Room ─── */
   const joinRoom = useCallback((code: string, playerName: string, playerId: string) => {
-    // Enforce room lock
-    if (isLocked) {
-      toast({ title: 'Room Locked', description: 'This room is locked and not accepting new players.', variant: 'destructive' });
-      return;
-    }
-
-    // Block joining during active match
     if (matchState !== 'idle') {
       toast({ title: 'Match in progress', description: 'Cannot join a room while a match is active.', variant: 'destructive' });
       return;
     }
-
+    if (!isUsingMocks()) {
+      getRoomAdapter().joinRoom(code, playerName, playerId).then(info => {
+        setRoomCode(info.code);
+        setIsInRoom(true);
+        setIsCreator(info.isCreator);
+        setPlayers(info.players);
+        setTeams(info.teams);
+        setModeState(info.mode);
+        setIsLocked(info.isLocked);
+        setMatchState('idle');
+        setReadyPlayers(new Set());
+        setIsPaused(false);
+        setMatchResult(null);
+      }).catch(err => toast({ title: 'Failed to join room', description: String(err), variant: 'destructive' }));
+      return;
+    }
+    // Mock
+    if (isLocked) {
+      toast({ title: 'Room Locked', description: 'This room is locked and not accepting new players.', variant: 'destructive' });
+      return;
+    }
     const joiner: RoomPlayer = { id: playerId, name: playerName, isCreator: false, isReady: false };
     const existingCreator: RoomPlayer = { id: 'host1', name: 'HostPlayer', isCreator: true, isReady: false };
     const mockExtra = MOCK_PLAYERS.slice(0, 2).map(p => ({ ...p, isCreator: false, isReady: false }));
     const all = [existingCreator, ...mockExtra, joiner];
-
     if (all.length > MAX_PLAYERS) {
       toast({ title: 'Room Full', description: `Maximum ${MAX_PLAYERS} players allowed.`, variant: 'destructive' });
       return;
     }
-
     setRoomCode(code.toUpperCase());
     setIsInRoom(true);
     setIsCreator(false);
@@ -226,81 +344,40 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initTeams(all, 2);
   }, [initTeams, isLocked, matchState]);
 
-  /* ─── Leave room with leadership transfer ─── */
+  /* ─── Leave Room ─── */
   const leaveRoom = useCallback(() => {
-    const currentPlayers = players;
-    const leavingCreator = isCreator;
-
-    if (currentPlayers.length > 1 && leavingCreator) {
-      // Transfer leadership: remove self, promote next player
-      const creatorId = currentPlayers.find(p => p.isCreator)?.id;
-      const remaining = currentPlayers.filter(p => !p.isCreator);
-      if (remaining.length > 0) {
-        remaining[0] = { ...remaining[0], isCreator: true };
-        const newCreatorId = remaining[0].id;
-        setPlayers(remaining);
-        setTeams(t => {
-          const updated: Record<number, RoomPlayer[]> = {};
-          Object.keys(t).forEach(k => {
-            updated[Number(k)] = t[Number(k)]
-              .filter(pl => pl.id !== creatorId)
-              .map(pl => pl.id === newCreatorId ? { ...pl, isCreator: true } : pl);
-          });
-          return updated;
-        });
-        // Only reset local user state, room persists for others
-        setIsInRoom(false);
-        setIsCreator(false);
-        setSelectedPlayer(null);
-        setIsPaused(false);
-        setMatchResult(null);
-        setMatchState('idle');
-        if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
-        if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
-        if (countdownTransitionRef.current) { clearTimeout(countdownTransitionRef.current); countdownTransitionRef.current = null; }
-        return;
-      }
+    if (!isUsingMocks()) {
+      getRoomAdapter().leaveRoom().catch(() => {});
     }
+    resetRoomState();
+  }, [resetRoomState]);
 
-    // Last player or non-creator: dissolve room entirely
-    setPlayers([]);
-    setIsInRoom(false);
-    setRoomCode('');
-    setTeams({});
-    setIsCreator(false);
-    setMatchState('idle');
-    setSelectedPlayer(null);
-    setDisconnectedPlayers(new Map());
-    setIsPaused(false);
-    setMatchResult(null);
-    if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
-    if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
-    if (countdownTransitionRef.current) { clearTimeout(countdownTransitionRef.current); countdownTransitionRef.current = null; }
-  }, [isCreator, players]);
-
-  /* ─── Kick player (also used for mock disconnect) ─── */
+  /* ─── Kick Player ─── */
   const kickPlayer = useCallback((playerId: string) => {
+    if (!isUsingMocks()) {
+      getRoomAdapter().kickPlayer(playerId).catch(() => {});
+      return;
+    }
     setPlayers(prev => {
       const player = prev.find(p => p.id === playerId);
       if (!player || player.isCreator) return prev;
-
       setDisconnectedPlayers(dp => {
         const next = new Map(dp);
-        next.set(playerId, {
-          player,
-          disconnectedAt: Date.now(),
-          remainingMs: DISCONNECT_GRACE_MS,
-        });
+        next.set(playerId, { player, disconnectedAt: Date.now(), remainingMs: DISCONNECT_GRACE_MS });
         return next;
       });
-
       return prev;
     });
   }, []);
 
-  const setMode = useCallback((m: RoomMode) => setModeState(m), []);
+  /* ─── Mode / Teams / Lock ─── */
+  const setMode = useCallback((m: RoomMode) => {
+    if (!isUsingMocks()) { getRoomAdapter().setMode(m).catch(() => {}); return; }
+    setModeState(m);
+  }, []);
 
   const setTeamCount = useCallback((count: number) => {
+    if (!isUsingMocks()) { getRoomAdapter().setTeamCount(count).catch(() => {}); return; }
     setTeamCountState(count);
     const all = Object.values(teams).flat();
     if (all.length > 0) {
@@ -311,9 +388,14 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [teams]);
 
-  const toggleLock = useCallback(() => setIsLocked(l => !l), []);
+  const toggleLock = useCallback(() => {
+    if (!isUsingMocks()) { getRoomAdapter().toggleLock().catch(() => {}); return; }
+    setIsLocked(l => !l);
+  }, []);
 
+  /* ─── Invite ─── */
   const inviteParty = useCallback(() => {
+    if (!isUsingMocks()) return; // Real mode: handled by server
     const toAdd = MOCK_PLAYERS.slice(0, 2).map(p => ({ ...p, isCreator: false, isReady: false }));
     setPlayers(prev => {
       const existing = new Set(prev.map(p => p.id));
@@ -344,49 +426,43 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [teams, teamCount]);
 
   const invitePlayer = useCallback((name: string) => {
+    if (!isUsingMocks()) {
+      getRoomAdapter().invitePlayer(name).catch(() => {});
+      return;
+    }
     if (isLocked) return;
     setPlayers(prev => {
       if (prev.length >= MAX_PLAYERS) {
         toast({ title: 'Room Full', description: `Maximum ${MAX_PLAYERS} players allowed.`, variant: 'destructive' });
         return prev;
       }
-      const newPlayer: RoomPlayer = {
-        id: `inv_${Date.now().toString(36)}`,
-        name,
-        isCreator: false,
-        isReady: false,
-      };
+      const newPlayer: RoomPlayer = { id: `inv_${Date.now().toString(36)}`, name, isCreator: false, isReady: false };
       setTeams(prevTeams => {
         let minTeam = 0;
         let minCount = Infinity;
         Object.entries(prevTeams).forEach(([idx, members]) => {
-          if (members.length < minCount) {
-            minCount = members.length;
-            minTeam = Number(idx);
-          }
+          if (members.length < minCount) { minCount = members.length; minTeam = Number(idx); }
         });
         return { ...prevTeams, [minTeam]: [...(prevTeams[minTeam] || []), newPlayer] };
       });
-
-      if (matchState === 'in-match') {
-        toast({ title: `${name} joined the match` });
-      }
-
+      if (matchState === 'in-match') toast({ title: `${name} joined the match` });
       return [...prev, newPlayer];
     });
   }, [isLocked, matchState]);
 
-  const selectPlayer = useCallback((player: RoomPlayer | null) => {
-    setSelectedPlayer(player);
-  }, []);
+  /* ─── Player selection & teams ─── */
+  const selectPlayer = useCallback((player: RoomPlayer | null) => setSelectedPlayer(player), []);
 
   const assignToTeam = useCallback((teamIdx: number) => {
     if (!selectedPlayer) return;
+    if (!isUsingMocks()) {
+      getRoomAdapter().movePlayer(selectedPlayer.id, -1, teamIdx).catch(() => {});
+      setSelectedPlayer(null);
+      return;
+    }
     setTeams(prev => {
       const next: Record<number, RoomPlayer[]> = {};
-      Object.keys(prev).forEach(k => {
-        next[Number(k)] = prev[Number(k)].filter(p => p.id !== selectedPlayer.id);
-      });
+      Object.keys(prev).forEach(k => { next[Number(k)] = prev[Number(k)].filter(p => p.id !== selectedPlayer.id); });
       next[teamIdx] = [...(next[teamIdx] || []), selectedPlayer];
       return next;
     });
@@ -395,6 +471,10 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const movePlayer = useCallback((playerId: string, fromTeam: number, toTeam: number) => {
     if (fromTeam === toTeam) return;
+    if (!isUsingMocks()) {
+      getRoomAdapter().movePlayer(playerId, fromTeam, toTeam).catch(() => {});
+      return;
+    }
     setTeams(prev => {
       const next = { ...prev };
       const src = [...(next[fromTeam] || [])];
@@ -410,6 +490,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const randomizeTeams = useCallback(() => {
+    if (!isUsingMocks()) { getRoomAdapter().randomizeTeams().catch(() => {}); return; }
     const all = Object.values(teams).flat();
     const shuffled = [...all].sort(() => Math.random() - 0.5);
     const t: Record<number, RoomPlayer[]> = {};
@@ -418,7 +499,9 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTeams(t);
   }, [teams, teamCount]);
 
+  /* ─── Ready / Start ─── */
   const toggleReady = useCallback((playerId: string) => {
+    if (!isUsingMocks()) { getRoomAdapter().toggleReady(playerId).catch(() => {}); return; }
     setReadyPlayers(prev => {
       const next = new Set(prev);
       if (next.has(playerId)) next.delete(playerId);
@@ -428,6 +511,11 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const startMatch = useCallback(() => {
+    if (!isUsingMocks()) {
+      getRoomAdapter().startMatch().catch(() => {});
+      return;
+    }
+    // Mock flow
     if (matchState === 'idle') {
       setMatchState('ready-check');
       setReadyPlayers(new Set());
@@ -439,7 +527,6 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
     } else if (matchState === 'ready-check') {
-      // Guard: clear any existing countdown
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
       setMatchState('countdown');
       setCountdownValue(3);
@@ -462,6 +549,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const togglePause = useCallback(() => {
     if (matchState === 'in-match') {
+      if (!isUsingMocks()) { getRoomAdapter().togglePause().catch(() => {}); }
       setIsPaused(p => !p);
     }
   }, [matchState]);
@@ -471,21 +559,21 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const totalPlayers = players.length;
       const placement = Math.random() > 0.5 ? 1 : Math.floor(Math.random() * (totalPlayers - 1)) + 2;
       setMatchResult({ isWinner: placement === 1, placement, totalPlayers });
+      setMatchStats({ kills: Math.floor(Math.random() * 12), deaths: Math.floor(Math.random() * 6), assists: Math.floor(Math.random() * 8) });
       setMatchState('post-match');
       setIsPaused(false);
-      if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
+      clearTimers();
     }
-  }, [matchState, players.length]);
+  }, [matchState, players.length, clearTimers]);
 
   const returnToLobby = useCallback(() => {
+    if (!isUsingMocks()) { getRoomAdapter().returnToLobby().catch(() => {}); }
     setMatchState('idle');
     setMatchResult(null);
     setReadyPlayers(new Set());
     setIsPaused(false);
-    if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
-    if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
-    if (countdownTransitionRef.current) { clearTimeout(countdownTransitionRef.current); countdownTransitionRef.current = null; }
-  }, []);
+    clearTimers();
+  }, [clearTimers]);
 
   const returnToMenu = useCallback(() => {
     leaveRoom();
@@ -502,12 +590,13 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       toast({ title: 'Match in progress', description: 'Wait for the current match to end.', variant: 'destructive' });
       return;
     }
+    if (!isUsingMocks()) {
+      // Real: server handles party→room creation
+      return;
+    }
     const code = generateRoomCode();
     const roomPlayers: RoomPlayer[] = partyMembers.map((m, i) => ({
-      id: m.id,
-      name: m.name,
-      isCreator: i === 0,
-      isReady: false,
+      id: m.id, name: m.name, isCreator: i === 0, isReady: false,
     }));
     setRoomCode(code);
     setIsInRoom(true);
@@ -537,8 +626,6 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const acceptInvite = useCallback((code: string) => {
     setPendingInvites(prev => prev.filter(i => i.roomCode !== code));
-    // Use a stable identity — callers should pass proper name/id via a wrapper
-    // For now, use a timestamp-based fallback; real integration will use auth context
     joinRoom(code, 'You', 'self_' + Date.now().toString(36));
   }, [joinRoom]);
 
@@ -547,6 +634,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const addMockInvite = useCallback(() => {
+    if (!isUsingMocks()) return;
     const from = MOCK_PLAYERS[Math.floor(Math.random() * MOCK_PLAYERS.length)].name;
     const code = generateRoomCode();
     setPendingInvites(prev => [...prev, { from, roomCode: code }]);

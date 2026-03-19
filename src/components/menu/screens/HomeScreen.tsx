@@ -676,7 +676,6 @@ const HomeScreen: React.FC = () => {
           </div>
         </div>
       )}
-      </div>
 
       {/* Invite controls */}
       {(!room.isLocked || room.isCreator) && (
@@ -701,7 +700,6 @@ const HomeScreen: React.FC = () => {
           </button>
         </div>
       )}
-      </div>
 
       {/* Room Actions */}
       <div className="flex gap-2 pt-1">

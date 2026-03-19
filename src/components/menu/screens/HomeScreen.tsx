@@ -204,8 +204,27 @@ const HomeScreen: React.FC = () => {
     window.dispatchEvent(new Event('loadout:collapse'));
   };
 
+  const handleQuickJoinFriend = () => {
+    if (!quickFriendId.trim()) return;
+    toast({ title: 'Joining friend...', description: quickFriendId });
+    setQuickFriendId('');
+  };
 
-  /* ─── Play Card ─── */
+  const handleQuickJoinRoom = () => {
+    if (quickRoomCode.trim().length < 4) return;
+    if (room.isInRoom) {
+      toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+      return;
+    }
+    if (isMatchActive) {
+      toast({ title: 'Match in progress', variant: 'destructive' });
+      return;
+    }
+    room.joinRoom(quickRoomCode.trim(), displayName, actorId);
+    setQuickRoomCode('');
+  };
+
+
   const PlayCard = (
     <div id="menu-home-hero" className="glass-card p-3 flex flex-col gap-2">
       <span className="section-label !mb-0">GAME MODE</span>

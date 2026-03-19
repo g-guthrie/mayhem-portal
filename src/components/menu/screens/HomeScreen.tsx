@@ -772,7 +772,8 @@ const HomeScreen: React.FC = () => {
             </div>
 
             {invitePartyOpen && (
-              <div className="flex gap-1.5 animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
+              <div className="flex gap-1.5 animate-fade-in-up items-center" style={{ animationDuration: '0.15s' }}>
+                <span className="pill-btn !px-2 !py-1 !text-[8px] cursor-default font-orbitron font-bold tracking-wider shrink-0">PLAYER ID</span>
                 <input
                   className="glass-input flex-1 !py-1 !px-2 !text-xs"
                   placeholder="Enter player ID..."

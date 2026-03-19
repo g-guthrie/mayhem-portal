@@ -168,10 +168,17 @@ const HomeScreen: React.FC = () => {
     }
   };
 
+  /* ─── Guards ─── */
+  const isMatchActive = room.matchState !== 'idle';
+
   /* ─── Create room ─── */
   const handleCreateRoom = () => {
     if (room.isInRoom) {
       toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+      return;
+    }
+    if (isMatchActive) {
+      toast({ title: 'Match in progress', description: 'Wait for the current match to end.', variant: 'destructive' });
       return;
     }
     room.createRoom(displayName, actorId);
@@ -182,6 +189,10 @@ const HomeScreen: React.FC = () => {
     if (roomCodeInput.trim().length < 4) return;
     if (room.isInRoom) {
       toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+      return;
+    }
+    if (isMatchActive) {
+      toast({ title: 'Match in progress', description: 'Wait for the current match to end.', variant: 'destructive' });
       return;
     }
     room.joinRoom(roomCodeInput.trim(), displayName, actorId);

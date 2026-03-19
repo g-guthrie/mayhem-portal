@@ -56,10 +56,6 @@ const HomeScreen: React.FC = () => {
   const [modesOpen, setModesOpen] = useState(false);
   const currentMode = GAME_MODES.find(m => m.id === selectedMode)!;
 
-  /* Quick join */
-  const [friendId, setFriendId] = useState('');
-  const [roomCodeInput, setRoomCodeInput] = useState('');
-
   /* Add/remove friend */
   const [addFriendOpen, setAddFriendOpen] = useState(false);
   const [addFriendId, setAddFriendId] = useState('');

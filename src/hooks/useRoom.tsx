@@ -487,6 +487,14 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   /* ─── Party → Match shortcut ─── */
   const startPartyMatch = useCallback((partyMembers: { id: string; name: string }[]) => {
     if (partyMembers.length === 0) return;
+    if (isInRoom) {
+      toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+      return;
+    }
+    if (matchState !== 'idle') {
+      toast({ title: 'Match in progress', description: 'Wait for the current match to end.', variant: 'destructive' });
+      return;
+    }
     const code = generateRoomCode();
     const roomPlayers: RoomPlayer[] = partyMembers.map((m, i) => ({
       id: m.id,

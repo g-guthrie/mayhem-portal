@@ -69,7 +69,7 @@ interface RoomState {
   randomizeTeams: () => void;
   startMatch: () => void;
   toggleReady: (playerId: string) => void;
-  acceptInvite: (roomCode: string) => void;
+  acceptInvite: (roomCode: string, playerName?: string, playerId?: string) => void;
   dismissInvite: (roomCode: string) => void;
   addMockInvite: () => void;
   togglePause: () => void;

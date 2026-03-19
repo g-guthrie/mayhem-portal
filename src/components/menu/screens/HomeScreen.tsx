@@ -324,9 +324,20 @@ const HomeScreen: React.FC = () => {
           <button
             className="pill-btn active !px-2 !py-1.5 !text-[9px]"
             onClick={() => {
+              if (room.isInRoom) {
+                toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+                setJoinConfirm(null);
+                return;
+              }
+              if (isMatchActive) {
+                toast({ title: 'Match in progress', variant: 'destructive' });
+                setJoinConfirm(null);
+                return;
+              }
               if (isPartyLeader) {
                 room.joinRoom(roomCodeInput.trim(), displayName, actorId);
               } else {
+                setPartyMembers([{ name: displayName, isLeader: true }]);
                 room.joinRoom(roomCodeInput.trim(), displayName, actorId);
               }
               toast({ title: isPartyLeader ? 'Joining room with party...' : 'Left party, joining room...' });

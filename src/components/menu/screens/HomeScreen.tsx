@@ -64,9 +64,12 @@ const HomeScreen: React.FC = () => {
   const [confirmingFriend, setConfirmingFriend] = useState<string | null>(null);
 
   const removeFriend = (name: string) => {
-    setFriends(prev => prev.filter(f => f.name !== name));
+    setFriends(prev => {
+      const next = prev.filter(f => f.name !== name);
+      if (next.length === 0) setRemoveMode(false);
+      return next;
+    });
     setConfirmingFriend(null);
-    if (friends.length <= 1) setRemoveMode(false);
   };
 
   /* Click outside to close add/remove */
@@ -216,13 +219,21 @@ const HomeScreen: React.FC = () => {
   };
 
   const handleQuickJoinFriend = () => {
-    if (!quickFriendId.trim()) return;
-    toast({ title: 'Joining friend...', description: quickFriendId });
+    const val = quickFriendId.trim();
+    if (!val || val.length < 2 || val.length > 32) {
+      if (val.length > 0) toast({ title: 'Invalid Friend ID', description: 'Must be 2–32 characters.', variant: 'destructive' });
+      return;
+    }
+    toast({ title: 'Joining friend...', description: val });
     setQuickFriendId('');
   };
 
   const handleQuickJoinRoom = () => {
-    if (quickRoomCode.trim().length < 4) return;
+    const val = quickRoomCode.trim().toUpperCase();
+    if (val.length < 4 || val.length > 8) {
+      if (val.length > 0) toast({ title: 'Invalid Room Code', description: 'Must be 4–8 characters.', variant: 'destructive' });
+      return;
+    }
     if (room.isInRoom) {
       toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
       return;
@@ -231,7 +242,7 @@ const HomeScreen: React.FC = () => {
       toast({ title: 'Match in progress', variant: 'destructive' });
       return;
     }
-    room.joinRoom(quickRoomCode.trim(), displayName, actorId);
+    room.joinRoom(val, displayName, actorId);
     setQuickRoomCode('');
   };
 
@@ -299,7 +310,7 @@ const HomeScreen: React.FC = () => {
           <div className="flex gap-1">
             <button
               className="pill-btn active !px-2 !py-1 !text-[8px]"
-              onClick={() => room.acceptInvite(inv.roomCode)}
+              onClick={() => room.acceptInvite(inv.roomCode, displayName, actorId)}
             >
               <Check className="w-2.5 h-2.5" /> JOIN
             </button>
@@ -424,7 +435,13 @@ const HomeScreen: React.FC = () => {
               <Lock className="w-2.5 h-2.5" />
             </span>
           ) : null}
-          <button className="pill-btn !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={room.leaveRoom} title="Leave Room">
+          <button className="pill-btn !px-1.5 !py-1 text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => {
+            room.leaveRoom();
+            setInviteInput('');
+            setInvitePartyOpen(false);
+            setRoomModeDropdownOpen(false);
+            setTeamCountDropdownOpen(false);
+          }} title="Leave Room">
             <LogOut className="w-2.5 h-2.5" />
           </button>
       </div>
@@ -611,20 +628,24 @@ const HomeScreen: React.FC = () => {
                     <input
                       className="glass-input !py-0.5 !px-2 !text-[10px] min-w-0 w-24"
                       placeholder="Enter ID..."
+                      maxLength={32}
                       value={inviteInput}
                       onChange={e => setInviteInput(e.target.value)}
                       onKeyDown={e => {
-                        if (e.key === 'Enter' && inviteInput.trim()) {
-                          room.invitePlayer(inviteInput.trim());
+                        if (e.key === 'Enter') {
+                          const val = inviteInput.trim();
+                          if (!val || val.length < 2) return;
+                          room.invitePlayer(val);
                           setInviteInput('');
                         }
                       }}
                     />
                     <button
-                      className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 shrink-0"
+                      className={`pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5 shrink-0 ${!inviteInput.trim() || inviteInput.trim().length < 2 ? 'opacity-50' : ''}`}
                       onClick={() => {
-                        if (!inviteInput.trim()) return;
-                        room.invitePlayer(inviteInput.trim());
+                        const val = inviteInput.trim();
+                        if (!val || val.length < 2) return;
+                        room.invitePlayer(val);
                         setInviteInput('');
                       }}
                       title="Invite to Party"
@@ -884,18 +905,20 @@ const HomeScreen: React.FC = () => {
             <input
               className="glass-input !py-1 !px-2 !text-[10px] flex-1 min-w-0"
               placeholder="Friend ID"
+              maxLength={32}
               value={quickFriendId}
               onChange={e => setQuickFriendId(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleQuickJoinFriend(); }}
             />
-            <button className="pill-btn !px-1.5 !py-1" title="Invite to party" onClick={() => {
-              if (!quickFriendId.trim()) return;
-              toast({ title: 'Invite sent', description: `Invited ${quickFriendId}` });
+            <button className={`pill-btn !px-1.5 !py-1 ${!quickFriendId.trim() ? 'opacity-50' : ''}`} title="Invite to party" onClick={() => {
+              const val = quickFriendId.trim();
+              if (!val || val.length < 2 || val.length > 32) return;
+              toast({ title: 'Invite sent', description: `Invited ${val}` });
               setQuickFriendId('');
             }}>
               <UserPlus className="w-2.5 h-2.5" />
             </button>
-            <button className="pill-btn !px-1.5 !py-1" title="Join friend" onClick={handleQuickJoinFriend}>
+            <button className={`pill-btn !px-1.5 !py-1 ${!quickFriendId.trim() ? 'opacity-50' : ''}`} title="Join friend" onClick={handleQuickJoinFriend}>
               <ArrowRight className="w-2.5 h-2.5" />
             </button>
           </div>
@@ -903,11 +926,12 @@ const HomeScreen: React.FC = () => {
             <input
               className="glass-input !py-1 !px-2 !text-[10px] flex-1 min-w-0"
               placeholder="Room Code"
+              maxLength={8}
               value={quickRoomCode}
-              onChange={e => setQuickRoomCode(e.target.value)}
+              onChange={e => setQuickRoomCode(e.target.value.toUpperCase())}
               onKeyDown={e => { if (e.key === 'Enter') handleQuickJoinRoom(); }}
             />
-            <button className="pill-btn !px-1.5 !py-1" title="Join room" onClick={handleQuickJoinRoom}>
+            <button className={`pill-btn !px-1.5 !py-1 ${quickRoomCode.trim().length < 4 ? 'opacity-50' : ''}`} title="Join room" onClick={handleQuickJoinRoom}>
               <Globe className="w-2.5 h-2.5" />
             </button>
           </div>

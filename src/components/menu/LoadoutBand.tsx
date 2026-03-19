@@ -91,6 +91,15 @@ const LoadoutBand: React.FC = () => {
     });
   };
 
+  // Reset throwable selection when switching to a category that doesn't contain the current selection
+  const handleThrowableCategoryChange = (cat: ThrowableCategory) => {
+    setThrowableCategory(cat);
+    const items = THROWABLES[cat];
+    if (!items.find(t => t.id === selectedThrowable)) {
+      setSelectedThrowable(items[0]?.id ?? '');
+    }
+  };
+
   const handleAbilitySelect = (id: string) => {
     setSelectedAbilities(prev => {
       const next: [string, string] = [...prev] as [string, string];
@@ -193,7 +202,7 @@ const LoadoutBand: React.FC = () => {
                       className={`slot-btn flex-1 ${throwableCategory === cat.id ? 'active' : ''}`}
                       data-cat-id={cat.id}
                       style={throwableCategory === cat.id ? { background: 'hsl(var(--loadout-tactical))', color: 'white', boxShadow: '0 0 15px hsl(var(--loadout-tactical) / 0.3)' } : {}}
-                      onClick={() => setThrowableCategory(cat.id)}
+                      onClick={() => handleThrowableCategoryChange(cat.id)}
                     >
                       {cat.label}
                     </button>

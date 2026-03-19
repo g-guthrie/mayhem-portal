@@ -27,10 +27,13 @@ const SocialScreen: React.FC = () => {
   ]);
 
   const removeFriend = (name: string) => {
-    setFriends(prev => prev.filter(f => f.name !== name));
+    setFriends(prev => {
+      const next = prev.filter(f => f.name !== name);
+      if (next.length === 0) setRemoveMode(false);
+      return next;
+    });
     setConfirmingFriend(null);
     toast({ title: `Removed ${name}` });
-    if (friends.length <= 1) setRemoveMode(false);
   };
 
   const isSolo = partyMembers.length <= 1;

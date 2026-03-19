@@ -33,9 +33,15 @@ const ControlsScreen: React.FC = () => {
       if (e.key === 'Escape') {
         setRebinding(null);
       } else {
+        const newKey = e.key.length === 1 ? e.key.toUpperCase() : e.key;
         setBindings(prev => {
           const next = [...prev];
-          next[idx] = { ...next[idx], key: e.key.length === 1 ? e.key.toUpperCase() : e.key };
+          // Check for duplicate — swap if another action already uses this key
+          const dupeIdx = next.findIndex((b, i) => i !== idx && b.key === newKey);
+          if (dupeIdx !== -1) {
+            next[dupeIdx] = { ...next[dupeIdx], key: next[idx].key };
+          }
+          next[idx] = { ...next[idx], key: newKey };
           return next;
         });
         setRebinding(null);

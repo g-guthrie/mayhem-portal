@@ -45,7 +45,7 @@ const ManualScreen: React.FC = () => {
           <div className="flex flex-col gap-2">
             <h3 className="font-orbitron text-sm font-bold text-primary">ARSENAL</h3>
             {['Machine Gun', 'Shotgun', 'Rifle', 'Pistol', 'Sniper'].map(w => (
-              <div key={w} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/20 cursor-pointer transition-colors">
+              <div key={w} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/20 transition-colors">
                 <Crosshair className="w-4 h-4 text-primary" />
                 <span className="font-rajdhani font-semibold text-sm">{w}</span>
               </div>
@@ -56,7 +56,7 @@ const ManualScreen: React.FC = () => {
           <div className="flex flex-col gap-2">
             <h3 className="font-orbitron text-sm font-bold text-primary">ABILITIES</h3>
             {['Vader Choke', 'Chain Hook', 'Heal', 'Missile', 'Deadeye'].map(a => (
-              <div key={a} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/20 cursor-pointer transition-colors">
+              <div key={a} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/20 transition-colors">
                 <Zap className="w-4 h-4 text-primary" />
                 <span className="font-rajdhani font-semibold text-sm">{a}</span>
               </div>
@@ -67,7 +67,7 @@ const ManualScreen: React.FC = () => {
           <div className="flex flex-col gap-2">
             <h3 className="font-orbitron text-sm font-bold text-primary">THROWABLES</h3>
             {['Frag Grenade', 'Plasma Grenade', 'Molotov', 'Knife'].map(t => (
-              <div key={t} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/20 cursor-pointer transition-colors">
+              <div key={t} className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/20 transition-colors">
                 <Bomb className="w-4 h-4 text-primary" />
                 <span className="font-rajdhani font-semibold text-sm">{t}</span>
               </div>

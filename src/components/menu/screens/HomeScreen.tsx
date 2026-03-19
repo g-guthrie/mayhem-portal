@@ -573,7 +573,7 @@ const HomeScreen: React.FC = () => {
             room.teamCount === 2 ? 'grid-cols-2' :
             room.teamCount === 3 ? 'grid-cols-3' :
             'grid-cols-2'
-          }`} style={{ maxHeight: room.teamCount <= 2 ? '200px' : '280px' }}>
+          }`} style={{ maxHeight: room.teamCount <= 2 ? '200px' : '280px', overflowY: 'auto' }}>
             {Array.from({ length: room.teamCount }).map((_, tIdx) => {
               const isDropTarget = dragOverTeam === tIdx;
               const isAssignTarget = room.selectedPlayer != null;
@@ -704,7 +704,7 @@ const HomeScreen: React.FC = () => {
       {/* Room Actions */}
       <div className="flex gap-2 pt-1">
         {room.isCreator && (
-          <button className="pill-btn flex-1 justify-center !py-2 !text-[9px] gap-1" onClick={room.inviteParty}>
+          <button className="pill-btn justify-center !py-2 !px-3 !text-[9px] gap-1 shrink-0" onClick={room.inviteParty}>
             <Users className="w-3 h-3" /> INVITE PARTY
           </button>
         )}

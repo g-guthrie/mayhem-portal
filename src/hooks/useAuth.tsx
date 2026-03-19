@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { isUsingMocks, getAuthAdapter } from '@/lib/server-adapter';
 
 /* ─── Guest ID generation ─── */
 const ADJECTIVES = ['amber', 'crimson', 'shadow', 'iron', 'neon', 'frost', 'ghost', 'void', 'solar', 'cyber'];
@@ -31,9 +32,9 @@ interface AuthState {
   user: AuthUser | null;
   actorId: string;
   displayName: string;
-  login: (username: string) => void;
+  login: (username: string, pin?: string) => void;
   logout: () => void;
-  /** Dev toggle for testing */
+  /** Dev toggle for testing (mock mode only) */
   toggleAuth: () => void;
 }
 
@@ -54,13 +55,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const actorId = isLoggedIn && user ? user.id : guestId;
   const displayName = isLoggedIn && user ? user.displayName : guestId;
 
-  const login = useCallback((username: string) => {
-    const u: AuthUser = { id: `usr_${Date.now().toString(36)}`, username, displayName: username };
-    setUser(u);
-    setIsLoggedIn(true);
+  // Restore session on mount (real mode only)
+  useEffect(() => {
+    if (isUsingMocks()) return;
+    getAuthAdapter().restoreSession().then(u => {
+      if (u) {
+        setUser(u);
+        setIsLoggedIn(true);
+      }
+    }).catch(() => { /* no session */ });
+  }, []);
+
+  const login = useCallback((username: string, pin?: string) => {
+    if (isUsingMocks()) {
+      // Mock: instant login
+      const u: AuthUser = { id: `usr_${Date.now().toString(36)}`, username, displayName: username };
+      setUser(u);
+      setIsLoggedIn(true);
+      return;
+    }
+    // Real: call server adapter
+    getAuthAdapter().login(username, pin || '').then(u => {
+      setUser(u);
+      setIsLoggedIn(true);
+    }).catch(err => {
+      console.error('[Auth] Login failed:', err);
+    });
   }, []);
 
   const logout = useCallback(() => {
+    if (!isUsingMocks()) {
+      getAuthAdapter().logout().catch(() => {});
+    }
     setUser(null);
     setIsLoggedIn(false);
   }, []);

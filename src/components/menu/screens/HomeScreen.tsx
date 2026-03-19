@@ -547,11 +547,6 @@ const HomeScreen: React.FC = () => {
         </div>
         <div className="flex items-center gap-1.5">
           {room.isCreator && (
-            <button className="pill-btn !py-1 !px-2 !text-[9px] gap-1 whitespace-nowrap" onClick={room.inviteParty}>
-              <Users className="w-2.5 h-2.5" /> INVITE PARTY
-            </button>
-          )}
-          {room.isCreator && (
             <span className="font-orbitron text-[7px] text-primary tracking-wider px-1.5 py-0.5 rounded-md bg-primary/10 border border-primary/20">
               <Shield className="w-2 h-2 inline mr-0.5" />HOST
             </span>

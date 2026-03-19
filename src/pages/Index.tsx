@@ -2,6 +2,7 @@ import React from 'react';
 import { MenuNavProvider } from '@/hooks/useMenuNav';
 import { AuthProvider } from '@/hooks/useAuth';
 import { RoomProvider, useRoom } from '@/hooks/useRoom';
+import { SocialProvider } from '@/hooks/useSocial';
 import MenuHeader from '@/components/menu/MenuHeader';
 import ScreenRouter from '@/components/menu/ScreenRouter';
 import LoadoutBand from '@/components/menu/LoadoutBand';
@@ -10,21 +11,11 @@ import { GameBridgeSync } from '@/components/menu/GameBridgeSync';
 
 /**
  * Overlay wrapper that toggles pointer-events based on match state.
- * During active unpaused gameplay, the overlay becomes transparent to input
- * so mouse/keyboard passes through to the Three.js canvas beneath.
  */
 const OverlayShell: React.FC = () => {
   const { matchState, isPaused } = useRoom();
 
-  // Overlay is interactive (blocks canvas input) when:
-  // - Not in a match (menu is showing)
-  // - In a match but paused (pause menu is showing)
-  // - In post-match (results screen)
-  // - In ready-check or countdown (overlay UI is active)
   const isOverlayInteractive = matchState !== 'in-match' || isPaused;
-
-  // During active gameplay (in-match, not paused), hide the menu shell entirely
-  // and only show the match overlay HUD
   const showMenuShell = matchState !== 'in-match' && matchState !== 'post-match';
   const showDimBackdrop = matchState !== 'in-match' || isPaused;
 
@@ -32,7 +23,6 @@ const OverlayShell: React.FC = () => {
     <>
       <GameBridgeSync />
 
-      {/* Simulated game canvas background */}
       <div
         className="fixed inset-0 z-0"
         style={{
@@ -47,7 +37,6 @@ const OverlayShell: React.FC = () => {
         className="fixed inset-0 z-40 grid place-items-center p-3 sm:p-5"
         style={{ pointerEvents: isOverlayInteractive ? 'auto' : 'none' }}
       >
-        {/* Dim overlay — sits between canvas (z-0) and menu (z-40) */}
         {showDimBackdrop && (
           <div className="fixed inset-0 bg-background/40 backdrop-blur-sm pointer-events-none" />
         )}
@@ -88,9 +77,11 @@ const Index: React.FC = () => {
   return (
     <AuthProvider>
     <RoomProvider>
+    <SocialProvider>
     <MenuNavProvider>
       <OverlayShell />
     </MenuNavProvider>
+    </SocialProvider>
     </RoomProvider>
     </AuthProvider>
   );

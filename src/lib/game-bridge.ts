@@ -7,6 +7,7 @@
 export type GameEvent =
   | 'match-start'
   | 'match-end'
+  | 'match-cancelled'
   | 'pause'
   | 'unpause'
   | 'player-join'

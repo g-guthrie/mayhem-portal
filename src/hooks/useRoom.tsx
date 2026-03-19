@@ -115,6 +115,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const disconnectTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
   const matchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownTransitionRef = useRef<NodeJS.Timeout | null>(null);
 
   /* ─── Auto-end match after duration ─── */
   useEffect(() => {
@@ -197,6 +198,12 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    // Block joining during active match
+    if (matchState !== 'idle') {
+      toast({ title: 'Match in progress', description: 'Cannot join a room while a match is active.', variant: 'destructive' });
+      return;
+    }
+
     const joiner: RoomPlayer = { id: playerId, name: playerName, isCreator: false, isReady: false };
     const existingCreator: RoomPlayer = { id: 'host1', name: 'HostPlayer', isCreator: true, isReady: false };
     const mockExtra = MOCK_PLAYERS.slice(0, 2).map(p => ({ ...p, isCreator: false, isReady: false }));
@@ -217,7 +224,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsPaused(false);
     setMatchResult(null);
     initTeams(all, 2);
-  }, [initTeams, isLocked]);
+  }, [initTeams, isLocked, matchState]);
 
   /* ─── Leave room with leadership transfer ─── */
   const leaveRoom = useCallback(() => {
@@ -250,6 +257,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setMatchState('idle');
         if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
         if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
+        if (countdownTransitionRef.current) { clearTimeout(countdownTransitionRef.current); countdownTransitionRef.current = null; }
         return;
       }
     }
@@ -267,6 +275,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setMatchResult(null);
     if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
     if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
+    if (countdownTransitionRef.current) { clearTimeout(countdownTransitionRef.current); countdownTransitionRef.current = null; }
   }, [isCreator, players]);
 
   /* ─── Kick player (also used for mock disconnect) ─── */
@@ -439,7 +448,10 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (prev <= 1) {
             if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
             countdownIntervalRef.current = null;
-            setTimeout(() => setMatchState('in-match'), 500);
+            countdownTransitionRef.current = setTimeout(() => {
+              countdownTransitionRef.current = null;
+              setMatchState('in-match');
+            }, 500);
             return 0;
           }
           return prev - 1;
@@ -472,6 +484,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsPaused(false);
     if (matchTimerRef.current) clearTimeout(matchTimerRef.current);
     if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
+    if (countdownTransitionRef.current) { clearTimeout(countdownTransitionRef.current); countdownTransitionRef.current = null; }
   }, []);
 
   const returnToMenu = useCallback(() => {
@@ -481,6 +494,14 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
   /* ─── Party → Match shortcut ─── */
   const startPartyMatch = useCallback((partyMembers: { id: string; name: string }[]) => {
     if (partyMembers.length === 0) return;
+    if (isInRoom) {
+      toast({ title: 'Already in a room', description: 'Leave your current room first.', variant: 'destructive' });
+      return;
+    }
+    if (matchState !== 'idle') {
+      toast({ title: 'Match in progress', description: 'Wait for the current match to end.', variant: 'destructive' });
+      return;
+    }
     const code = generateRoomCode();
     const roomPlayers: RoomPlayer[] = partyMembers.map((m, i) => ({
       id: m.id,
@@ -512,10 +533,12 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       });
     }, 300);
-  }, [initTeams]);
+  }, [initTeams, isInRoom, matchState]);
 
   const acceptInvite = useCallback((code: string) => {
     setPendingInvites(prev => prev.filter(i => i.roomCode !== code));
+    // Use a stable identity — callers should pass proper name/id via a wrapper
+    // For now, use a timestamp-based fallback; real integration will use auth context
     joinRoom(code, 'You', 'self_' + Date.now().toString(36));
   }, [joinRoom]);
 

@@ -11,15 +11,18 @@ const MatchOverlay: React.FC = () => {
   const { actorId } = useAuth();
   const menuNav = useMenuNav();
 
-  // ESC key to toggle pause during match
+  // ESC key to toggle pause during match (only when not already paused — PauseMenu handles its own ESC)
   useEffect(() => {
     if (matchState !== 'in-match') return;
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !isPaused) {
-        togglePause();
+      if (e.key === 'Escape') {
+        if (!isPaused) {
+          togglePause();
+        }
+        // When paused, PauseMenu's own ESC handler takes over
       }
     };
-    window.addEventListener('keydown', handleKey);
+    window.addEventListener('keydown', handleKey, { capture: false });
     return () => window.removeEventListener('keydown', handleKey);
   }, [matchState, isPaused, togglePause]);
 

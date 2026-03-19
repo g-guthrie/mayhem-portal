@@ -13,10 +13,11 @@ const SettingsScreen: React.FC = () => {
       label: isLoggedIn ? 'PROFILE' : 'LOGIN',
       icon: isLoggedIn ? <User className="w-4 h-4" /> : <LogIn className="w-4 h-4" />,
       action: () => push('auth'),
+      disabled: false,
     },
-    { id: 'controls', label: 'CONTROLS', icon: <Gamepad2 className="w-4 h-4" />, action: () => push('controls') },
-    { id: 'sound', label: 'SOUND', icon: <Volume2 className="w-4 h-4" />, action: undefined },
-    { id: 'manual', label: 'INSTRUCTIONS', icon: <BookOpen className="w-4 h-4" />, action: () => push('manual') },
+    { id: 'controls', label: 'CONTROLS', icon: <Gamepad2 className="w-4 h-4" />, action: () => push('controls'), disabled: false },
+    { id: 'sound', label: 'SOUND', icon: <Volume2 className="w-4 h-4" />, action: undefined, disabled: true, sublabel: 'COMING SOON' },
+    { id: 'manual', label: 'INSTRUCTIONS', icon: <BookOpen className="w-4 h-4" />, action: () => push('manual'), disabled: false },
   ];
 
   return (

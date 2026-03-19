@@ -764,7 +764,7 @@ const HomeScreen: React.FC = () => {
           </>
         )}
         {room.isCreator && (
-          <button className="pill-btn !py-1.5 !px-2 !text-[9px] gap-1 whitespace-nowrap shrink-0" onClick={room.inviteParty}>
+          <button className="pill-btn !py-1.5 !px-2 !text-[9px] gap-1 whitespace-nowrap flex-1" onClick={room.inviteParty}>
             <Users className="w-3 h-3" /> INVITE PARTY
           </button>
         )}

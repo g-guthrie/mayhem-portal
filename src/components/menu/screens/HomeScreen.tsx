@@ -200,6 +200,7 @@ const HomeScreen: React.FC = () => {
       return;
     }
     room.createRoom(displayName, actorId);
+    window.dispatchEvent(new Event('loadout:collapse'));
   };
 
   /* ─── Join room by code ─── */

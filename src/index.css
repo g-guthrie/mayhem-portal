@@ -15,7 +15,7 @@
     --background: 210 40% 96%;
     --foreground: 220 20% 18%;
 
-    --primary: 142 70% 45%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 20% 93%;
@@ -24,7 +24,7 @@
     --muted: 210 15% 90%;
     --muted-foreground: 220 10% 45%;
 
-    --accent: 142 70% 45%;
+    --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
 
     --card: 0 0% 100%;
@@ -38,7 +38,7 @@
 
     --border: 220 13% 87%;
     --input: 220 13% 87%;
-    --ring: 142 70% 45%;
+    --ring: 217 91% 60%;
 
     --radius: 0.75rem;
 
@@ -48,7 +48,7 @@
     --radius-lg: 18px;
     --radius-md: 12px;
     --shadow-lift: 0 20px 60px rgba(0,0,0,0.08), 0 0 0 1px hsl(var(--glass-border));
-    --shadow-glow: 0 0 20px hsl(142 70% 45% / 0.12);
+    --shadow-glow: 0 0 20px hsl(217 91% 60% / 0.12);
     --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
     --tempo: 300ms;
 

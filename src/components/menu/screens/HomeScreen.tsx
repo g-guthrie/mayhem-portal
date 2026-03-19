@@ -578,24 +578,29 @@ const HomeScreen: React.FC = () => {
               const isDropTarget = dragOverTeam === tIdx;
               const isAssignTarget = room.selectedPlayer != null;
               const teamMembers = room.teams[tIdx] || [];
+              const ts = TEAM_STYLES[tIdx];
+
+              const activeStyle = (isDropTarget || isAssignTarget) ? {
+                borderColor: ts.borderColor,
+                backgroundColor: ts.bgColor,
+              } : {};
 
               return (
                 <div
                   key={tIdx}
                   className={`rounded-xl border-2 border-dashed p-2.5 min-h-[70px] transition-all duration-200 ${
-                    isDropTarget
-                      ? `${TEAM_BORDER_COLORS[tIdx]} ${TEAM_BG_COLORS[tIdx]} scale-[1.03] shadow-lg`
-                      : isAssignTarget
-                        ? `${TEAM_BORDER_COLORS[tIdx]} ${TEAM_BG_COLORS[tIdx]} hover:scale-[1.01] cursor-pointer`
-                        : 'border-border/30 bg-muted/5 hover:bg-muted/10'
+                    isDropTarget ? 'scale-[1.03] shadow-lg' :
+                    isAssignTarget ? 'hover:scale-[1.01] cursor-pointer' :
+                    'border-border/30 bg-muted/5 hover:bg-muted/10'
                   }`}
+                  style={activeStyle}
                   onDragOver={e => { e.preventDefault(); handleDragOver(e, tIdx); }}
                   onDragLeave={handleDragLeave}
                   onDrop={() => handleDrop(tIdx)}
                   onClick={() => handleTeamClick(tIdx)}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`font-orbitron text-[9px] font-bold tracking-wider ${TEAM_COLORS[tIdx]}`}>
+                    <span className="font-orbitron text-[9px] font-bold tracking-wider" style={{ color: ts.color }}>
                       TEAM {tIdx + 1}
                     </span>
                     <span className="font-rajdhani text-[9px] text-muted-foreground font-semibold">
@@ -604,9 +609,10 @@ const HomeScreen: React.FC = () => {
                   </div>
 
                   {teamMembers.length === 0 && (
-                    <div className={`flex items-center justify-center py-3 rounded-lg border border-dashed transition-colors ${
-                      isDropTarget ? `${TEAM_BORDER_COLORS[tIdx]}` : 'border-border/20'
-                    }`}>
+                    <div
+                      className="flex items-center justify-center py-3 rounded-lg border border-dashed transition-colors"
+                      style={{ borderColor: isDropTarget ? ts.borderColor : undefined }}
+                    >
                       <span className="font-orbitron text-[8px] text-muted-foreground/50 tracking-wider">
                         {isDropTarget ? 'DROP HERE' : 'DRAG PLAYER'}
                       </span>

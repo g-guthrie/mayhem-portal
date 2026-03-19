@@ -564,8 +564,8 @@ const HomeScreen: React.FC = () => {
             </button>
           </div>
         )}
-      </div>
-
+            </div>
+          </div>
 
       {/* ─── Inline Party + Friends sub-panels ─── */}
       <div ref={socialPanelRef} className={`grid gap-2.5 mt-1 ${isLoggedIn ? 'grid-cols-2' : 'grid-cols-1'}`}>

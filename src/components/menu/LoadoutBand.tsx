@@ -121,7 +121,7 @@ const LoadoutBand: React.FC = () => {
           <button
             id="loadout-collapse-btn"
             className="pill-btn !py-1.5 !px-3 text-[10px] ml-auto"
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={toggleCollapsed}
           >
             {collapsed ? '▲ EXPAND LOADOUT' : '▼ COLLAPSE LOADOUT'}
           </button>

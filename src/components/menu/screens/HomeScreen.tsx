@@ -1068,8 +1068,8 @@ const HomeScreen: React.FC = () => {
           RoomCardContent
         ) : (
           <>
-            {showSocialPanel && SocialPanel}
             {RoomCardContent}
+            {showSocialPanel && SocialPanel}
           </>
         )}
       </div>

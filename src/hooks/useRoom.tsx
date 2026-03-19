@@ -197,6 +197,12 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    // Block joining during active match
+    if (matchState !== 'idle') {
+      toast({ title: 'Match in progress', description: 'Cannot join a room while a match is active.', variant: 'destructive' });
+      return;
+    }
+
     const joiner: RoomPlayer = { id: playerId, name: playerName, isCreator: false, isReady: false };
     const existingCreator: RoomPlayer = { id: 'host1', name: 'HostPlayer', isCreator: true, isReady: false };
     const mockExtra = MOCK_PLAYERS.slice(0, 2).map(p => ({ ...p, isCreator: false, isReady: false }));
@@ -217,7 +223,7 @@ export const RoomProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsPaused(false);
     setMatchResult(null);
     initTeams(all, 2);
-  }, [initTeams, isLocked]);
+  }, [initTeams, isLocked, matchState]);
 
   /* ─── Leave room with leadership transfer ─── */
   const leaveRoom = useCallback(() => {

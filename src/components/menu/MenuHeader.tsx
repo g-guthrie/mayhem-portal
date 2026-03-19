@@ -100,6 +100,17 @@ const MenuHeader: React.FC = () => {
               </button>
             </div>
           )}
+          {/* Login button — guest only, next to ID pill */}
+          {!isLoggedIn && current === 'home' && (
+            <button
+              id="menu-login-btn"
+              className="pill-btn active gap-1"
+              onClick={() => push('auth')}
+            >
+              <LogIn className="w-3 h-3" />
+              <span className="text-[10px]">LOGIN</span>
+            </button>
+          )}
         </div>
         <div id="menu-header-actions" className="flex items-center gap-2">
           {/* Quick join — home screen only */}

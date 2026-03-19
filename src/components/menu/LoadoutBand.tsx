@@ -49,12 +49,27 @@ const LoadoutBand: React.FC = () => {
   const [abilitySlot, setAbilitySlot] = useState<0 | 1>(0);
   const [selectedAbilities, setSelectedAbilities] = useState<[string, string]>(['choke', 'missile']);
   const [collapsed, setCollapsed] = useState(false);
+  const [manuallyCollapsed, setManuallyClosed] = useState(false);
 
+  // Auto-collapse on room create, but re-expand when leaving room
   useEffect(() => {
-    const handler = () => setCollapsed(true);
-    window.addEventListener('loadout:collapse', handler);
-    return () => window.removeEventListener('loadout:collapse', handler);
-  }, []);
+    const collapseHandler = () => setCollapsed(true);
+    const expandHandler = () => {
+      if (!manuallyCollapsed) setCollapsed(false);
+    };
+    window.addEventListener('loadout:collapse', collapseHandler);
+    window.addEventListener('loadout:expand', expandHandler);
+    return () => {
+      window.removeEventListener('loadout:collapse', collapseHandler);
+      window.removeEventListener('loadout:expand', expandHandler);
+    };
+  }, [manuallyCollapsed]);
+
+  const toggleCollapsed = () => {
+    const next = !collapsed;
+    setCollapsed(next);
+    setManuallyClosed(next);
+  };
 
   const handleWeaponSelect = (id: string) => {
     setSelectedWeapons(prev => {

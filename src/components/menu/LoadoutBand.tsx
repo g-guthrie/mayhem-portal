@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Crosshair, Bomb, Sword, Zap, Shield, Wind, Flame, Sparkles, Target, Eye, Heart, Anchor, Grip, Rows3, Asterisk } from 'lucide-react';
 
 type ThrowableCategory = 'grenade' | 'blade';
@@ -49,6 +49,12 @@ const LoadoutBand: React.FC = () => {
   const [abilitySlot, setAbilitySlot] = useState<0 | 1>(0);
   const [selectedAbilities, setSelectedAbilities] = useState<[string, string]>(['choke', 'missile']);
   const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setCollapsed(true);
+    window.addEventListener('loadout:collapse', handler);
+    return () => window.removeEventListener('loadout:collapse', handler);
+  }, []);
 
   const handleWeaponSelect = (id: string) => {
     setSelectedWeapons(prev => {

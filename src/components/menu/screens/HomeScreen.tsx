@@ -92,6 +92,7 @@ const HomeScreen: React.FC = () => {
 
   /* Invite player input */
   const [inviteInput, setInviteInput] = useState('');
+  const [invitePartyOpen, setInvitePartyOpen] = useState(false);
 
   /* Room mode dropdown */
   const [roomModeDropdownOpen, setRoomModeDropdownOpen] = useState(false);
@@ -722,28 +723,6 @@ const HomeScreen: React.FC = () => {
 
       {/* Invite + Room Actions — all inline */}
       <div className="flex items-center gap-1.5 flex-nowrap">
-        {(!room.isLocked || room.isCreator) && (
-          <>
-            <input
-              className="glass-input !py-1.5 !px-2 !text-xs min-w-0 flex-1"
-              placeholder="Player..."
-              value={inviteInput}
-              onChange={e => setInviteInput(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && inviteInput.trim()) {
-                  room.invitePlayer(inviteInput.trim());
-                  setInviteInput('');
-                }
-              }}
-            />
-            <button
-              className="pill-btn !px-2 !py-1.5 !text-[9px] gap-1 whitespace-nowrap flex-1"
-              onClick={() => { if (inviteInput.trim()) { room.invitePlayer(inviteInput.trim()); setInviteInput(''); } }}
-            >
-              <UserPlus className="w-2.5 h-2.5" /> INVITE
-            </button>
-          </>
-        )}
         {room.isCreator && (
           <button className="pill-btn !py-1.5 !px-2 !text-[9px] gap-1 whitespace-nowrap flex-1" onClick={room.inviteParty}>
             <Users className="w-3 h-3" /> INVITE PARTY
@@ -773,16 +752,59 @@ const HomeScreen: React.FC = () => {
               <span className="section-label flex items-center gap-1 !mb-0 !text-[9px]">
                 <Users className="w-3 h-3 text-primary" /> PARTY ({partyMembers.length})
               </span>
-              {!isSolo && (
-                <button
-                  className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
-                  onClick={() => { setPartyMembers([{ name: displayName, isLeader: true }]); toast({ title: 'Left party' }); }}
-                >
-                  <LogOut className="w-2.5 h-2.5" />
-                  <span className="hidden sm:inline">LEAVE</span>
-                </button>
-              )}
+              <div className="flex items-center gap-1">
+                {(!room.isLocked || room.isCreator) && (
+                  <button
+                    className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
+                    onClick={() => setInvitePartyOpen(!invitePartyOpen)}
+                    title="Invite to Party"
+                  >
+                    <UserPlus className="w-2.5 h-2.5" />
+                    <span className="hidden sm:inline">INVITE</span>
+                  </button>
+                )}
+                {!isSolo && (
+                  <button
+                    className="pill-btn !px-1.5 !py-0.5 text-[8px] gap-0.5"
+                    onClick={() => { setPartyMembers([{ name: displayName, isLeader: true }]); toast({ title: 'Left party' }); }}
+                  >
+                    <LogOut className="w-2.5 h-2.5" />
+                    <span className="hidden sm:inline">LEAVE</span>
+                  </button>
+                )}
+              </div>
             </div>
+
+            {invitePartyOpen && (
+              <div className="flex gap-1.5 animate-fade-in-up" style={{ animationDuration: '0.15s' }}>
+                <input
+                  className="glass-input flex-1 !py-1 !px-2 !text-xs"
+                  placeholder="Enter player ID..."
+                  value={inviteInput}
+                  onChange={e => setInviteInput(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && inviteInput.trim()) {
+                      room.invitePlayer(inviteInput.trim());
+                      setInviteInput('');
+                      setInvitePartyOpen(false);
+                    }
+                  }}
+                  autoFocus
+                />
+                <button
+                  className="pill-btn active !px-2 !py-1 !text-[9px]"
+                  onClick={() => {
+                    if (!inviteInput.trim()) return;
+                    room.invitePlayer(inviteInput.trim());
+                    setInviteInput('');
+                    setInvitePartyOpen(false);
+                  }}
+                >
+                  SEND
+                </button>
+              </div>
+            )}
+
             <div className="flex flex-col gap-0.5 max-h-[160px] overflow-y-auto">
               {partyMembers.map(m => {
                 const isInFriendsList = friends.some(f => f.name === m.name);
